@@ -1,8 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import MessageBubble from "./MessageBubble";
 import TypingIndicator from "./TypingIndicator";
 import QuickActions from "./QuickActions";
+import QuickReplies from "./QuickReplies";
+import { extractSuggestions } from "@/lib/extractSuggestions";
 import { Zap } from "lucide-react";
 
 interface ChatMessage {
@@ -43,6 +45,21 @@ const ChatMessages = ({
 }: ChatMessagesProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Extract suggestions from the last assistant message
+  const quickReplySuggestions = useMemo(() => {
+    if (isLoading) return [];
+    
+    const filteredMessages = messages.filter(
+      (m) => m.role === "user" || m.role === "assistant"
+    );
+    const lastMessage = filteredMessages[filteredMessages.length - 1];
+    
+    if (lastMessage?.role === "assistant") {
+      return extractSuggestions(lastMessage.content);
+    }
+    return [];
+  }, [messages, isLoading]);
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -71,6 +88,13 @@ const ChatMessages = ({
           ))}
 
         {isLoading && <TypingIndicator />}
+
+        {!isLoading && quickReplySuggestions.length > 0 && (
+          <QuickReplies
+            suggestions={quickReplySuggestions}
+            onSelect={onQuickAction}
+          />
+        )}
       </div>
     </ScrollArea>
   );
