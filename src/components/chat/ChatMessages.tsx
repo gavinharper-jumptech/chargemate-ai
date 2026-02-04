@@ -44,30 +44,78 @@ const ChatMessages = ({
   onQuickAction,
 }: ChatMessagesProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const prevMessageCountRef = useRef(0);
+  const wasLoadingRef = useRef(false);
+
+  // Filter to only user/assistant messages
+  const filteredMessages = useMemo(
+    () => messages.filter((m) => m.role === "user" || m.role === "assistant"),
+    [messages]
+  );
 
   // Extract suggestions from the last assistant message
   const quickReplySuggestions = useMemo(() => {
     if (isLoading) return [];
     
-    const filteredMessages = messages.filter(
-      (m) => m.role === "user" || m.role === "assistant"
-    );
     const lastMessage = filteredMessages[filteredMessages.length - 1];
     
     if (lastMessage?.role === "assistant") {
       return extractSuggestions(lastMessage.content);
     }
     return [];
-  }, [messages, isLoading]);
+  }, [filteredMessages, isLoading]);
 
+  // Smart scroll effect
   useEffect(() => {
-    if (scrollRef.current) {
-      const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (viewport) {
+    const viewport = scrollRef.current?.querySelector('[data-radix-scroll-area-viewport]');
+    if (!viewport) return;
+
+    const currentCount = filteredMessages.length;
+    const prevCount = prevMessageCountRef.current;
+    const wasLoading = wasLoadingRef.current;
+
+    // New message arrived
+    if (currentCount > prevCount) {
+      const newMessage = filteredMessages[currentCount - 1];
+      
+      if (newMessage.role === "user") {
+        // User sent a message - scroll to bottom to show their message + typing indicator
         viewport.scrollTop = viewport.scrollHeight;
+      } else if (newMessage.role === "assistant") {
+        // AI responded - scroll to show the START of the response
+        const messageEl = messageRefs.current.get(newMessage.id);
+        if (messageEl) {
+          // Small delay to ensure render is complete
+          requestAnimationFrame(() => {
+            messageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        }
+      }
+    } 
+    // Loading started (typing indicator appeared)
+    else if (isLoading && !wasLoading) {
+      viewport.scrollTop = viewport.scrollHeight;
+    }
+
+    // Update refs for next comparison
+    prevMessageCountRef.current = currentCount;
+    wasLoadingRef.current = isLoading;
+  }, [filteredMessages, isLoading]);
+
+  // Scroll when quick replies appear
+  useEffect(() => {
+    if (!isLoading && quickReplySuggestions.length > 0) {
+      const viewport = scrollRef.current?.querySelector('[data-radix-scroll-area-viewport]');
+      if (viewport) {
+        // Gentle scroll to ensure chips are visible without jumping
+        const scrollNeeded = viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight;
+        if (scrollNeeded > 0 && scrollNeeded < 100) {
+          viewport.scrollTop = viewport.scrollHeight;
+        }
       }
     }
-  }, [messages, isLoading, quickReplySuggestions]);
+  }, [quickReplySuggestions, isLoading]);
 
   return (
     <ScrollArea className="flex-1" ref={scrollRef}>
@@ -80,15 +128,23 @@ const ChatMessages = ({
           </div>
         )}
 
-        {messages
-          .filter((m) => m.role === "user" || m.role === "assistant")
-          .map((message) => (
+        {filteredMessages.map((message) => (
+          <div
+            key={message.id}
+            ref={(el) => {
+              if (el) {
+                messageRefs.current.set(message.id, el);
+              } else {
+                messageRefs.current.delete(message.id);
+              }
+            }}
+          >
             <MessageBubble
-              key={message.id}
               content={message.content}
               role={message.role as "user" | "assistant"}
             />
-          ))}
+          </div>
+        ))}
 
         {isLoading && <TypingIndicator />}
 
