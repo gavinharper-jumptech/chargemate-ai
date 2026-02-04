@@ -63,6 +63,11 @@ export const useN8nChat = () => {
         const extractString = (value: unknown): string => {
           if (typeof value === "string") return value;
           if (value === null || value === undefined) return "";
+          // Handle arrays - extract from first element
+          if (Array.isArray(value)) {
+            if (value.length > 0) return extractString(value[0]);
+            return "";
+          }
           if (typeof value === "object") {
             const obj = value as Record<string, unknown>;
             // Try common response keys recursively
