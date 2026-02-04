@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useN8nChat } from "@/hooks/use-n8n-chat";
+import { useChatConfig } from "@/context/ChatConfigContext";
 import ChatHeader from "@/components/chat/ChatHeader";
 import ChatMessages from "@/components/chat/ChatMessages";
 import ChatInput from "@/components/chat/ChatInput";
@@ -7,6 +8,7 @@ import ChatInput from "@/components/chat/ChatInput";
 const Index = () => {
   const [showQuickActions, setShowQuickActions] = useState(true);
   const { messages, sendMessage, isLoading } = useN8nChat();
+  const { isEmbedded } = useChatConfig();
 
   const handleSend = (content: string) => {
     setShowQuickActions(false);
@@ -19,7 +21,7 @@ const Index = () => {
 
   return (
     <div className="flex h-screen flex-col bg-background">
-      <ChatHeader />
+      {!isEmbedded && <ChatHeader />}
       <ChatMessages
         messages={messages}
         isLoading={isLoading}

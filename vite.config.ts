@@ -24,4 +24,21 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     include: ["react", "react-dom"],
   },
+  build: {
+    // Widget build configuration (use: npm run build -- --config vite.config.ts --mode widget)
+    ...(mode === "widget" && {
+      lib: {
+        entry: path.resolve(__dirname, "src/widget.tsx"),
+        name: "EVChatWidget",
+        fileName: () => "ev-chat-widget.js",
+        formats: ["iife"],
+      },
+      rollupOptions: {
+        output: {
+          // Ensure CSS is inlined into the JS bundle for easy embedding
+          assetFileNames: "ev-chat-widget[extname]",
+        },
+      },
+    }),
+  },
 }));

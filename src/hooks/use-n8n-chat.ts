@@ -1,8 +1,6 @@
 import { useState, useCallback } from "react";
 import { toast } from "@/hooks/use-toast";
-
-// Replace this with your n8n webhook URL
-const N8N_WEBHOOK_URL = "https://jt-eco.app.n8n.cloud/webhook/1cd4ac0b-7a32-4c9f-9307-d0501ff02822";
+import { getConfig } from "@/lib/chat-config";
 
 interface ChatMessage {
   id: string;
@@ -29,6 +27,9 @@ export const useN8nChat = () => {
     async (content: string) => {
       if (!content.trim()) return;
 
+      // Get webhook URL from config (supports per-embed customization)
+      const { webhookUrl } = getConfig();
+
       // Add user message immediately
       const userMessage: ChatMessage = {
         id: `user-${Date.now()}`,
@@ -40,7 +41,7 @@ export const useN8nChat = () => {
       setIsLoading(true);
 
       try {
-        const response = await fetch(N8N_WEBHOOK_URL, {
+        const response = await fetch(webhookUrl!, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

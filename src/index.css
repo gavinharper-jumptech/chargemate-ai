@@ -2,45 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
-/* EV Home Charging Assistant - Green/Eco Design System */
+/* EV Home Charging Assistant - Embeddable Widget Design System */
+/* Parent sites can override using --jt-ev-chat-* CSS variables */
 
 @layer base {
   :root {
-    --background: 120 20% 98%;
-    --foreground: 150 30% 15%;
+    /* Core theme variables - inherit from parent or use defaults */
+    --background: var(--jt-ev-chat-background, 120 20% 98%);
+    --foreground: var(--jt-ev-chat-foreground, 150 30% 15%);
 
-    --card: 0 0% 100%;
-    --card-foreground: 150 30% 15%;
+    --card: var(--jt-ev-chat-card, 0 0% 100%);
+    --card-foreground: var(--jt-ev-chat-card-foreground, 150 30% 15%);
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 150 30% 15%;
+    --popover: var(--jt-ev-chat-popover, 0 0% 100%);
+    --popover-foreground: var(--jt-ev-chat-popover-foreground, 150 30% 15%);
 
-    --primary: 142 55% 40%;
-    --primary-foreground: 0 0% 100%;
+    --primary: var(--jt-ev-chat-primary, 142 55% 40%);
+    --primary-foreground: var(--jt-ev-chat-primary-foreground, 0 0% 100%);
 
-    --secondary: 120 25% 92%;
-    --secondary-foreground: 150 30% 20%;
+    --secondary: var(--jt-ev-chat-secondary, 120 25% 92%);
+    --secondary-foreground: var(--jt-ev-chat-secondary-foreground, 150 30% 20%);
 
-    --muted: 120 15% 94%;
-    --muted-foreground: 150 10% 45%;
+    --muted: var(--jt-ev-chat-muted, 120 15% 94%);
+    --muted-foreground: var(--jt-ev-chat-muted-foreground, 150 10% 45%);
 
-    --accent: 160 50% 45%;
-    --accent-foreground: 0 0% 100%;
+    --accent: var(--jt-ev-chat-accent, 160 50% 45%);
+    --accent-foreground: var(--jt-ev-chat-accent-foreground, 0 0% 100%);
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: var(--jt-ev-chat-destructive, 0 84.2% 60.2%);
+    --destructive-foreground: var(--jt-ev-chat-destructive-foreground, 210 40% 98%);
 
-    --border: 120 20% 88%;
-    --input: 120 20% 88%;
-    --ring: 142 55% 40%;
+    --border: var(--jt-ev-chat-border, 120 20% 88%);
+    --input: var(--jt-ev-chat-input, 120 20% 88%);
+    --ring: var(--jt-ev-chat-ring, 142 55% 40%);
 
-    --radius: 1rem;
+    --radius: var(--jt-ev-chat-radius, 1rem);
 
     /* Chat-specific tokens */
-    --chat-user: 142 55% 40%;
-    --chat-user-foreground: 0 0% 100%;
-    --chat-assistant: 120 25% 96%;
-    --chat-assistant-foreground: 150 30% 15%;
+    --chat-user: var(--jt-ev-chat-user, 142 55% 40%);
+    --chat-user-foreground: var(--jt-ev-chat-user-foreground, 0 0% 100%);
+    --chat-assistant: var(--jt-ev-chat-assistant, 120 25% 96%);
+    --chat-assistant-foreground: var(--jt-ev-chat-assistant-foreground, 150 30% 15%);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -53,38 +55,38 @@
   }
 
   .dark {
-    --background: 150 25% 8%;
-    --foreground: 120 15% 95%;
+    --background: var(--jt-ev-chat-background, 150 25% 8%);
+    --foreground: var(--jt-ev-chat-foreground, 120 15% 95%);
 
-    --card: 150 25% 12%;
-    --card-foreground: 120 15% 95%;
+    --card: var(--jt-ev-chat-card, 150 25% 12%);
+    --card-foreground: var(--jt-ev-chat-card-foreground, 120 15% 95%);
 
-    --popover: 150 25% 12%;
-    --popover-foreground: 120 15% 95%;
+    --popover: var(--jt-ev-chat-popover, 150 25% 12%);
+    --popover-foreground: var(--jt-ev-chat-popover-foreground, 120 15% 95%);
 
-    --primary: 142 55% 45%;
-    --primary-foreground: 0 0% 100%;
+    --primary: var(--jt-ev-chat-primary, 142 55% 45%);
+    --primary-foreground: var(--jt-ev-chat-primary-foreground, 0 0% 100%);
 
-    --secondary: 150 20% 18%;
-    --secondary-foreground: 120 15% 90%;
+    --secondary: var(--jt-ev-chat-secondary, 150 20% 18%);
+    --secondary-foreground: var(--jt-ev-chat-secondary-foreground, 120 15% 90%);
 
-    --muted: 150 15% 20%;
-    --muted-foreground: 120 10% 60%;
+    --muted: var(--jt-ev-chat-muted, 150 15% 20%);
+    --muted-foreground: var(--jt-ev-chat-muted-foreground, 120 10% 60%);
 
-    --accent: 160 50% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: var(--jt-ev-chat-accent, 160 50% 50%);
+    --accent-foreground: var(--jt-ev-chat-accent-foreground, 0 0% 100%);
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: var(--jt-ev-chat-destructive, 0 62.8% 30.6%);
+    --destructive-foreground: var(--jt-ev-chat-destructive-foreground, 210 40% 98%);
 
-    --border: 150 20% 20%;
-    --input: 150 20% 20%;
-    --ring: 142 55% 45%;
+    --border: var(--jt-ev-chat-border, 150 20% 20%);
+    --input: var(--jt-ev-chat-input, 150 20% 20%);
+    --ring: var(--jt-ev-chat-ring, 142 55% 45%);
 
-    --chat-user: 142 55% 45%;
-    --chat-user-foreground: 0 0% 100%;
-    --chat-assistant: 150 20% 15%;
-    --chat-assistant-foreground: 120 15% 95%;
+    --chat-user: var(--jt-ev-chat-user, 142 55% 45%);
+    --chat-user-foreground: var(--jt-ev-chat-user-foreground, 0 0% 100%);
+    --chat-assistant: var(--jt-ev-chat-assistant, 150 20% 15%);
+    --chat-assistant-foreground: var(--jt-ev-chat-assistant-foreground, 120 15% 95%);
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -104,5 +106,10 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Widget container - applies font family from parent */
+  .jt-ev-chat-widget {
+    font-family: var(--jt-ev-chat-font-family, inherit);
   }
 }

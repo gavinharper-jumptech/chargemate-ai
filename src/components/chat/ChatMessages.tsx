@@ -2,9 +2,10 @@ import { useEffect, useRef, useMemo } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import MessageBubble from "./MessageBubble";
 import TypingIndicator from "./TypingIndicator";
-import QuickActions from "./QuickActions";
+import CategorizedQuickActions from "./CategorizedQuickActions";
 import QuickReplies from "./QuickReplies";
 import { extractSuggestions } from "@/lib/extractSuggestions";
+import { useChatConfig } from "@/context/ChatConfigContext";
 import { Zap } from "lucide-react";
 
 interface ChatMessage {
@@ -20,22 +21,25 @@ interface ChatMessagesProps {
   onQuickAction: (message: string) => void;
 }
 
-const WelcomeMessage = () => (
-  <div className="flex flex-col items-center justify-center gap-4 px-4 py-8 text-center">
-    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-      <Zap className="h-8 w-8 text-primary" />
+const WelcomeMessage = () => {
+  const { welcomeTitle, welcomeMessage } = useChatConfig();
+
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 px-4 py-8 text-center">
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+        <Zap className="h-8 w-8 text-primary" />
+      </div>
+      <div className="space-y-2">
+        <h2 className="text-xl font-semibold text-foreground">
+          {welcomeTitle}
+        </h2>
+        <p className="max-w-md text-muted-foreground">
+          {welcomeMessage}
+        </p>
+      </div>
     </div>
-    <div className="space-y-2">
-      <h2 className="text-xl font-semibold text-foreground">
-        Hi! I'm your EV Home Charging Assistant 🔌
-      </h2>
-      <p className="max-w-md text-muted-foreground">
-        I can help you with everything about charging your electric vehicle at home — 
-        from installation tips to cost calculations and product recommendations.
-      </p>
-    </div>
-  </div>
-);
+  );
+};
 
 const ChatMessages = ({
   messages,
@@ -124,7 +128,7 @@ const ChatMessages = ({
         
         {showQuickActions && (
           <div className="flex justify-center">
-            <QuickActions onSelect={onQuickAction} />
+            <CategorizedQuickActions onSelect={onQuickAction} />
           </div>
         )}
 
