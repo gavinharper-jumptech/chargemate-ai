@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { toast } from "@/hooks/use-toast";
 
 // Replace this with your n8n webhook URL
-const N8N_WEBHOOK_URL = "YOUR_N8N_WEBHOOK_URL_HERE";
+const N8N_WEBHOOK_URL = "https://jt-eco.app.n8n.cloud/webhook/1cd4ac0b-7a32-4c9f-9307-d0501ff02822";
 
 interface ChatMessage {
   id: string;
@@ -14,7 +14,7 @@ interface ChatMessage {
 const generateSessionId = (): string => {
   const stored = sessionStorage.getItem("n8n-session-id");
   if (stored) return stored;
-  
+
   const newId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   sessionStorage.setItem("n8n-session-id", newId);
   return newId;
@@ -25,92 +25,95 @@ export const useN8nChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId] = useState(generateSessionId);
 
-  const sendMessage = useCallback(async (content: string) => {
-    if (!content.trim()) return;
+  const sendMessage = useCallback(
+    async (content: string) => {
+      if (!content.trim()) return;
 
-    // Check if webhook URL is configured
-    if (N8N_WEBHOOK_URL === "YOUR_N8N_WEBHOOK_URL_HERE") {
-      toast({
-        title: "Webhook not configured",
-        description: "Please update the N8N_WEBHOOK_URL in src/hooks/use-n8n-chat.ts",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Add user message immediately
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      role: "user",
-      content: content.trim(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setIsLoading(true);
-
-    try {
-      const response = await fetch(N8N_WEBHOOK_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: content.trim(),
-          sessionId,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      // Check if webhook URL is configured
+      if (N8N_WEBHOOK_URL === "YOUR_N8N_WEBHOOK_URL_HERE") {
+        toast({
+          title: "Webhook not configured",
+          description: "Please update the N8N_WEBHOOK_URL in src/hooks/use-n8n-chat.ts",
+          variant: "destructive",
+        });
+        return;
       }
 
-      // Handle different response formats from n8n
-      const data = await response.text();
-      let assistantContent: string;
+      // Add user message immediately
+      const userMessage: ChatMessage = {
+        id: `user-${Date.now()}`,
+        role: "user",
+        content: content.trim(),
+      };
+
+      setMessages((prev) => [...prev, userMessage]);
+      setIsLoading(true);
 
       try {
-        // Try to parse as JSON first
-        const jsonData = JSON.parse(data);
-        // n8n might return { output: "..." } or { response: "..." } or { text: "..." } or just a string
-        assistantContent = 
-          jsonData.output || 
-          jsonData.response || 
-          jsonData.text || 
-          jsonData.message ||
-          (typeof jsonData === "string" ? jsonData : JSON.stringify(jsonData));
-      } catch {
-        // If not JSON, use the raw text response
-        assistantContent = data;
+        const response = await fetch(N8N_WEBHOOK_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: content.trim(),
+            sessionId,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Handle different response formats from n8n
+        const data = await response.text();
+        let assistantContent: string;
+
+        try {
+          // Try to parse as JSON first
+          const jsonData = JSON.parse(data);
+          // n8n might return { output: "..." } or { response: "..." } or { text: "..." } or just a string
+          assistantContent =
+            jsonData.output ||
+            jsonData.response ||
+            jsonData.text ||
+            jsonData.message ||
+            (typeof jsonData === "string" ? jsonData : JSON.stringify(jsonData));
+        } catch {
+          // If not JSON, use the raw text response
+          assistantContent = data;
+        }
+
+        const assistantMessage: ChatMessage = {
+          id: `assistant-${Date.now()}`,
+          role: "assistant",
+          content: assistantContent,
+        };
+
+        setMessages((prev) => [...prev, assistantMessage]);
+      } catch (error) {
+        console.error("n8n webhook error:", error);
+
+        toast({
+          title: "Connection failed",
+          description: "Could not connect to the AI assistant. Please try again.",
+          variant: "destructive",
+        });
+
+        // Add error message to chat
+        const errorMessage: ChatMessage = {
+          id: `error-${Date.now()}`,
+          role: "assistant",
+          content: "Sorry, I couldn't connect to the server. Please check your connection and try again.",
+        };
+
+        setMessages((prev) => [...prev, errorMessage]);
+      } finally {
+        setIsLoading(false);
       }
-
-      const assistantMessage: ChatMessage = {
-        id: `assistant-${Date.now()}`,
-        role: "assistant",
-        content: assistantContent,
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error("n8n webhook error:", error);
-      
-      toast({
-        title: "Connection failed",
-        description: "Could not connect to the AI assistant. Please try again.",
-        variant: "destructive",
-      });
-
-      // Add error message to chat
-      const errorMessage: ChatMessage = {
-        id: `error-${Date.now()}`,
-        role: "assistant",
-        content: "Sorry, I couldn't connect to the server. Please check your connection and try again.",
-      };
-
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [sessionId]);
+    },
+    [sessionId],
+  );
 
   const clearMessages = useCallback(() => {
     setMessages([]);
