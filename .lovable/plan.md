@@ -1,85 +1,89 @@
 
 
-## Fix Auto-Scroll for Chat Messages
+## Smarter Auto-Scroll for Chat Messages
 
-The chat currently doesn't auto-scroll because the scroll logic is targeting the wrong element.
-
----
-
-### The Problem
-
-The current code does:
-```javascript
-const scrollRef = useRef<HTMLDivElement>(null);
-
-// In useEffect:
-scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-
-// In JSX:
-<ScrollArea ref={scrollRef}>
-```
-
-The issue is that with Radix UI's `ScrollArea`, the ref is attached to the **Root** container, but the actual scrollable element is the internal **Viewport**. Setting `scrollTop` on the root has no effect because the root isn't what scrolls.
+Currently, when the AI responds, the chat scrolls to the very bottom of the response. For long messages, this means users see the end first and have to scroll up to read from the beginning — frustrating, especially on mobile.
 
 ---
 
-### The Fix
+### How Other Chat UIs Handle This
 
-We need to access the Viewport element (the actual scrollable container) rather than the Root. There are two approaches:
+Most chat apps scroll to show the **start** of a new message, not the end. This makes sense because:
+- Users read from top to bottom
+- You want to see where the response begins, then scroll down as you read
+- Only scrolling to bottom makes sense for streaming responses (where content appears gradually)
 
-**Option chosen: Query for the viewport inside the ScrollArea**
-
-Instead of trying to modify the ScrollArea component, we'll:
-1. Keep the ref on the ScrollArea root
-2. Use a query selector to find the viewport element inside it (it has the attribute `data-radix-scroll-area-viewport`)
-3. Scroll that element instead
-
-This is cleaner than modifying the shared UI component and is a common pattern with Radix ScrollArea.
+Since your AI responses arrive all at once (not streamed), the best approach is to scroll so the **top of the new AI message** is visible.
 
 ---
 
-### Implementation Steps
+### The New Scroll Behavior
+
+**When the user sends a message:**
+- Scroll to show their message at the bottom (current behavior is fine here)
+
+**When the AI responds:**
+- Scroll so the **start of the AI response** is visible near the top of the viewport
+- The user can then read naturally and scroll down as needed
+
+**When quick reply chips appear:**
+- Gentle scroll to ensure chips are visible, but don't jump aggressively
+
+---
+
+### Implementation Approach
 
 **File: `src/components/chat/ChatMessages.tsx`**
 
-Update the scroll logic in the `useEffect`:
+1. **Track the last message count** to detect when a new message arrives
+2. **Identify if the new message is from the assistant** 
+3. **Scroll behavior:**
+   - For **user messages**: Continue scrolling to bottom (user knows what they typed)
+   - For **assistant messages**: Scroll so the new message bubble is at the top of the visible area
+   - Use `scrollIntoView({ behavior: 'smooth', block: 'start' })` on the new message element
 
-1. Keep the existing `scrollRef` on the `ScrollArea`
-2. Inside the effect, query for the viewport element using `[data-radix-scroll-area-viewport]`
-3. Scroll that viewport element to the bottom
-4. Add `quickReplySuggestions` to the dependency array so it also scrolls when chips appear
+4. **Add refs to message elements** so we can scroll to specific messages
 
-The updated scroll effect will look like:
-```javascript
-useEffect(() => {
-  if (scrollRef.current) {
-    const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
-    if (viewport) {
-      viewport.scrollTop = viewport.scrollHeight;
-    }
-  }
-}, [messages, isLoading, quickReplySuggestions]);
-```
+The approach:
+- Add a ref to track the last assistant message element
+- When a new assistant message appears, scroll that element into view at the top
+- When user sends a message, scroll to bottom to show their message + typing indicator
 
 ---
 
-### Why This Works
+### Technical Details
 
-- Radix UI's ScrollArea adds `data-radix-scroll-area-viewport` to the actual scrolling container
-- By querying for this element, we get direct access to the scrollable viewport
-- Setting `scrollTop = scrollHeight` scrolls to the bottom
-- The dependency array ensures scrolling happens when:
-  - New messages arrive
-  - Loading state changes (typing indicator appears/disappears)
-  - Quick reply chips appear
+```
+Before (current):
+┌─────────────────────┐
+│ ...older content... │
+│ ...long response... │
+│ ...end of response..│ ← User sees this first
+└─────────────────────┘
+
+After (improved):  
+┌─────────────────────┐
+│ AI Response starts..│ ← User sees this first
+│ ...continues...     │
+│ ...can scroll down..│
+└─────────────────────┘
+```
+
+**Changes needed:**
+
+1. **Track previous message state** using `useRef` to compare current vs previous messages
+2. **Add a ref to each MessageBubble** (using index or id) to scroll to it
+3. **Update scroll logic:**
+   - When `isLoading` becomes true → scroll to bottom (show typing indicator)
+   - When new assistant message appears → scroll to start of that message
+   - When quick replies appear → small scroll to ensure visibility
 
 ---
 
 ### Result
 
-After this change, the chat will automatically scroll to show the latest content whenever:
-- A new user message is sent
-- The AI starts responding (typing indicator appears)
-- The AI finishes responding
-- Quick reply chips appear below the response
+- When you send a message, you'll see your message and the typing indicator
+- When the AI responds, you'll see the beginning of the response
+- On mobile, long responses won't require scrolling back up
+- Natural reading flow from top to bottom
 
