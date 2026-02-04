@@ -1,51 +1,71 @@
 
-## Goal
-Make the assistant’s response render as real, readable Markdown (headings, paragraphs, spacing, and bullet lists) exactly as returned by your n8n AI agent.
+## Add Quick Reply Chips After AI Messages
 
-## What’s happening (root cause)
-- Your UI uses `react-markdown`, which correctly converts `# ...` and `- ...` into `<h1>` and `<ul><li>...</li></ul>`.
-- But Tailwind’s base “preflight” CSS intentionally removes default browser styling for headings and lists:
-  - `h1/h2` lose their default font-size and margins (so headings look like normal text).
-  - `ul/ol` lose `list-style` and padding (so bullets/numbers don’t appear).
-- The styling you added in `MessageBubble.tsx` relies on Tailwind Typography’s `prose` class and `prose-*` variants (like `prose-ul:list-disc`, `prose-headings:...`).
-- The Tailwind Typography plugin is installed (`@tailwindcss/typography` is in `devDependencies`) but it is **not enabled** in `tailwind.config.ts`.  
-  Result: `prose` and `prose-*` variants don’t produce any CSS, so your rendered Markdown looks like plain text.
+This feature will parse the AI's response to detect when it offers choices (like "Would you like me to explain more about specific tariffs, smart charging options, or how to calculate potential savings?") and automatically display clickable chips that let users respond with one tap.
 
-## Fix strategy
-Enable the Tailwind Typography plugin so:
-- headings regain proper size/weight and spacing
-- paragraphs regain margins
-- bullet/number markers appear again
-- your existing `prose-*` override classes in `MessageBubble.tsx` start working as intended
+---
 
-## Implementation steps
-### 1) Enable Tailwind Typography plugin
-**File:** `tailwind.config.ts`
+### How It Will Work
 
-- Update the `plugins` array to include `@tailwindcss/typography` alongside `tailwindcss-animate`.
+1. When the AI finishes responding, we check if the last message contains a question offering choices
+2. We extract the suggested options from that text using pattern matching
+3. We display small, clickable "chips" below the AI's message
+4. When clicked, the chip sends the corresponding message to the AI
+5. The chips disappear once the user sends any message
 
-Expected outcome:
-- The `.prose` class becomes active.
-- `prose-headings:*`, `prose-ul:*`, etc. begin generating CSS.
+---
 
-### 2) Small refinement to list indentation (optional but recommended)
-**File:** `src/components/chat/MessageBubble.tsx`
+### What You'll See
 
-- Once Typography is enabled, verify indentation/spacing visually.
-- If bullets are too close to the left edge, adjust from `prose-ul:pl-4` to `prose-ul:pl-6` (same for `prose-ol`).
-- Optionally add `prose-li:marker:text-chat-assistant-foreground` to ensure bullet markers match your theme.
+After an AI response like:
+> "Would you like me to explain more about specific tariffs, smart charging options, or how to calculate potential savings?"
 
-(These are minor tweaks; the main issue is step 1.)
+You'll see three chips appear:
+- "Explain specific tariffs"
+- "Explain smart charging options"  
+- "Explain how to calculate potential savings"
 
-## Verification (end-to-end)
-1. In the UI, send a message that returns the sample Markdown you pasted (headings + “Key points” list).
-2. Confirm:
-   - `# Home EV Charging Costs` is visually larger/bolder than body text
-   - spacing exists between sections (heading → paragraph → subheading → list → paragraph)
-   - the list shows visible bullet markers and correct indentation
-3. Check in dark mode as well (since your chat uses theme tokens).
+Clicking any chip sends that as your next message.
 
-## Notes / Why this is the correct fix
-- The Markdown is already “clean” and `react-markdown` is already parsing it correctly.
-- The missing headings/bullets/spacing is a styling/reset issue, not a parsing issue.
-- Enabling the already-installed typography plugin is the cleanest, most maintainable approach, and keeps the UI aligned with the `prose`-based styling you’ve already written.
+---
+
+### Implementation Details
+
+**1. Create new component: `src/components/chat/QuickReplies.tsx`**
+- A component that displays an array of reply options as styled chips
+- Reuses similar styling to the existing `QuickActions` component (rounded pills with hover effects)
+- Props: list of suggestions + callback when one is selected
+
+**2. Create helper utility: `src/lib/extractSuggestions.ts`**
+- A function that parses the AI's message to detect questions offering choices
+- Looks for patterns like "Would you like..." or "I can help with..." followed by comma-separated options
+- Returns an array of cleaned-up suggestion strings, or empty array if none found
+- Common patterns to detect:
+  - "Would you like me to [option1], [option2], or [option3]?"
+  - "I can provide more information about [option1], [option2], or [option3]"
+
+**3. Update `src/components/chat/ChatMessages.tsx`**
+- After rendering all messages, check if the last message is from the assistant
+- If so, extract suggestions from that message
+- Display `QuickReplies` component with the extracted options
+- Hide the chips when loading (user is waiting for response) or when there are no suggestions
+
+**4. Update `src/pages/Index.tsx`**
+- The existing `onQuickAction` handler already works for this use case (sends a message and hides initial quick actions)
+- No changes needed here since the same callback can be passed through
+
+---
+
+### Suggestion Extraction Logic
+
+The extraction function will:
+1. Look for the last sentence/paragraph that contains a question mark
+2. Check for patterns like "Would you like", "I can explain", "Do you want to know about"
+3. Split on commas and "or" to find the individual options
+4. Clean up each option (remove "me to", trim whitespace, capitalize first letter)
+5. Return up to 4 suggestions maximum to avoid cluttering the UI
+
+Example transformations:
+- "explain more about specific tariffs" → "Explain specific tariffs"
+- "smart charging options" → "Smart charging options"
+- "how to calculate potential savings" → "How to calculate potential savings"
