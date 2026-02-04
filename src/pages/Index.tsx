@@ -5,10 +5,15 @@ import ChatHeader from "@/components/chat/ChatHeader";
 import ChatMessages from "@/components/chat/ChatMessages";
 import ChatInput from "@/components/chat/ChatInput";
 
-const Index = () => {
+interface IndexProps {
+  /** Override default height behavior for embedded contexts */
+  className?: string;
+}
+
+const Index = ({ className }: IndexProps) => {
   const [showQuickActions, setShowQuickActions] = useState(true);
   const { messages, sendMessage, isLoading } = useN8nChat();
-  const { isEmbedded } = useChatConfig();
+  const { isEmbedded, mode } = useChatConfig();
 
   const handleSend = (content: string) => {
     setShowQuickActions(false);
@@ -19,9 +24,12 @@ const Index = () => {
     handleSend(message);
   };
 
+  // Show header only in standalone mode (not embedded, not window mode)
+  const showHeader = !isEmbedded && mode !== "window";
+
   return (
-    <div className="flex h-screen flex-col bg-background">
-      {!isEmbedded && <ChatHeader />}
+    <div className={className || "flex h-full flex-col bg-background"}>
+      {showHeader && <ChatHeader />}
       <ChatMessages
         messages={messages}
         isLoading={isLoading}

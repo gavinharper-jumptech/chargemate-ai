@@ -3,6 +3,7 @@ import {
   ResolvedConfig,
   getResolvedConfig,
   EVChatConfig,
+  CreateChatOptions,
 } from "@/lib/chat-config";
 
 interface ChatConfigContextValue extends ResolvedConfig {}
@@ -12,7 +13,9 @@ const ChatConfigContext = createContext<ChatConfigContextValue | null>(null);
 interface ChatConfigProviderProps {
   children: ReactNode;
   /** Override config for widget mode - otherwise reads from window.EVChatConfig */
-  overrideConfig?: Partial<EVChatConfig> & { isEmbedded?: boolean };
+  overrideConfig?: Partial<EVChatConfig & CreateChatOptions> & {
+    isEmbedded?: boolean;
+  };
 }
 
 /**
@@ -29,8 +32,8 @@ export function ChatConfigProvider({
   overrideConfig,
 }: ChatConfigProviderProps) {
   const config = useMemo(() => {
-    const baseConfig = getResolvedConfig();
-    
+    const baseConfig = getResolvedConfig(overrideConfig);
+
     // Check for URL-based embedded mode
     const urlEmbedded = isEmbeddedViaUrl();
 
@@ -38,7 +41,8 @@ export function ChatConfigProvider({
       return {
         ...baseConfig,
         ...overrideConfig,
-        isEmbedded: overrideConfig.isEmbedded ?? urlEmbedded ?? baseConfig.isEmbedded,
+        isEmbedded:
+          overrideConfig.isEmbedded ?? urlEmbedded ?? baseConfig.isEmbedded,
       };
     }
 

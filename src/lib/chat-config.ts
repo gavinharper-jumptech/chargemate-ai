@@ -6,18 +6,34 @@ export interface QuestionCategory {
   questions: string[];
 }
 
-export interface EVChatConfig {
-  // Required for embedded mode
-  container?: string; // CSS selector for mount point
+export interface I18nConfig {
+  title?: string;
+  subtitle?: string;
+  inputPlaceholder?: string;
+  getStarted?: string;
+}
 
-  // Optional
+export interface CreateChatOptions {
+  // Required
   webhookUrl?: string;
-  brandName?: string;
 
-  // Categorized questions
+  // Display
+  target?: string; // Default: '#ev-chat'
+  mode?: "window" | "fullscreen"; // Default: 'fullscreen'
+  position?: "bottom-right" | "bottom-left"; // For window mode
+
+  // Content
   categories?: QuestionCategory[];
+  initialMessages?: string[];
 
-  // Welcome message customization
+  // Text customization
+  i18n?: I18nConfig;
+}
+
+// Legacy config interface for backward compatibility
+export interface EVChatConfig extends CreateChatOptions {
+  container?: string; // Alias for target (legacy)
+  brandName?: string;
   welcomeTitle?: string;
   welcomeMessage?: string;
 }
@@ -29,7 +45,7 @@ declare global {
   }
 }
 
-// Default webhook URL (current hardcoded value)
+// Default webhook URL
 const DEFAULT_WEBHOOK_URL =
   "https://jt-eco.app.n8n.cloud/webhook/1cd4ac0b-7a32-4c9f-9307-d0501ff02822";
 
@@ -61,35 +77,65 @@ export const DEFAULT_CATEGORIES: QuestionCategory[] = [
   },
 ];
 
-// Default welcome messages
-const DEFAULT_WELCOME_TITLE = "Hi! I'm your EV Home Charging Assistant 🔌";
-const DEFAULT_WELCOME_MESSAGE =
-  "I can help you with everything about charging your electric vehicle at home — from installation tips to cost calculations and product recommendations.";
+// Default i18n
+const DEFAULT_I18N: I18nConfig = {
+  title: "Hi! I'm your EV Home Charging Assistant 🔌",
+  subtitle:
+    "I can help you with everything about charging your electric vehicle at home — from installation tips to cost calculations and product recommendations.",
+  inputPlaceholder: "Type your message...",
+  getStarted: "Choose a topic to get started",
+};
 
 /**
- * Read configuration from window.EVChatConfig or return defaults
+ * Read configuration from window.EVChatConfig or provided options
  */
-export function getConfig(): EVChatConfig {
-  const config = window.EVChatConfig || {};
+export function getConfig(options?: CreateChatOptions): EVChatConfig {
+  const windowConfig = window.EVChatConfig || {};
+  const mergedOptions = { ...windowConfig, ...options };
 
   return {
-    container: config.container,
-    webhookUrl: config.webhookUrl || DEFAULT_WEBHOOK_URL,
-    brandName: config.brandName,
+    // Target/container
+    target: mergedOptions.target || mergedOptions.container || "#ev-chat",
+    container: mergedOptions.container,
+
+    // Mode and position
+    mode: mergedOptions.mode || "fullscreen",
+    position: mergedOptions.position || "bottom-right",
+
+    // Webhook
+    webhookUrl: mergedOptions.webhookUrl || DEFAULT_WEBHOOK_URL,
+
+    // Content
     categories:
-      config.categories && config.categories.length > 0
-        ? config.categories
+      mergedOptions.categories && mergedOptions.categories.length > 0
+        ? mergedOptions.categories
         : DEFAULT_CATEGORIES,
-    welcomeTitle: config.welcomeTitle || DEFAULT_WELCOME_TITLE,
-    welcomeMessage: config.welcomeMessage || DEFAULT_WELCOME_MESSAGE,
+    initialMessages: mergedOptions.initialMessages,
+
+    // i18n - merge with defaults
+    i18n: {
+      ...DEFAULT_I18N,
+      ...mergedOptions.i18n,
+    },
+
+    // Legacy support
+    brandName: mergedOptions.brandName,
+    welcomeTitle:
+      mergedOptions.welcomeTitle ||
+      mergedOptions.i18n?.title ||
+      DEFAULT_I18N.title,
+    welcomeMessage:
+      mergedOptions.welcomeMessage ||
+      mergedOptions.i18n?.subtitle ||
+      DEFAULT_I18N.subtitle,
   };
 }
 
 /**
- * Check if running in embedded mode (config container is specified)
+ * Check if running in embedded mode
  */
 export function isEmbeddedMode(): boolean {
-  return Boolean(window.EVChatConfig?.container);
+  return Boolean(window.EVChatConfig?.container || window.EVChatConfig?.target);
 }
 
 /**
@@ -99,9 +145,9 @@ export interface ResolvedConfig extends EVChatConfig {
   isEmbedded: boolean;
 }
 
-export function getResolvedConfig(): ResolvedConfig {
+export function getResolvedConfig(options?: CreateChatOptions): ResolvedConfig {
   return {
-    ...getConfig(),
-    isEmbedded: isEmbeddedMode(),
+    ...getConfig(options),
+    isEmbedded: isEmbeddedMode() || Boolean(options),
   };
 }
