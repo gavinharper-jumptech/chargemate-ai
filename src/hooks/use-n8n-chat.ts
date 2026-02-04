@@ -59,16 +59,25 @@ export const useN8nChat = () => {
         const data = await response.text();
         let assistantContent: string;
 
+        // Helper to extract string from potentially nested response
+        const extractString = (value: unknown): string => {
+          if (typeof value === "string") return value;
+          if (value === null || value === undefined) return "";
+          if (typeof value === "object") {
+            const obj = value as Record<string, unknown>;
+            // Try common response keys recursively
+            const content = obj.output || obj.response || obj.text || obj.message || obj.content;
+            if (content) return extractString(content);
+            // Fallback to JSON string
+            return JSON.stringify(value);
+          }
+          return String(value);
+        };
+
         try {
           // Try to parse as JSON first
           const jsonData = JSON.parse(data);
-          // n8n might return { output: "..." } or { response: "..." } or { text: "..." } or just a string
-          assistantContent =
-            jsonData.output ||
-            jsonData.response ||
-            jsonData.text ||
-            jsonData.message ||
-            (typeof jsonData === "string" ? jsonData : JSON.stringify(jsonData));
+          assistantContent = extractString(jsonData);
         } catch {
           // If not JSON, use the raw text response
           assistantContent = data;
