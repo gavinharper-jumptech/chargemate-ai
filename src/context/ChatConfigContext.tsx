@@ -15,22 +15,37 @@ interface ChatConfigProviderProps {
   overrideConfig?: Partial<EVChatConfig> & { isEmbedded?: boolean };
 }
 
+/**
+ * Check if embedded mode is requested via URL parameter
+ */
+function isEmbeddedViaUrl(): boolean {
+  if (typeof window === "undefined") return false;
+  const params = new URLSearchParams(window.location.search);
+  return params.get("embedded") === "true" || params.get("embed") === "true";
+}
+
 export function ChatConfigProvider({
   children,
   overrideConfig,
 }: ChatConfigProviderProps) {
   const config = useMemo(() => {
     const baseConfig = getResolvedConfig();
+    
+    // Check for URL-based embedded mode
+    const urlEmbedded = isEmbeddedViaUrl();
 
     if (overrideConfig) {
       return {
         ...baseConfig,
         ...overrideConfig,
-        isEmbedded: overrideConfig.isEmbedded ?? baseConfig.isEmbedded,
+        isEmbedded: overrideConfig.isEmbedded ?? urlEmbedded ?? baseConfig.isEmbedded,
       };
     }
 
-    return baseConfig;
+    return {
+      ...baseConfig,
+      isEmbedded: urlEmbedded || baseConfig.isEmbedded,
+    };
   }, [overrideConfig]);
 
   return (
