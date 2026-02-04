@@ -5,26 +5,60 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ChatConfigProvider } from "@/context/ChatConfigContext";
 import Index from "./pages/Index";
+import ChatWindow from "./components/chat/ChatWindow";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <ChatConfigProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index className="flex h-screen flex-col bg-background" />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </ChatConfigProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+/**
+ * Read mode from URL parameter for testing
+ * Usage: ?mode=window or ?mode=fullscreen
+ */
+function getModeFromUrl(): "window" | "fullscreen" | undefined {
+  if (typeof window === "undefined") return undefined;
+  const params = new URLSearchParams(window.location.search);
+  const mode = params.get("mode");
+  if (mode === "window" || mode === "fullscreen") return mode;
+  return undefined;
+}
+
+const App = () => {
+  const urlMode = getModeFromUrl();
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <ChatConfigProvider overrideConfig={urlMode ? { mode: urlMode } : undefined}>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route 
+                path="/" 
+                element={
+                  urlMode === "window" ? (
+                    <div className="h-screen bg-muted/30">
+                      <div className="p-8 max-w-2xl">
+                        <h1 className="text-2xl font-bold mb-2">Window Mode Test</h1>
+                        <p className="text-muted-foreground">
+                          Click the chat button in the bottom-right corner to open the chat window.
+                        </p>
+                      </div>
+                      <ChatWindow position="bottom-right" />
+                    </div>
+                  ) : (
+                    <Index className="flex h-screen flex-col bg-background" />
+                  )
+                } 
+              />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </ChatConfigProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
