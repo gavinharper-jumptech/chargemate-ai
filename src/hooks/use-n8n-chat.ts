@@ -29,16 +29,6 @@ export const useN8nChat = () => {
     async (content: string) => {
       if (!content.trim()) return;
 
-      // Check if webhook URL is configured
-      if (N8N_WEBHOOK_URL === "YOUR_N8N_WEBHOOK_URL_HERE") {
-        toast({
-          title: "Webhook not configured",
-          description: "Please update the N8N_WEBHOOK_URL in src/hooks/use-n8n-chat.ts",
-          variant: "destructive",
-        });
-        return;
-      }
-
       // Add user message immediately
       const userMessage: ChatMessage = {
         id: `user-${Date.now()}`,
