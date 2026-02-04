@@ -1,59 +1,51 @@
 
 
-## Connect to n8n Webhook
+## Fix Markdown Formatting for Chat Responses
 
-Configure the chat interface to send messages to your n8n webhook and receive responses.
-
----
-
-### What We'll Do
-
-1. **Update the chat configuration** to use a custom fetch function that sends requests to your n8n webhook URL
-2. **Handle the n8n response format** properly (n8n returns data differently than the AI SDK expects)
-3. **Add error handling** with user-friendly messages if the connection fails
+The chat responses from n8n are showing as plain text instead of nicely formatted content because of two issues that need to be fixed.
 
 ---
 
-### How It Will Work
+### The Problem
 
-When you send a message:
-1. Your message gets sent to the n8n webhook as a POST request
-2. n8n processes it through your AI agent
-3. The response comes back and displays in the chat
+1. **Response format not handled**: Your n8n webhook returns an array like `[{output: "..."}]`, but the code doesn't extract the content from arrays properly - it just converts the whole thing to a JSON string.
+
+2. **Styling needs improvement**: The markdown renderer needs better styling to show headings, bullet points, and paragraphs with proper spacing.
 
 ---
 
-### What You'll Need to Provide
+### What We'll Fix
 
-After I implement this, you'll need to **paste your webhook URL** into the code. It will look something like:
-```
-https://your-n8n-instance.com/webhook/abc123
-```
+**1. Update the response parser** to handle arrays from n8n
+- Detect when the response is an array
+- Extract the first item and then get the `output` field
+- This will give us the actual markdown text instead of a JSON string
+
+**2. Improve the markdown display styling**
+- Add proper spacing between paragraphs
+- Style headings to stand out (larger text, bold)
+- Format bullet points as a proper list with spacing
+- Add margins between sections
+
+---
+
+### Result
+
+After these changes, your chat responses will display with:
+- Large, bold headings for titles like "Home EV Charging Costs"
+- Proper bullet point lists with spacing
+- Paragraph breaks between sections
+- Clean, readable formatting
 
 ---
 
 ### Technical Details
 
-**Changes to `src/pages/Index.tsx`:**
-- Switch from `useChat` to a custom implementation since n8n webhooks don't follow the Vercel AI SDK streaming protocol
-- Create a simple fetch-based approach that:
-  - Sends `{ message: "user's question", sessionId: "unique-id" }` to your webhook
-  - Receives the AI response and displays it
-  - Handles loading states and errors
+**File: `src/hooks/use-n8n-chat.ts`**
+- Update `extractString` function to check if value is an array using `Array.isArray()`
+- If it's an array, recursively extract from the first element
 
-**New utility:**
-- Add a simple session ID generator to maintain conversation context in n8n
-
-**Error handling:**
-- Show a friendly toast message if the webhook fails
-- Display inline error message in chat if something goes wrong
-
----
-
-### n8n Webhook Setup Checklist
-
-Make sure your n8n webhook node is configured to:
-- Accept **POST** requests
-- Return the AI response as plain text or JSON with a `response` or `output` field
-- (Optional) Accept a `sessionId` field if you want conversation memory in n8n
+**File: `src/components/chat/MessageBubble.tsx`**
+- Add more comprehensive Tailwind prose classes for proper markdown styling
+- Include styling for lists (`prose-ul`, `prose-ol`), paragraphs, and proper spacing
 
