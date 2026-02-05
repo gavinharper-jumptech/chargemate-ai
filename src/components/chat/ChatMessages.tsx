@@ -141,6 +141,7 @@ const ChatMessages = ({
           style={useContainerStyling ? {
             border: 'var(--message-container-border)',
             maxWidth: 'var(--message-container-max-width)',
+            minHeight: 'var(--message-container-min-height)',
             width: '100%',
           } : undefined}
         >
