@@ -7,6 +7,7 @@ import { ChatConfigProvider } from "@/context/ChatConfigContext";
 import Index from "./pages/Index";
 import ChatWindow from "./components/chat/ChatWindow";
 import NotFound from "./pages/NotFound";
+import VindisPreview from "./pages/VindisPreview";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +71,7 @@ const App = () => {
                   )
                 } 
               />
+              <Route path="/vindis-preview" element={<VindisPreview />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
