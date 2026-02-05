@@ -11,6 +11,7 @@ export interface I18nConfig {
   subtitle?: string;
   inputPlaceholder?: string;
   getStarted?: string;
+  sendButtonText?: string; // Custom text for send button (fullscreen only)
 }
 
 export interface CreateChatOptions {
