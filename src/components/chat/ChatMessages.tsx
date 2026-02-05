@@ -137,7 +137,7 @@ const ChatMessages = ({
           <div
             className={cn(
               "flex flex-col gap-4",
-              useContainerStyling && "p-4 mx-auto bg-[hsl(var(--message-container-bg))]"
+              useContainerStyling && "p-4 mx-auto bg-[hsl(var(--chat-assistant))]"
             )}
             style={useContainerStyling ? {
               border: 'var(--message-container-border)',
