@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { MessageCircle, X, RotateCcw } from "lucide-react";
+import { useState } from "react";
+import { MessageCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Index from "@/pages/Index";
 
@@ -9,11 +9,6 @@ interface ChatWindowProps {
 
 const ChatWindow = ({ position = "bottom-right" }: ChatWindowProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const clearMessagesRef = useRef<(() => void) | null>(null);
-
-  const handleNewChat = () => {
-    clearMessagesRef.current?.();
-  };
 
   const positionClasses = {
     "bottom-right": "right-4 bottom-4",
@@ -48,14 +43,6 @@ const ChatWindow = ({ position = "bottom-right" }: ChatWindowProps) => {
             <span className="font-medium text-foreground">Chat Assistant</span>
           </div>
           <button
-            onClick={handleNewChat}
-            className="p-1.5 rounded-lg hover:bg-muted transition-colors"
-            aria-label="Start new chat"
-            title="New chat"
-          >
-            <RotateCcw className="h-4 w-4 text-muted-foreground" />
-          </button>
-          <button
             onClick={() => setIsOpen(false)}
             className="p-1.5 rounded-lg hover:bg-muted transition-colors"
             aria-label="Close chat"
@@ -66,7 +53,7 @@ const ChatWindow = ({ position = "bottom-right" }: ChatWindowProps) => {
 
         {/* Chat Content */}
         <div className="h-[calc(100%-56px)]">
-          <Index onClearMessagesRef={(fn) => { clearMessagesRef.current = fn; }} />
+          <Index />
         </div>
       </div>
 
