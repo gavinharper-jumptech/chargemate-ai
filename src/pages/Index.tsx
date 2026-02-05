@@ -55,7 +55,7 @@ const Index = ({ className }: IndexProps) => {
 
   // Default: input below layout (traditional chat style)
   return (
-    <div className={className || "flex h-full flex-col bg-background"}>
+    <div className={className || "flex h-full flex-col bg-background overflow-hidden"}>
       {showHeader && <ChatHeader />}
       <ChatMessages
         messages={messages}

@@ -37,24 +37,24 @@
    return (
      <div className="flex flex-col w-full">
        {/* Category Tabs */}
-        <div className="flex justify-center border-b border-border overflow-x-auto overflow-y-hidden scrollbar-hide">
-         {categories.map((category) => (
-           <button
-             key={category.title}
-             type="button"
-             onClick={() => setActiveCategory(category.title)}
-             className={cn(
-               "px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors",
-               "border-b-2 -mb-px flex-shrink-0",
-               activeCategory === category.title
-                 ? "border-primary text-primary"
-                 : "border-transparent text-muted-foreground hover:text-foreground"
-             )}
-           >
-             {category.title.toUpperCase()}
-           </button>
-         ))}
-       </div>
+        <div className="flex border-b border-border overflow-x-auto overflow-y-hidden scrollbar-hide">
+          {categories.map((category) => (
+            <button
+              key={category.title}
+              type="button"
+              onClick={() => setActiveCategory(category.title)}
+              className={cn(
+                "px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors",
+                "border-b-2 -mb-px flex-shrink-0",
+                activeCategory === category.title
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {category.title.toUpperCase()}
+            </button>
+          ))}
+        </div>
  
        {/* Questions - Chips on desktop, Dropdown on mobile */}
        <div className="p-4">

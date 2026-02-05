@@ -117,7 +117,7 @@ const ChatMessages = ({
   }, [quickReplySuggestions, isLoading]);
 
   return (
-    <ScrollArea className="flex-1" ref={scrollRef}>
+    <ScrollArea className="flex-1 min-h-0" ref={scrollRef}>
       <div className="flex flex-col gap-4 p-4">
         {!hideWelcome && <WelcomeMessage />}
         
