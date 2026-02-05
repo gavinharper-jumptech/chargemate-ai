@@ -1,179 +1,132 @@
 
-# Widget User Guide Documentation
+# GitHub Actions Workflow for Widget Build
 
 ## Overview
-Create a comprehensive markdown documentation file that covers all widget configuration options and CSS theming capabilities, suitable for developers integrating the widget into their sites.
+Create a GitHub Actions workflow that automatically builds the standalone widget and commits the output files to the `public/` folder. This enables the widget to be served directly from your Lovable app URL, avoiding CDN dependencies and maintaining your existing DPA coverage.
 
-## Document Structure
+## What Will Be Created
 
-### File: `docs/WIDGET_GUIDE.md`
+### File: `.github/workflows/build-widget.yml`
 
-The guide will be organized into the following sections:
+A workflow that:
+1. Triggers on pushes to the main branch (when source files change)
+2. Installs dependencies and builds the widget using `vite.config.widget.ts`
+3. Copies the built files (`ev-chat.js`, `style.css`) to `public/widget/`
+4. Commits and pushes the changes back to the repository
+5. Syncs automatically to Lovable via bidirectional sync
 
----
+## Workflow Configuration
 
-### 1. Quick Start
-- CDN installation (script + link tags)
-- Basic `createChat()` usage with minimal config
-- Simple fullscreen and window mode examples
+```yaml
+name: Build Widget
 
-### 2. Installation Methods
-- **ES Module import** (recommended for bundlers)
-- **Script tag** (for traditional sites)
-- **Legacy auto-mount** via `window.EVChatConfig`
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'vite.config.widget.ts'
+      - 'package.json'
 
-### 3. Configuration Options
-
-Complete reference for `createChat(options)`:
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `webhookUrl` | string | (internal default) | n8n webhook endpoint for chat |
-| `target` | string | `#ev-chat` | CSS selector for mount container |
-| `mode` | `"fullscreen"` \| `"window"` | `"fullscreen"` | Display mode |
-| `position` | `"bottom-right"` \| `"bottom-left"` | `"bottom-right"` | Window mode button position |
-| `inputPosition` | `"above"` \| `"below"` | `"below"` | Input field placement |
-| `inputLayout` | `"separate"` \| `"embedded"` | `"separate"` | Input/button layout style |
-| `categories` | `QuestionCategory[]` | (defaults) | Quick question categories |
-| `initialMessages` | `string[]` | - | Pre-populated messages |
-| `i18n` | `I18nConfig` | (defaults) | Text customization |
-
-### 4. i18n Configuration
-
-| Property | Default | Description |
-|----------|---------|-------------|
-| `title` | "Hi! I'm your EV Home Charging Assistant..." | Welcome heading |
-| `subtitle` | "I can help you with..." | Welcome description |
-| `inputPlaceholder` | "Type your message..." | Input placeholder text |
-| `getStarted` | "Choose a topic to get started" | Quick actions prompt |
-| `sendButtonText` | - | Custom send button text (fullscreen only) |
-
-### 5. Question Categories
-
-Structure and example:
-```javascript
-categories: [
-  {
-    title: 'Installation',
-    icon: 'Plug', // Optional Lucide icon name
-    questions: [
-      'How do I install a home charger?',
-      'What electrical work is needed?'
-    ]
-  }
-]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - Checkout code
+      - Setup Node.js 20
+      - Install dependencies (npm ci)
+      - Build widget (npx vite build --config vite.config.widget.ts)
+      - Copy dist/ files to public/widget/
+      - Commit and push if changes exist
 ```
 
-### 6. CSS Theming Reference
+## File Locations
 
-Complete list of `--jt-ev-chat-*` CSS variables organized by category:
+**Built files will be placed in:**
+- `public/widget/ev-chat.js` - The widget JavaScript module
+- `public/widget/style.css` - The widget styles
 
-**Core Colors:**
-- `--jt-ev-chat-background` - Page/widget background
-- `--jt-ev-chat-foreground` - Default text color
-- `--jt-ev-chat-card` - Card/panel backgrounds
-- `--jt-ev-chat-primary` - Primary accent color (buttons, links)
-- `--jt-ev-chat-primary-hover` - Primary hover state
-- `--jt-ev-chat-primary-foreground` - Text on primary backgrounds
-- etc.
+**Why a subfolder?** Using `public/widget/` keeps widget files organized and separate from other public assets, making it clear which files are auto-generated.
 
-**Border Radii:**
-- `--jt-ev-chat-radius` - Global default radius
-- `--jt-ev-chat-input-radius` - Input field corners
-- `--jt-ev-chat-button-radius` - Button corners
-- `--jt-ev-chat-chip-radius` - Quick action chip corners
-- `--jt-ev-chat-message-bubble-radius` - Message bubble corners
-- `--jt-ev-chat-message-bubble-tail-radius` - Bubble tail corner
+## Package.json Update
 
-**Chip Styling:**
-- `--jt-ev-chat-chip-bg` - Chip background (HSL values)
-- `--jt-ev-chat-chip-text` - Chip text color
-- `--jt-ev-chat-chip-border` - Chip border (full CSS value)
-- `--jt-ev-chat-chip-hover-bg` - Hover background
-- `--jt-ev-chat-chip-hover-border` - Hover border
-- `--jt-ev-chat-chip-hover-text` - Hover text color
-
-**Input Styling:**
-- `--jt-ev-chat-input` - Input border color
-- `--jt-ev-chat-input-text` - Input text color
-- `--jt-ev-chat-input-container-bg` - Input container background
-- `--jt-ev-chat-input-container-border` - Input container border
-
-**Message Bubbles:**
-- `--jt-ev-chat-user` - User message background
-- `--jt-ev-chat-user-foreground` - User message text
-- `--jt-ev-chat-assistant` - Assistant message background
-- `--jt-ev-chat-assistant-foreground` - Assistant message text
-
-**Message Container (fullscreen only):**
-- `--jt-ev-chat-message-container-border` - Container border (full CSS)
-- `--jt-ev-chat-message-container-bg` - Container background
-- `--jt-ev-chat-message-container-max-width` - Max width
-- `--jt-ev-chat-message-container-min-height` - Min height
-
-**Tabs:**
-- `--jt-ev-chat-tab-active-border` - Active tab underline color
-- `--jt-ev-chat-tab-container-border` - Tab container border
-
-**Typography:**
-- `--jt-ev-chat-font-family` - Font stack
-
-### 7. HSL Color Format
-
-Explanation of the HSL format used (without `hsl()` wrapper):
-```css
-/* Format: H S% L% */
---jt-ev-chat-primary: 172 100% 35%;  /* Teal green */
---jt-ev-chat-background: 0 0% 100%;  /* White */
+Add a dedicated build script:
+```json
+"scripts": {
+  "build:widget": "vite build --config vite.config.widget.ts"
+}
 ```
 
-### 8. Complete Examples
+## Vite Config Update
 
-**Basic Integration:**
+Modify `vite.config.widget.ts` to output directly to `public/widget/`:
+```typescript
+outDir: "public/widget",
+```
+
+This eliminates the copy step in the workflow.
+
+## How It Works
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  Developer pushes code to GitHub (or edits in Lovable)         │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  GitHub Actions detects changes in src/, vite.config.widget.ts │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Workflow runs: npm ci → npm run build:widget                  │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Built files committed to public/widget/                       │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Lovable syncs the new files automatically                     │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Widget available at https://your-app.lovable.app/widget/      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Customer Integration
+
+Once deployed, your customers can embed the widget with:
+
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/.../style.css">
+<!-- Styles -->
+<link rel="stylesheet" href="https://your-app.lovable.app/widget/style.css">
+
+<!-- Widget Script -->
 <script type="module">
-  import { createChat } from 'https://cdn.jsdelivr.net/.../ev-chat.js';
-  createChat({ webhookUrl: 'https://...' });
+  import { createChat } from 'https://your-app.lovable.app/widget/ev-chat.js';
+  
+  createChat({
+    webhookUrl: 'https://your-webhook-url.com/chat'
+  });
 </script>
 ```
 
-**Custom Theming Example (Vindis-style):**
-Full working example showing:
-- Custom CSS variables for colors, radii, borders
-- Custom categories and i18n
-- Square corners, custom color scheme
+## Implementation Steps
 
-### 9. Mode Comparison
-
-| Feature | Fullscreen | Window |
-|---------|------------|--------|
-| Container | Fills target element | Floating popup |
-| Input position | Configurable | Always below |
-| Input layout | Separate or embedded | Always separate |
-| Message container border | Configurable | Not shown |
-| Send button text | Configurable | Icon only |
-
-### 10. Cleanup
-
-How to unmount the widget:
-```javascript
-const cleanup = createChat({ ... });
-// Later:
-cleanup();
-```
-
----
+1. Create `.github/workflows/build-widget.yml` - The GitHub Actions workflow file
+2. Update `vite.config.widget.ts` - Change output directory to `public/widget`
+3. Update `package.json` - Add `build:widget` script
+4. Update `docs/WIDGET_GUIDE.md` - Update URLs to reflect the new hosting location
 
 ## Technical Notes
 
-- All CSS variables use HSL values without the `hsl()` wrapper for consistency
-- The `.jt-ev-chat-widget` class scopes all theming to prevent conflicts with parent sites
-- Variables cascade: component-specific overrides fall back to global values
-- Dark mode support is included but requires `.dark` class on container
-
-## File Location
-
-Create at: `docs/WIDGET_GUIDE.md`
-
-This location keeps documentation separate from source code and is CDN-friendly for linking in release notes.
+- The workflow uses `actions/checkout` with a token that allows pushing back to the repo
+- Uses `git diff --quiet` to avoid empty commits when no changes occur
+- Sourcemaps are included for debugging (can be disabled for production if preferred)
+- The workflow only runs when relevant source files change, avoiding unnecessary builds
