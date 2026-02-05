@@ -16,7 +16,8 @@ const QuickReplies = ({ suggestions, onSelect }: QuickRepliesProps) => {
           variant="outline"
           size="sm"
           onClick={() => onSelect(suggestion)}
-          className="rounded-full border-primary/30 bg-card text-foreground hover:bg-primary hover:text-primary-foreground transition-colors text-xs"
+          className="border-[var(--chip-border)] bg-[hsl(var(--chip-bg))] text-[hsl(var(--chip-text))] transition-colors h-auto py-2 px-3 hover:bg-[hsl(var(--chip-hover-bg))] hover:border-[hsl(var(--chip-hover-border))] hover:text-[hsl(var(--chip-hover-text))]"
+          style={{ borderRadius: 'var(--chip-radius)' }}
         >
           {suggestion}
         </Button>
