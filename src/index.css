@@ -50,6 +50,8 @@
     --input-container-border: var(--jt-ev-chat-input-container-border, hsl(var(--border)));
 
     /* Chip styling */
+    --chip-bg: var(--jt-ev-chat-chip-bg, var(--card));
+    --chip-text: var(--jt-ev-chat-chip-text, var(--foreground));
     --chip-border: var(--jt-ev-chat-chip-border, hsl(var(--primary) / 0.3));
     --chip-hover-bg: var(--jt-ev-chat-chip-hover-bg, var(--primary));
     --chip-hover-border: var(--jt-ev-chat-chip-hover-border, var(--primary));
@@ -126,6 +128,8 @@
     --input-container-border: var(--jt-ev-chat-input-container-border, hsl(var(--border)));
 
     /* Chip styling (dark mode) */
+    --chip-bg: var(--jt-ev-chat-chip-bg, var(--card));
+    --chip-text: var(--jt-ev-chat-chip-text, var(--foreground));
     --chip-border: var(--jt-ev-chat-chip-border, hsl(var(--primary) / 0.3));
     --chip-hover-bg: var(--jt-ev-chat-chip-hover-bg, var(--primary));
     --chip-hover-border: var(--jt-ev-chat-chip-hover-border, var(--primary));
@@ -208,6 +212,8 @@
     --input-container-border: var(--jt-ev-chat-input-container-border, hsl(var(--border)));
     
     /* Chip styling */
+    --chip-bg: var(--jt-ev-chat-chip-bg, var(--card));
+    --chip-text: var(--jt-ev-chat-chip-text, var(--foreground));
     --chip-border: var(--jt-ev-chat-chip-border, hsl(var(--primary) / 0.3));
     --chip-hover-bg: var(--jt-ev-chat-chip-hover-bg, var(--primary));
     --chip-hover-border: var(--jt-ev-chat-chip-hover-border, var(--primary));
