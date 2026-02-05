@@ -1,6 +1,10 @@
-import { Zap, Leaf } from "lucide-react";
+import { Zap, Leaf, RotateCcw } from "lucide-react";
 
-const ChatHeader = () => {
+interface ChatHeaderProps {
+  onNewChat?: () => void;
+}
+
+const ChatHeader = ({ onNewChat }: ChatHeaderProps) => {
   return (
     <header className="flex items-center gap-3 border-b border-border bg-card px-6 py-4">
       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary">
@@ -10,6 +14,16 @@ const ChatHeader = () => {
         <h1 className="text-lg font-semibold text-foreground">EV Home Charging Assistant</h1>
         <p className="text-sm text-muted-foreground">Your friendly guide to home EV charging</p>
       </div>
+      {onNewChat && (
+        <button
+          onClick={onNewChat}
+          className="p-2 rounded-lg hover:bg-muted transition-colors"
+          aria-label="Start new chat"
+          title="New chat"
+        >
+          <RotateCcw className="h-5 w-5 text-muted-foreground" />
+        </button>
+      )}
       <Leaf className="h-6 w-6 text-primary opacity-60" />
     </header>
   );
