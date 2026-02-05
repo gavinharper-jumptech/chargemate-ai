@@ -132,50 +132,45 @@ const ChatMessages = ({
           </div>
         )}
 
-        {/* Bordered conversation container - only appears when there are messages */}
-        {filteredMessages.length > 0 && (
-          <div
-            className={cn(
-              "flex flex-col gap-4",
-              useContainerStyling && "p-4 mx-auto bg-[hsl(var(--message-container-bg))]"
-            )}
-            style={useContainerStyling ? {
-              border: 'var(--message-container-border)',
-              maxWidth: 'var(--message-container-max-width)',
-              width: '100%',
-            } : undefined}
-          >
-            {filteredMessages.map((message) => (
-              <div
-                key={message.id}
-                ref={(el) => {
-                  if (el) {
-                    messageRefs.current.set(message.id, el);
-                  } else {
-                    messageRefs.current.delete(message.id);
-                  }
-                }}
-              >
-                <MessageBubble
-                  content={message.content}
-                  role={message.role as "user" | "assistant"}
-                />
-              </div>
-            ))}
-
-            {isLoading && <TypingIndicator />}
-
-            {!isLoading && quickReplySuggestions.length > 0 && (
-              <QuickReplies
-                suggestions={quickReplySuggestions}
-                onSelect={onQuickAction}
+        {/* Bordered conversation container - always visible */}
+        <div
+          className={cn(
+            "flex flex-col gap-4",
+            useContainerStyling && "p-4 mx-auto bg-[hsl(var(--message-container-bg))]"
+          )}
+          style={useContainerStyling ? {
+            border: 'var(--message-container-border)',
+            maxWidth: 'var(--message-container-max-width)',
+            width: '100%',
+          } : undefined}
+        >
+          {filteredMessages.map((message) => (
+            <div
+              key={message.id}
+              ref={(el) => {
+                if (el) {
+                  messageRefs.current.set(message.id, el);
+                } else {
+                  messageRefs.current.delete(message.id);
+                }
+              }}
+            >
+              <MessageBubble
+                content={message.content}
+                role={message.role as "user" | "assistant"}
               />
-            )}
-          </div>
-        )}
+            </div>
+          ))}
 
-        {/* Show typing indicator outside container if no messages yet */}
-        {filteredMessages.length === 0 && isLoading && <TypingIndicator />}
+          {isLoading && <TypingIndicator />}
+
+          {!isLoading && quickReplySuggestions.length > 0 && (
+            <QuickReplies
+              suggestions={quickReplySuggestions}
+              onSelect={onQuickAction}
+            />
+          )}
+        </div>
       </div>
     </ScrollArea>
   );
