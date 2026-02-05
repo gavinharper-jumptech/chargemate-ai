@@ -62,6 +62,7 @@
 
     /* Tab styling */
     --tab-active-border: var(--jt-ev-chat-tab-active-border, var(--primary));
+    --tab-container-border: var(--jt-ev-chat-tab-container-border, hsl(var(--border)));
 
     /* Message bubble radius */
     --message-bubble-radius: var(--jt-ev-chat-message-bubble-radius, 1rem);
@@ -136,6 +137,7 @@
 
     /* Tab styling (dark mode) */
     --tab-active-border: var(--jt-ev-chat-tab-active-border, var(--primary));
+    --tab-container-border: var(--jt-ev-chat-tab-container-border, hsl(var(--border)));
 
     /* Message bubble radius (dark mode) */
     --message-bubble-radius: var(--jt-ev-chat-message-bubble-radius, 1rem);
@@ -216,6 +218,7 @@
 
     /* Tab styling */
     --tab-active-border: var(--jt-ev-chat-tab-active-border, var(--primary));
+    --tab-container-border: var(--jt-ev-chat-tab-container-border, hsl(var(--border)));
 
     /* Message bubble radius */
     --message-bubble-radius: var(--jt-ev-chat-message-bubble-radius, 1rem);
