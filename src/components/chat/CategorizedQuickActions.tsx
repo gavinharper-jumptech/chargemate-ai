@@ -37,10 +37,13 @@ const CategorizedQuickActions = ({ onSelect }: CategorizedQuickActionsProps) => 
    return (
      <div className="flex flex-col w-full">
         {/* Category Tabs */}
-         <div className={cn(
-           "flex border-b border-border overflow-x-auto overflow-y-hidden scrollbar-hide",
-           mode !== "window" && "justify-center"
-         )}>
+          <div 
+            className={cn(
+              "flex overflow-x-auto overflow-y-hidden scrollbar-hide",
+              mode !== "window" && "justify-center"
+            )}
+            style={{ borderBottom: '1px solid var(--tab-container-border)' }}
+          >
            {categories.map((category) => (
             <button
               key={category.title}
