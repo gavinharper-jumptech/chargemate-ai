@@ -27,7 +27,8 @@ const Index = ({ className }: IndexProps) => {
   const showHeader = !isEmbedded && mode !== "window" && mode !== "fullscreen";
 
   // Input above layout: welcome + quick actions + input at top, messages scroll below
-  if (inputPosition === "above") {
+  // Window mode always uses input-below for natural popup chat UX
+  if (inputPosition === "above" && mode !== "window") {
     return (
       <div className={className || "flex h-full flex-col bg-background"}>
         {showHeader && <ChatHeader />}
