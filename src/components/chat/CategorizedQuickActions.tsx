@@ -83,12 +83,12 @@ const CategorizedQuickActions = ({ onSelect }: CategorizedQuickActionsProps) => 
          ) : (
           <div className="flex flex-wrap gap-2 justify-center">
               {activeQuestions.map((question) => (
-                <Button
+              <Button
                   key={question}
                   variant="outline"
                   size="sm"
                   onClick={() => onSelect(question)}
-                  className="border-[var(--chip-border)] bg-card text-foreground transition-colors h-auto py-2 px-3 hover:bg-[hsl(var(--chip-hover-bg))] hover:border-[hsl(var(--chip-hover-border))] hover:text-[hsl(var(--chip-hover-text))]"
+                  className="border-[var(--chip-border)] bg-[hsl(var(--chip-bg))] text-[hsl(var(--chip-text))] transition-colors h-auto py-2 px-3 hover:bg-[hsl(var(--chip-hover-bg))] hover:border-[hsl(var(--chip-hover-border))] hover:text-[hsl(var(--chip-hover-text))]"
                   style={{ borderRadius: 'var(--chip-radius)' }}
                 >
                   {question}
