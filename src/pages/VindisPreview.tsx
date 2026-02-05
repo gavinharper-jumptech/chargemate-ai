@@ -103,6 +103,10 @@ const vindisStyles: React.CSSProperties & Record<string, string> = {
   '--jt-ev-chat-assistant': '203 100% 12%',
   '--jt-ev-chat-assistant-foreground': '0 0% 100%',
   
+  // User message bubble: teal-green background
+  '--jt-ev-chat-user': '172 100% 35%',
+  '--jt-ev-chat-user-foreground': '0 0% 100%',
+  
   // Square message bubbles
   '--jt-ev-chat-message-bubble-radius': '0',
   '--jt-ev-chat-message-bubble-tail-radius': '0',
