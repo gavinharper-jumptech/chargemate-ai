@@ -10,11 +10,11 @@ interface ChatInputProps {
 }
 
 const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
-  const { mode, i18n } = useChatConfig();
+  const config = useChatConfig();
   const [input, setInput] = useState("");
 
   // Show text button only in fullscreen mode when sendButtonText is configured
-  const showTextButton = mode !== "window" && i18n?.sendButtonText;
+  const showTextButton = config.mode !== "window" && config.i18n?.sendButtonText;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -40,7 +40,7 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={i18n?.inputPlaceholder || "Ask me anything about EV home charging..."}
+        placeholder={config.i18n?.inputPlaceholder || "Ask me anything about EV home charging..."}
         className="min-h-[44px] max-h-32 resize-none rounded-xl border-input bg-background"
         disabled={isLoading}
       />
@@ -50,7 +50,7 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
           disabled={!input.trim() || isLoading}
           className="h-11 shrink-0 rounded-xl bg-primary hover:bg-primary/90 px-4"
         >
-          {i18n.sendButtonText}
+          {config.i18n?.sendButtonText}
         </Button>
       ) : (
         <Button
