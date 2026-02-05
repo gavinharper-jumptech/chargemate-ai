@@ -82,6 +82,7 @@ const vindisStyles: React.CSSProperties & Record<string, string> = {
   
   // Input box: white background
   '--jt-ev-chat-input': '0 0% 100%',
+  '--jt-ev-chat-input-container-bg': '0 0% 100%',
   
   // Message container: teal-green border, white bg
   '--jt-ev-chat-message-container-border': '2px solid hsl(172 100% 35%)',
