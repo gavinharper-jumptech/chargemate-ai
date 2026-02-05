@@ -59,8 +59,8 @@ const vindisStyles: React.CSSProperties & Record<string, string> = {
   '--jt-ev-chat-background': '210 20% 98%',
   '--jt-ev-chat-card': '210 20% 98%',
   
-  // Primary = teal-green for button
-  '--jt-ev-chat-primary': '172 100% 35%',
+  // Primary = dark navy for button
+  '--jt-ev-chat-primary': '203 100% 12%',
   '--jt-ev-chat-primary-foreground': '0 0% 100%',
   
   // Muted text styling
