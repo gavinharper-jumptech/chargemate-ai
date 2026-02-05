@@ -92,7 +92,12 @@ const ChatMessages = ({
         if (messageEl) {
           // Small delay to ensure render is complete
           requestAnimationFrame(() => {
-            messageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Calculate scroll position relative to the widget's viewport only
+            // Using scrollTo instead of scrollIntoView prevents the parent page from scrolling
+            const viewportRect = viewport.getBoundingClientRect();
+            const elementRect = messageEl.getBoundingClientRect();
+            const targetScrollTop = viewport.scrollTop + (elementRect.top - viewportRect.top);
+            viewport.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
           });
         }
       }
