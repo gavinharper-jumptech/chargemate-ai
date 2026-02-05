@@ -19,23 +19,25 @@ A customizable, embeddable chat widget for EV home charging assistance.
 
 ## Quick Start
 
-### CDN Installation
+### Script Installation
 
 Add the stylesheet and script to your HTML:
 
 ```html
 <!-- Styles -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/OWNER/REPO@VERSION/dist/style.css">
+<link rel="stylesheet" href="https://YOUR-APP.lovable.app/widget/style.css">
 
 <!-- Widget Script -->
 <script type="module">
-  import { createChat } from 'https://cdn.jsdelivr.net/gh/OWNER/REPO@VERSION/dist/ev-chat.js';
+  import { createChat } from 'https://YOUR-APP.lovable.app/widget/ev-chat.js';
   
   createChat({
     webhookUrl: 'https://your-webhook-url.com/chat'
   });
 </script>
 ```
+
+> **Note**: Replace `YOUR-APP` with your actual Lovable app subdomain.
 
 ### Minimal Fullscreen Example
 
@@ -81,7 +83,7 @@ createChat({
 
 ```html
 <script type="module">
-  import { createChat } from 'https://cdn.jsdelivr.net/.../ev-chat.js';
+  import { createChat } from 'https://YOUR-APP.lovable.app/widget/ev-chat.js';
   createChat({ webhookUrl: 'https://...' });
 </script>
 ```
@@ -326,13 +328,13 @@ This format allows the widget to apply opacity modifiers when needed.
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/.../style.css">
+  <link rel="stylesheet" href="https://YOUR-APP.lovable.app/widget/style.css">
 </head>
 <body>
   <div id="ev-chat" style="height: 100vh;"></div>
   
   <script type="module">
-    import { createChat } from 'https://cdn.jsdelivr.net/.../ev-chat.js';
+    import { createChat } from 'https://YOUR-APP.lovable.app/widget/ev-chat.js';
     
     createChat({
       webhookUrl: 'https://your-api.com/chat'

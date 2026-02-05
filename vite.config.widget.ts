@@ -30,8 +30,8 @@ export default defineConfig({
         },
       },
     },
-    // Output to dist folder
-    outDir: "dist",
+    // Output to public/widget for direct serving from Lovable
+    outDir: "public/widget",
     // Generate sourcemaps for debugging
     sourcemap: true,
   },
