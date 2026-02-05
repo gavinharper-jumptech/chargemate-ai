@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useN8nChat } from "@/hooks/use-n8n-chat";
 import { useChatConfig } from "@/context/ChatConfigContext";
 import ChatHeader from "@/components/chat/ChatHeader";
@@ -13,12 +12,10 @@ interface IndexProps {
 }
 
 const Index = ({ className }: IndexProps) => {
-  const [showQuickActions, setShowQuickActions] = useState(true);
   const { messages, sendMessage, isLoading } = useN8nChat();
   const { isEmbedded, mode, inputPosition } = useChatConfig();
 
   const handleSend = (content: string) => {
-    setShowQuickActions(false);
     sendMessage(content);
   };
 
@@ -38,11 +35,9 @@ const Index = ({ className }: IndexProps) => {
         {/* Static top section */}
         <div className="flex-shrink-0">
           <WelcomeSection />
-          {showQuickActions && (
-            <div className="flex justify-center px-4 pb-4">
-              <CategorizedQuickActions onSelect={handleQuickAction} />
-            </div>
-          )}
+        <div className="flex justify-center px-4 pb-4">
+          <CategorizedQuickActions onSelect={handleQuickAction} />
+        </div>
           <ChatInput onSend={handleSend} isLoading={isLoading} />
         </div>
         
@@ -50,7 +45,6 @@ const Index = ({ className }: IndexProps) => {
         <ChatMessages
           messages={messages}
           isLoading={isLoading}
-          showQuickActions={false}
           onQuickAction={handleQuickAction}
           hideWelcome
         />
@@ -65,7 +59,6 @@ const Index = ({ className }: IndexProps) => {
       <ChatMessages
         messages={messages}
         isLoading={isLoading}
-        showQuickActions={showQuickActions}
         onQuickAction={handleQuickAction}
       />
       <ChatInput onSend={handleSend} isLoading={isLoading} />
