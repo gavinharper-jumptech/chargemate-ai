@@ -1,20 +1,33 @@
 
 
-# Update Widget Documentation for jsDelivr CDN
+# Replace README with EV Chat Widget Documentation
 
 ## Overview
-Update `docs/WIDGET_GUIDE.md` to use jsDelivr CDN URLs instead of direct Lovable app URLs. jsDelivr provides proper CORS headers, enabling the widget to be embedded on any domain without cross-origin errors.
+Replace the current boilerplate README with a proper project README that explains the EV Chat Widget and removes all Lovable references.
 
-## CDN URLs
+## Changes to `README.md`
 
-The widget will be served from:
-- **JavaScript**: `https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/ev-chat.js`
-- **Styles**: `https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/style.css`
+**Complete replacement** with the following content:
 
-## Changes to `docs/WIDGET_GUIDE.md`
+---
 
-### Quick Start Section (lines 26-40)
-Replace Lovable URLs with jsDelivr CDN URLs:
+```markdown
+# Jumptech Chat Widget
+
+A customizable, embeddable chat widget. Built with React, TypeScript, and Tailwind CSS.
+
+## Features
+
+- **Two Display Modes**: Fullscreen (embedded) or floating window with trigger button
+- **Fully Customizable Theming**: 40+ CSS custom properties for complete brand control
+- **i18n Support**: Customize all user-facing text
+- **Quick Question Categories**: Tabbed navigation with predefined questions
+- **Markdown Rendering**: Rich text formatting in chat messages
+- **Responsive Design**: Works on desktop and mobile devices
+
+## Quick Start
+
+Add the widget to any webpage using the jsDelivr CDN:
 
 ```html
 <!-- Styles -->
@@ -30,33 +43,108 @@ Replace Lovable URLs with jsDelivr CDN URLs:
 </script>
 ```
 
-### Script Tag Section (lines 82-89)
-Update the Script Tag installation method with the CDN URL.
+## Configuration
 
-### Basic Integration Example (lines 327-344)
-Update the complete HTML example to use CDN URLs.
+```javascript
+createChat({
+  webhookUrl: 'https://your-api.com/chat',  // Chat API endpoint
+  target: '#chat-container',                 // Mount target (default: #ev-chat)
+  mode: 'fullscreen',                        // 'fullscreen' or 'window'
+  position: 'bottom-right',                  // Floating button position
+  inputPosition: 'below',                    // 'above' or 'below' messages
+  inputLayout: 'separate',                   // 'separate' or 'embedded'
+  
+  categories: [
+    {
+      title: 'Installation',
+      icon: 'Plug',
+      questions: ['How long does installation take?', 'What's included?']
+    }
+  ],
+  
+  i18n: {
+    title: 'Chat with us!',
+    subtitle: 'Ask anything about EV charging.',
+    inputPlaceholder: 'Type your message...',
+    sendButtonText: 'Send'
+  }
+});
+```
 
-### Add CDN Note
-Add a note explaining:
-- jsDelivr automatically serves files from your GitHub repository with proper CORS headers
-- The `@main` tag references the main branch (updates automatically when GitHub Actions builds new versions)
-- For production, consider using a specific commit hash or tag for stability
+## Theming
 
-## Why jsDelivr?
+Customize the widget using CSS custom properties with the `--jt-ev-chat-` prefix:
 
-| Feature | Lovable Static | jsDelivr CDN |
-|---------|----------------|--------------|
-| CORS headers | Not included | Included |
-| Cross-origin embedding | Blocked | Works |
-| Global CDN | No | Yes |
-| Cache invalidation | Manual | Automatic |
-| Cost | Free | Free |
+```css
+#chat-container {
+  --jt-ev-chat-primary: 172 100% 35%;
+  --jt-ev-chat-background: 0 0% 100%;
+  --jt-ev-chat-radius: 0.5rem;
+  --jt-ev-chat-user: 172 100% 35%;
+  --jt-ev-chat-assistant: 220 13% 26%;
+}
+```
 
-## Implementation
+See the [Widget Guide](docs/WIDGET_GUIDE.md) for complete theming reference.
 
-Update these sections in `docs/WIDGET_GUIDE.md`:
-1. Quick Start (lines 26-40) - Main installation snippet
-2. Script Tag method (lines 82-89) - Alternative installation
-3. Basic Integration example (lines 327-344) - Complete HTML example
-4. Add a note about versioning options (`@main` vs `@v1.0.0` vs `@commit-hash`)
+## Development
+
+### Prerequisites
+
+- Node.js 18+ or Bun
+
+### Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+### Build Widget
+
+The widget is automatically built via GitHub Actions when changes are pushed to `main`. The built files are committed to `public/widget/`.
+
+To build manually:
+
+```bash
+bun run vite build --config vite.config.widget.ts
+```
+
+## Tech Stack
+
+- React - UI framework
+- TypeScript - Type safety
+- Vite - Build tool
+- Tailwind CSS - Styling
+- shadcn/ui - UI components
+
+## Documentation
+
+Full documentation including all configuration options, theming variables, and examples:
+
+[Widget Guide](docs/WIDGET_GUIDE.md)
+
+## License
+
+MIT
+```
+
+---
+
+## Summary
+
+| Section | Content |
+|---------|---------|
+| Title | EV Chat Widget |
+| Description | Embeddable chat for EV charging assistance |
+| Features | Display modes, theming, i18n, categories, markdown |
+| Quick Start | jsDelivr CDN integration snippet |
+| Configuration | All main options with examples |
+| Theming | CSS variable overview with link to full docs |
+| Development | Setup and build instructions |
+| Tech Stack | React, TypeScript, Vite, Tailwind |
+| Documentation | Link to WIDGET_GUIDE.md |
 
