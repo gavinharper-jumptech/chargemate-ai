@@ -59,8 +59,8 @@ const vindisStyles: React.CSSProperties & Record<string, string> = {
   '--jt-ev-chat-background': '210 20% 98%',
   '--jt-ev-chat-card': '210 20% 98%',
   
-  // Primary = dark teal/blue for button
-  '--jt-ev-chat-primary': '200 50% 25%',
+  // Primary = teal-green for button
+  '--jt-ev-chat-primary': '172 100% 35%',
   '--jt-ev-chat-primary-foreground': '0 0% 100%',
   
   // Muted text styling
@@ -75,16 +75,16 @@ const vindisStyles: React.CSSProperties & Record<string, string> = {
   '--jt-ev-chat-button-radius': '0',
   '--jt-ev-chat-chip-radius': '0',
   
-  // Chip hover: white bg, teal border
+  // Chip hover: white bg, teal-green border
   '--jt-ev-chat-chip-hover-bg': '0 0% 100%',
-  '--jt-ev-chat-chip-hover-border': '200 50% 25%',
-  '--jt-ev-chat-chip-hover-text': '200 50% 25%',
+  '--jt-ev-chat-chip-hover-border': '172 100% 35%',
+  '--jt-ev-chat-chip-hover-text': '172 100% 35%',
   
   // Input box: white background
   '--jt-ev-chat-input': '0 0% 100%',
   
-  // Message container: teal border, white bg
-  '--jt-ev-chat-message-container-border': '2px solid hsl(200 50% 25%)',
+  // Message container: teal-green border, white bg
+  '--jt-ev-chat-message-container-border': '2px solid hsl(172 100% 35%)',
   '--jt-ev-chat-message-container-max-width': '100%',
   '--jt-ev-chat-message-container-bg': '0 0% 100%',
   '--jt-ev-chat-assistant': '203 100% 12%',
