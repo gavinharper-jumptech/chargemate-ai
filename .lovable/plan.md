@@ -1,36 +1,51 @@
 
 
-## Remove Tiny Scrollbar from Category Tabs
+## Force Input Below in Window Mode
 
-A quick CSS fix to hide the unwanted vertical scrollbar appearing on the category tabs.
+A simple logic change to ensure window mode always uses the traditional "input below" layout, regardless of the `inputPosition` configuration.
 
 ---
 
-### Issue
+### Current Behavior
 
-The category tabs container shows a tiny vertical scrollbar (visible on the right side in your screenshot). This is caused by the container not explicitly hiding vertical overflow.
+The `inputPosition` setting applies to both:
+- Fullscreen/embedded mode ✓ (makes sense)
+- Window mode ✗ (causes overflow issues and unnatural UX)
 
 ---
 
 ### Solution
 
-**File:** `src/components/chat/CategorizedQuickActions.tsx`
+**File:** `src/pages/Index.tsx`
 
-**Line 40 - Add `overflow-y-hidden` to prevent vertical scrollbar:**
+**Line 30 - Update the conditional to exclude window mode:**
 
 ```tsx
 // Current:
-<div className="flex justify-center border-b border-border overflow-x-auto scrollbar-hide">
+if (inputPosition === "above") {
 
 // Updated:
-<div className="flex justify-center border-b border-border overflow-x-auto overflow-y-hidden scrollbar-hide">
+if (inputPosition === "above" && mode !== "window") {
 ```
 
-Adding `overflow-y-hidden` will explicitly hide any vertical scrollbar while keeping the horizontal scroll behavior for mobile/narrow screens.
+This single change ensures:
+- Window mode always uses "input below" layout (natural popup chat UX)
+- Fullscreen/embedded modes respect the `inputPosition` setting
+- Also fixes the overflow issue you reported earlier (since window mode won't use the "above" layout)
+
+---
+
+### File Changes
+
+| File | Action | Description |
+|------|--------|-------------|
+| `src/pages/Index.tsx` | **Edit** | Add `mode !== "window"` check to the input position conditional |
 
 ---
 
 ### Result
 
-The tiny vertical scrollbar will be removed, giving a clean appearance to the category tabs.
+- Window mode popup will always have input at the bottom
+- Fullscreen mode can still use `inputPosition: 'above'` when configured
+- Overflow issue in window mode is resolved as a side effect
 
