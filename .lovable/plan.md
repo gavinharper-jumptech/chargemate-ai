@@ -1,63 +1,65 @@
 
 
-## Fix Embedded Input Container Background
+## Show Message Container Box Always (Not Just After First Message)
 
-The embedded input layout is rendering correctly, but the white container background isn't visible because it uses `bg-background` which is the same grey as the page background. We need the embedded container to have a distinct white background.
+Currently, the bordered conversation container (with the teal-green border) only appears after the user submits their first question. You want this container to always be visible.
 
 ---
 
 ### Root Cause
 
-In `ChatInput.tsx`, the embedded layout container uses:
+In `ChatMessages.tsx`, line 136 has this condition:
 
 ```tsx
-className="flex items-stretch border border-input bg-background overflow-hidden"
+{filteredMessages.length > 0 && (
+  <div className="..." style={{ border: 'var(--message-container-border)', ... }}>
+    {/* messages, typing indicator, quick replies */}
+  </div>
+)}
 ```
 
-- `bg-background` resolves to `210 20% 98%` (light grey)
-- Page background is also `210 20% 98%` (light grey)
-- Result: The container blends into the page with no visible distinction
+This means the entire bordered container is hidden until there are messages.
 
 ---
 
 ### Solution
 
-Add a new CSS variable specifically for the embedded input container background, then use it in the component.
-
-| Variable | Purpose | Vindis Value |
-|----------|---------|--------------|
-| `--jt-ev-chat-input-container-bg` | Background of the embedded input container | White (`0 0% 100%`) |
+Remove the conditional rendering so the container always shows, and move the typing indicator inside it. When empty, the container will display as an empty bordered box ready to receive the conversation.
 
 ---
 
 ### Changes Required
 
-#### 1. Add New CSS Variable in `src/index.css`
+#### ChatMessages.tsx
 
-Add to `:root` and `.jt-ev-chat-widget`:
-
-```css
---input-container-bg: var(--jt-ev-chat-input-container-bg, var(--card));
-```
-
-Default to `--card` (white) so the embedded container has a distinct background.
-
-#### 2. Update ChatInput.tsx Embedded Layout
-
-Change the container background from `bg-background` to use the new variable:
-
+**Before (lines 135-179):**
 ```tsx
-// Line 46
-className="flex items-stretch border border-input bg-[hsl(var(--input-container-bg))] overflow-hidden"
+{/* Bordered conversation container - only appears when there are messages */}
+{filteredMessages.length > 0 && (
+  <div className={cn(...)} style={...}>
+    {filteredMessages.map(...)}
+    {isLoading && <TypingIndicator />}
+    {!isLoading && quickReplySuggestions.length > 0 && <QuickReplies ... />}
+  </div>
+)}
+
+{/* Show typing indicator outside container if no messages yet */}
+{filteredMessages.length === 0 && isLoading && <TypingIndicator />}
 ```
 
-#### 3. Update VindisPreview.tsx
-
-Add the input container background variable to explicitly set white:
-
+**After:**
 ```tsx
-'--jt-ev-chat-input-container-bg': '0 0% 100%',
+{/* Bordered conversation container - always visible */}
+<div className={cn(...)} style={...}>
+  {filteredMessages.map(...)}
+  {isLoading && <TypingIndicator />}
+  {!isLoading && quickReplySuggestions.length > 0 && <QuickReplies ... />}
+</div>
 ```
+
+- Remove the `filteredMessages.length > 0 &&` condition
+- Remove the separate typing indicator that was outside the container
+- The container will now always render, showing as an empty bordered box when no messages exist
 
 ---
 
@@ -65,14 +67,13 @@ Add the input container background variable to explicitly set white:
 
 | File | Changes |
 |------|---------|
-| `src/index.css` | Add `--input-container-bg` variable in `:root`, `.dark`, and `.jt-ev-chat-widget` |
-| `src/components/chat/ChatInput.tsx` | Use `bg-[hsl(var(--input-container-bg))]` for embedded container |
-| `src/pages/VindisPreview.tsx` | Set container background to white |
+| `src/components/chat/ChatMessages.tsx` | Remove conditional wrapper, always show the bordered container |
 
 ---
 
 ### Visual Result
 
-Before: The embedded input container blends into the grey page background
-After: The embedded input container has a distinct white background, making the input field and button appear as a unified control
+- **Before first message**: Empty white box with teal-green border visible
+- **After first message**: Same box now contains the conversation
+- The container serves as a visual "stage" where the conversation will appear
 
