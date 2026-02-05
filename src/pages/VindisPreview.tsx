@@ -84,6 +84,7 @@ const vindisStyles: React.CSSProperties & Record<string, string> = {
   // Input box: light gray border, white background, dark text
   '--jt-ev-chat-input': '220 13% 91%',
   '--jt-ev-chat-input-container-bg': '0 0% 100%',
+  '--jt-ev-chat-input-container-border': 'transparent',
   '--jt-ev-chat-input-text': '220 13% 26%',
   
   // Tab underline: teal-green (same as conversation border)

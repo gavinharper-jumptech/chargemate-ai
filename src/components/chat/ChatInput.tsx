@@ -40,7 +40,8 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
     return (
       <form
         onSubmit={handleSubmit}
-        className="border-t border-border bg-card p-4"
+        className="bg-card p-4"
+        style={{ borderTop: '1px solid var(--input-container-border)' }}
       >
         <div 
           className="flex items-stretch border border-input bg-[hsl(var(--input-container-bg))] overflow-hidden"
@@ -77,7 +78,8 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-end gap-2 border-t border-border bg-card p-4"
+      className="flex items-end gap-2 bg-card p-4"
+      style={{ borderTop: '1px solid var(--input-container-border)' }}
     >
       <Textarea
         value={input}
