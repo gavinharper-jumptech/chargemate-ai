@@ -1,88 +1,57 @@
 
 
-## Fix Window Mode Content Overflow & Category Tab Handling
+## Add "New Chat" Button to Reset Conversation
 
-Two related fixes to ensure all content stays within the window panel bounds and handles multiple categories gracefully.
+Add a button to the chat header that clears all messages and generates a fresh session ID, giving users a clean slate to start a new conversation.
 
 ---
 
-### Issue 1: Content Overflowing Window Bounds
+### Changes Overview
 
-**Root Cause:**
-The layout containers lack proper overflow constraints. When using flexbox with `flex-1`, the child needs `min-h-0` to allow proper shrinking, and the parent needs `overflow-hidden` to contain content.
+**1. Update the chat hook to properly reset the session**
 
-**Solution:**
+The current `clearMessages` function removes the session ID but doesn't regenerate one. We need to update it to also set a new session ID so subsequent messages use the fresh ID.
+
+**File: `src/hooks/use-n8n-chat.ts`**
+
+- Convert `sessionId` from `useState` to a ref or mutable state
+- Update `clearMessages` to generate and set a new session ID
+
+---
+
+**2. Pass the reset function to ChatHeader**
+
+ChatHeader needs access to the clear/reset function. We'll pass it as a prop from Index.tsx.
+
+**File: `src/components/chat/ChatHeader.tsx`**
+
+- Add `onNewChat` prop
+- Add a "New Chat" button with a `RotateCcw` or `Plus` icon
+- Style it to match the existing header aesthetic
+
+---
+
+**3. Wire up the reset function in Index.tsx**
+
+Extract `clearMessages` from the hook and pass it to ChatHeader.
 
 **File: `src/pages/Index.tsx`**
 
-Update the default layout container (lines 57-67):
-
-```tsx
-// Current:
-<div className={className || "flex h-full flex-col bg-background"}>
-
-// Updated:
-<div className={className || "flex h-full flex-col bg-background overflow-hidden"}>
-```
-
-**File: `src/components/chat/ChatMessages.tsx`**
-
-Update the ScrollArea to properly fill available space (line 120):
-
-```tsx
-// Current:
-<ScrollArea className="flex-1" ref={scrollRef}>
-
-// Updated:
-<ScrollArea className="flex-1 min-h-0" ref={scrollRef}>
-```
-
-The `min-h-0` is critical for flexbox - it overrides the default `min-height: auto` which prevents flex items from shrinking below their content size.
+- Destructure `clearMessages` from `useN8nChat()`
+- Pass it to `<ChatHeader onNewChat={clearMessages} />`
 
 ---
 
-### Issue 2: Category Tabs Being Cut Off (4+ Categories)
+**4. Add "New Chat" button to ChatWindow header**
 
-**Current Behavior:**
-- Tabs use `overflow-x-auto` - they scroll horizontally but the "PRODUCTS" tab is clipped at the edge
-- No visual indication that more tabs exist
+The window mode has its own inline header. We need to add the reset button there too, which means lifting the reset function up.
 
-**Solution:**
-For the window's limited 380px width, we should:
-1. Make tabs more compact with smaller padding
-2. Keep horizontal scroll but ensure visible scroll indicators
-3. Optionally: For 4+ categories, consider a dropdown alternative
+**File: `src/components/chat/ChatWindow.tsx`**
 
-**File: `src/components/chat/CategorizedQuickActions.tsx`**
+- Use `useN8nChat` directly in ChatWindow OR
+- Create a shared context for the reset function
 
-Update the tabs container and buttons (lines 40-57):
-
-```tsx
-{/* Category Tabs - compact for window mode */}
-<div className="flex border-b border-border overflow-x-auto overflow-y-hidden scrollbar-hide">
-  {categories.map((category) => (
-    <button
-      key={category.title}
-      type="button"
-      onClick={() => setActiveCategory(category.title)}
-      className={cn(
-        "px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors",
-        "border-b-2 -mb-px flex-shrink-0",
-        activeCategory === category.title
-          ? "border-primary text-primary"
-          : "border-transparent text-muted-foreground hover:text-foreground"
-      )}
-    >
-      {category.title.toUpperCase()}
-    </button>
-  ))}
-</div>
-```
-
-Key changes:
-- `px-3` instead of `px-4` (more compact)
-- `text-xs` instead of `text-sm` (smaller text)
-- Removed `justify-center` to let tabs flow naturally from left
+The cleanest approach: Move the chat state to ChatWindow level for window mode, passing the reset function to its header.
 
 ---
 
@@ -90,17 +59,47 @@ Key changes:
 
 | File | Action | Description |
 |------|--------|-------------|
-| `src/pages/Index.tsx` | **Edit** | Add `overflow-hidden` to main container |
-| `src/components/chat/ChatMessages.tsx` | **Edit** | Add `min-h-0` to ScrollArea for proper flex shrinking |
-| `src/components/chat/CategorizedQuickActions.tsx` | **Edit** | Make tabs more compact with smaller padding and text |
+| `src/hooks/use-n8n-chat.ts` | **Edit** | Update `clearMessages` to regenerate session ID |
+| `src/components/chat/ChatHeader.tsx` | **Edit** | Add `onNewChat` prop and "New Chat" button |
+| `src/pages/Index.tsx` | **Edit** | Pass `clearMessages` to ChatHeader |
+| `src/components/chat/ChatWindow.tsx` | **Edit** | Integrate reset button into window header |
+
+---
+
+### Technical Details
+
+**Updated hook logic:**
+```typescript
+// Use state instead of one-time generation
+const [sessionId, setSessionId] = useState(generateSessionId);
+
+const clearMessages = useCallback(() => {
+  setMessages([]);
+  sessionStorage.removeItem("n8n-session-id");
+  // Generate fresh session ID
+  const newId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  sessionStorage.setItem("n8n-session-id", newId);
+  setSessionId(newId);
+}, []);
+```
+
+**ChatHeader button:**
+```tsx
+<button
+  onClick={onNewChat}
+  className="p-2 rounded-lg hover:bg-muted transition-colors"
+  aria-label="Start new chat"
+>
+  <RotateCcw className="h-5 w-5 text-muted-foreground" />
+</button>
+```
 
 ---
 
 ### Result
 
-- All content will stay within window bounds
-- Messages will scroll properly within the available space
-- Category tabs will be more compact and fit better
-- Horizontal scroll still works for many categories, but tabs are more visible
-- No visual clipping of the rightmost tab
+- Users can start fresh conversations at any time
+- The n8n backend will treat it as a new session with no prior context
+- Button is accessible in both window mode and fullscreen/standalone mode
+- Consistent UX across all display modes
 
