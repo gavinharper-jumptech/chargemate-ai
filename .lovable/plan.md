@@ -1,84 +1,31 @@
 
+# Style Quick Response Chips to Match Quick Question Buttons
 
-## Set Input Border and Text Colors for Vindis Preview
+## Overview
+Update the quick response chips (suggestions that appear below AI messages) to use the same CSS variable-based styling as the quick question buttons, ensuring consistent appearance across the widget.
 
-Add CSS variables to control the input box border color and text color, then apply specific values for the Vindis theme.
+## Current State
+- **Quick question buttons** (in `CategorizedQuickActions.tsx`): Use CSS variables (`--chip-bg`, `--chip-text`, `--chip-border`, `--chip-hover-*`, `--chip-radius`)
+- **Quick response chips** (in `QuickReplies.tsx`): Use hardcoded Tailwind classes (`rounded-full`, `border-primary/30`, `bg-card`, etc.)
 
----
+## Changes Required
 
-### Hex to HSL Conversion
+### File: `src/components/chat/QuickReplies.tsx`
 
-| Hex | HSL | Purpose |
-|-----|-----|---------|
-| `#e5e7eb` | `220 13% 91%` | Input border |
-| `#374151` | `220 13% 26%` | Input text |
+Update the Button styling to match the quick question buttons:
 
----
-
-### Changes Required
-
-#### 1. Update VindisPreview.tsx
-
-Set the input border and text colors using existing CSS variable hooks:
-
+**Before:**
 ```tsx
-// Input border - uses --input variable
-'--jt-ev-chat-input': '220 13% 91%',
-
-// Input text - uses --foreground variable for text inside input
-'--jt-ev-chat-foreground': '220 13% 26%',
+className="rounded-full border-primary/30 bg-card text-foreground hover:bg-primary hover:text-primary-foreground transition-colors text-xs"
 ```
 
-However, changing `--foreground` would affect all text in the widget. A more targeted approach is to add a new CSS variable specifically for input text.
-
----
-
-### Recommended Approach
-
-#### Option A: Use Existing Variables (Quick)
-
-If changing the overall foreground color is acceptable:
-- Set `--jt-ev-chat-input: 220 13% 91%` for the border
-- Set `--jt-ev-chat-foreground: 220 13% 26%` for text
-
-#### Option B: Add New Input Text Variable (Precise)
-
-Add a new `--input-text` variable for fine-grained control:
-
-**src/index.css** - Add to `:root`, `.dark`, and `.jt-ev-chat-widget`:
-```css
---input-text: var(--jt-ev-chat-input-text, var(--foreground));
-```
-
-**src/components/chat/ChatInput.tsx** - Apply to Textarea:
+**After:**
 ```tsx
-<Textarea
-  className="... text-[hsl(var(--input-text))]"
-  ...
-/>
+className="border-[var(--chip-border)] bg-[hsl(var(--chip-bg))] text-[hsl(var(--chip-text))] transition-colors h-auto py-2 px-3 hover:bg-[hsl(var(--chip-hover-bg))] hover:border-[hsl(var(--chip-hover-border))] hover:text-[hsl(var(--chip-hover-text))]"
+style={{ borderRadius: 'var(--chip-radius)' }}
 ```
 
-**src/pages/VindisPreview.tsx** - Set values:
-```tsx
-'--jt-ev-chat-input': '220 13% 91%',
-'--jt-ev-chat-input-text': '220 13% 26%',
-```
-
----
-
-### Files to Modify
-
-| File | Changes |
-|------|---------|
-| `src/index.css` | Add `--input-text` variable (Option B) |
-| `src/components/chat/ChatInput.tsx` | Apply text color class to Textarea |
-| `src/pages/VindisPreview.tsx` | Set border and text color values |
-
----
-
-### Result
-
-- Input container border: `#e5e7eb` (light gray)
-- Input text color: `#374151` (dark gray)
-- Other text in the widget remains unaffected
-
+## Result
+For the Vindis theme, both quick question buttons and quick response chips will have:
+- **Inactive**: White background, `#e2e8f0` border, dark navy text, square corners
+- **Hover**: White background, teal `#00b198` border, dark navy text
