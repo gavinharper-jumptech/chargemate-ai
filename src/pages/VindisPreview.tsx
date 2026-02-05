@@ -88,6 +88,7 @@ const vindisStyles: React.CSSProperties & Record<string, string> = {
   '--jt-ev-chat-message-container-border': '2px solid hsl(172 100% 35%)',
   '--jt-ev-chat-message-container-max-width': '100%',
   '--jt-ev-chat-message-container-bg': '0 0% 100%',
+  '--jt-ev-chat-message-container-min-height': '120px',
   '--jt-ev-chat-assistant': '203 100% 12%',
   '--jt-ev-chat-assistant-foreground': '0 0% 100%',
   
