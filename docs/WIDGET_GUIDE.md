@@ -344,7 +344,7 @@ This format allows the widget to apply opacity modifiers when needed.
 </html>
 ```
 
-### Custom Branded Theme (Vindis-style)
+### Example Custom Branded Theme
 
 ```html
 <!DOCTYPE html>
