@@ -132,39 +132,50 @@ const ChatMessages = ({
           </div>
         )}
 
-        {filteredMessages.map((message) => (
+        {/* Bordered conversation container - only appears when there are messages */}
+        {filteredMessages.length > 0 && (
           <div
-            key={message.id}
-            ref={(el) => {
-              if (el) {
-                messageRefs.current.set(message.id, el);
-              } else {
-                messageRefs.current.delete(message.id);
-              }
-            }}
             className={cn(
-              useContainerStyling && message.role === "assistant" && "mx-auto"
+              "flex flex-col gap-4",
+              useContainerStyling && "p-4 mx-auto bg-[hsl(var(--chat-assistant))]"
             )}
-            style={useContainerStyling && message.role === "assistant" ? {
+            style={useContainerStyling ? {
               border: 'var(--message-container-border)',
               maxWidth: 'var(--message-container-max-width)',
+              width: '100%',
             } : undefined}
           >
-            <MessageBubble
-              content={message.content}
-              role={message.role as "user" | "assistant"}
-            />
+            {filteredMessages.map((message) => (
+              <div
+                key={message.id}
+                ref={(el) => {
+                  if (el) {
+                    messageRefs.current.set(message.id, el);
+                  } else {
+                    messageRefs.current.delete(message.id);
+                  }
+                }}
+              >
+                <MessageBubble
+                  content={message.content}
+                  role={message.role as "user" | "assistant"}
+                />
+              </div>
+            ))}
+
+            {isLoading && <TypingIndicator />}
+
+            {!isLoading && quickReplySuggestions.length > 0 && (
+              <QuickReplies
+                suggestions={quickReplySuggestions}
+                onSelect={onQuickAction}
+              />
+            )}
           </div>
-        ))}
-
-        {isLoading && <TypingIndicator />}
-
-        {!isLoading && quickReplySuggestions.length > 0 && (
-          <QuickReplies
-            suggestions={quickReplySuggestions}
-            onSelect={onQuickAction}
-          />
         )}
+
+        {/* Show typing indicator outside container if no messages yet */}
+        {filteredMessages.length === 0 && isLoading && <TypingIndicator />}
       </div>
     </ScrollArea>
   );
