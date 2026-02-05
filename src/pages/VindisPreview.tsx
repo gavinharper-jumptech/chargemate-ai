@@ -86,6 +86,9 @@ const vindisStyles: React.CSSProperties & Record<string, string> = {
   '--jt-ev-chat-input-container-bg': '0 0% 100%',
   '--jt-ev-chat-input-text': '220 13% 26%',
   
+  // Tab underline: teal-green (same as conversation border)
+  '--jt-ev-chat-tab-active-border': '172 100% 35%',
+  
   // Message container: teal-green border, white bg
   '--jt-ev-chat-message-container-border': '2px solid hsl(172 100% 35%)',
   '--jt-ev-chat-message-container-max-width': '100%',

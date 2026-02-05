@@ -60,6 +60,9 @@
     --message-container-bg: var(--jt-ev-chat-message-container-bg, var(--card));
     --message-container-min-height: var(--jt-ev-chat-message-container-min-height, auto);
 
+    /* Tab styling */
+    --tab-active-border: var(--jt-ev-chat-tab-active-border, var(--primary));
+
     /* Message bubble radius */
     --message-bubble-radius: var(--jt-ev-chat-message-bubble-radius, 1rem);
     --message-bubble-tail-radius: var(--jt-ev-chat-message-bubble-tail-radius, 0.375rem);
@@ -130,6 +133,9 @@
     --message-container-max-width: var(--jt-ev-chat-message-container-max-width, 100%);
     --message-container-bg: var(--jt-ev-chat-message-container-bg, var(--card));
     --message-container-min-height: var(--jt-ev-chat-message-container-min-height, auto);
+
+    /* Tab styling (dark mode) */
+    --tab-active-border: var(--jt-ev-chat-tab-active-border, var(--primary));
 
     /* Message bubble radius (dark mode) */
     --message-bubble-radius: var(--jt-ev-chat-message-bubble-radius, 1rem);
@@ -207,6 +213,9 @@
     --message-container-max-width: var(--jt-ev-chat-message-container-max-width, 100%);
     --message-container-bg: var(--jt-ev-chat-message-container-bg, var(--card));
     --message-container-min-height: var(--jt-ev-chat-message-container-min-height, auto);
+
+    /* Tab styling */
+    --tab-active-border: var(--jt-ev-chat-tab-active-border, var(--primary));
 
     /* Message bubble radius */
     --message-bubble-radius: var(--jt-ev-chat-message-bubble-radius, 1rem);
