@@ -43,6 +43,9 @@
     --button-radius: var(--jt-ev-chat-button-radius, var(--radius));
     --chip-radius: var(--jt-ev-chat-chip-radius, 9999px);
 
+    /* Input container background */
+    --input-container-bg: var(--jt-ev-chat-input-container-bg, var(--card));
+
     /* Chip styling */
     --chip-border: var(--jt-ev-chat-chip-border, hsl(var(--primary) / 0.3));
     --chip-hover-bg: var(--jt-ev-chat-chip-hover-bg, var(--primary));
@@ -107,6 +110,9 @@
     --input-radius: var(--jt-ev-chat-input-radius, var(--radius));
     --button-radius: var(--jt-ev-chat-button-radius, var(--radius));
     --chip-radius: var(--jt-ev-chat-chip-radius, 9999px);
+
+    /* Input container background (dark mode) */
+    --input-container-bg: var(--jt-ev-chat-input-container-bg, var(--card));
 
     /* Chip styling (dark mode) */
     --chip-border: var(--jt-ev-chat-chip-border, hsl(var(--primary) / 0.3));
@@ -178,6 +184,9 @@
     --input-radius: var(--jt-ev-chat-input-radius, var(--radius));
     --button-radius: var(--jt-ev-chat-button-radius, var(--radius));
     --chip-radius: var(--jt-ev-chat-chip-radius, 9999px);
+
+    /* Input container background */
+    --input-container-bg: var(--jt-ev-chat-input-container-bg, var(--card));
     
     /* Chip styling */
     --chip-border: var(--jt-ev-chat-chip-border, hsl(var(--primary) / 0.3));
