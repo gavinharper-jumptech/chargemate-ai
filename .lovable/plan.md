@@ -1,47 +1,63 @@
 
 
-## Fix Header Visibility for Fullscreen Mode Testing
+## Remove Lightning Bolt Icon from Welcome Message
 
-The header currently shows when using `?mode=fullscreen` because the logic only hides it for:
-- `isEmbedded = true` (triggered by `?embedded=true`)
-- `mode = "window"`
-
-When testing via URL or when actually embedded via `createChat()`, fullscreen mode should also hide the header.
+This is a simple change to remove the Zap icon from the welcome message area, leaving just the title and subtitle.
 
 ---
 
-### The Fix
+### What Will Change
 
-Update the header visibility logic in `src/pages/Index.tsx` to hide the header whenever a mode is explicitly set (either `window` or `fullscreen`), since both indicate embedded usage:
+**Before:**
+- Lightning bolt icon in a green circle
+- Title below
+- Subtitle below title
 
-**Current:**
-```tsx
-const showHeader = !isEmbedded && mode !== "window";
-```
-
-**Updated:**
-```tsx
-// Hide header when embedded OR when any mode is explicitly set (widget usage)
-const showHeader = !isEmbedded && mode !== "window" && mode !== "fullscreen";
-```
-
-This means:
-- **No URL params**: Header shows (standalone app mode)
-- **`?mode=fullscreen`**: Header hidden (embedded widget testing)
-- **`?mode=window`**: Header hidden (already working)
-- **`?embedded=true`**: Header hidden (iframe embedding)
+**After:**
+- Title only
+- Subtitle below title
+- Cleaner, more minimal welcome area
 
 ---
 
-### File to Modify
+### Implementation
 
-| File | Change |
-|------|--------|
-| `src/pages/Index.tsx` | Update `showHeader` condition to also check for `mode !== "fullscreen"` |
+**File to modify:** `src/components/chat/ChatMessages.tsx`
+
+1. Remove the `Zap` import from lucide-react (line 9)
+2. Remove the icon container div entirely (lines 28-31):
+   ```tsx
+   // DELETE THIS:
+   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+     <Zap className="h-8 w-8 text-primary" />
+   </div>
+   ```
+3. Adjust spacing on the remaining container (reduce top padding since there's no icon above)
+
+---
+
+### Updated WelcomeMessage Component
+
+```tsx
+const WelcomeMessage = () => {
+  const { welcomeTitle, welcomeMessage } = useChatConfig();
+
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 px-4 py-6 text-center">
+      <h2 className="text-xl font-semibold text-foreground">
+        {welcomeTitle}
+      </h2>
+      <p className="max-w-md text-muted-foreground">
+        {welcomeMessage}
+      </p>
+    </div>
+  );
+};
+```
 
 ---
 
 ### Result
 
-After this change, adding `?mode=fullscreen` to your preview URL will show exactly what customers see when they embed the widget - a clean chat interface without the header.
+The welcome area will show just the configurable title and subtitle text, without any icon, giving a cleaner look that works for any brand.
 
