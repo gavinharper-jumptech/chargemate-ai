@@ -22,13 +22,32 @@ function getModeFromUrl(): "window" | "fullscreen" | undefined {
   return undefined;
 }
 
+/**
+ * Read inputPosition from URL parameter for testing
+ * Usage: ?inputPosition=above or ?inputPosition=below
+ */
+function getInputPositionFromUrl(): "above" | "below" | undefined {
+  if (typeof window === "undefined") return undefined;
+  const params = new URLSearchParams(window.location.search);
+  const pos = params.get("inputPosition");
+  if (pos === "above" || pos === "below") return pos;
+  return undefined;
+}
+
 const App = () => {
   const urlMode = getModeFromUrl();
+  const urlInputPosition = getInputPositionFromUrl();
+  
+  // Build override config from URL parameters
+  const overrideConfig = (urlMode || urlInputPosition) ? {
+    ...(urlMode && { mode: urlMode }),
+    ...(urlInputPosition && { inputPosition: urlInputPosition }),
+  } : undefined;
   
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <ChatConfigProvider overrideConfig={urlMode ? { mode: urlMode } : undefined}>
+        <ChatConfigProvider overrideConfig={overrideConfig}>
           <Toaster />
           <Sonner />
           <BrowserRouter>
