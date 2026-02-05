@@ -24,8 +24,8 @@ const Index = ({ className }: IndexProps) => {
     handleSend(message);
   };
 
-  // Show header only in standalone mode (not embedded, not window mode)
-  const showHeader = !isEmbedded && mode !== "window";
+  // Hide header when embedded OR when any mode is explicitly set (widget usage)
+  const showHeader = !isEmbedded && mode !== "window" && mode !== "fullscreen";
 
   return (
     <div className={className || "flex h-full flex-col bg-background"}>
