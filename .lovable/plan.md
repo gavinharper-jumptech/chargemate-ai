@@ -1,33 +1,32 @@
 
 
-## Fix: Separate Container Background from Assistant Bubble Color
+## Fix Embedded Input Container Background
 
-The issue is that the conversation container and the assistant message bubbles are both using the same CSS variable (`--chat-assistant`). When we changed it to dark blue for the bubbles, the entire container background also became dark blue.
+The embedded input layout is rendering correctly, but the white container background isn't visible because it uses `bg-background` which is the same grey as the page background. We need the embedded container to have a distinct white background.
 
 ---
 
-### Current Problem
+### Root Cause
+
+In `ChatInput.tsx`, the embedded layout container uses:
 
 ```tsx
-// ChatMessages.tsx line 140
-className="... bg-[hsl(var(--chat-assistant))]"  // Container background
-
-// MessageBubble.tsx
-className="... bg-chat-assistant"  // Bubble background
+className="flex items-stretch border border-input bg-background overflow-hidden"
 ```
 
-Both use the same `--chat-assistant` variable, so changing one affects the other.
+- `bg-background` resolves to `210 20% 98%` (light grey)
+- Page background is also `210 20% 98%` (light grey)
+- Result: The container blends into the page with no visible distinction
 
 ---
 
 ### Solution
 
-Add a new CSS variable specifically for the message container background, separate from the bubble colors:
+Add a new CSS variable specifically for the embedded input container background, then use it in the component.
 
 | Variable | Purpose | Vindis Value |
 |----------|---------|--------------|
-| `--jt-ev-chat-message-container-bg` | Background of the bordered conversation area | White (`0 0% 100%`) |
-| `--jt-ev-chat-assistant` | Background of AI message bubbles only | Dark blue (`203 100% 12%`) |
+| `--jt-ev-chat-input-container-bg` | Background of the embedded input container | White (`0 0% 100%`) |
 
 ---
 
@@ -38,27 +37,26 @@ Add a new CSS variable specifically for the message container background, separa
 Add to `:root` and `.jt-ev-chat-widget`:
 
 ```css
---message-container-bg: var(--jt-ev-chat-message-container-bg, var(--card));
+--input-container-bg: var(--jt-ev-chat-input-container-bg, var(--card));
 ```
 
-Default to `--card` (white) so existing themes work without changes.
+Default to `--card` (white) so the embedded container has a distinct background.
 
-#### 2. Update ChatMessages.tsx Container
+#### 2. Update ChatInput.tsx Embedded Layout
 
-Change line 140 from:
+Change the container background from `bg-background` to use the new variable:
+
 ```tsx
-bg-[hsl(var(--chat-assistant))]
-```
-to:
-```tsx
-bg-[hsl(var(--message-container-bg))]
+// Line 46
+className="flex items-stretch border border-input bg-[hsl(var(--input-container-bg))] overflow-hidden"
 ```
 
 #### 3. Update VindisPreview.tsx
 
-Add the container background variable to use white:
+Add the input container background variable to explicitly set white:
+
 ```tsx
-'--jt-ev-chat-message-container-bg': '0 0% 100%',
+'--jt-ev-chat-input-container-bg': '0 0% 100%',
 ```
 
 ---
@@ -67,16 +65,14 @@ Add the container background variable to use white:
 
 | File | Changes |
 |------|---------|
-| `src/index.css` | Add `--message-container-bg` variable |
-| `src/components/chat/ChatMessages.tsx` | Use new `--message-container-bg` variable for container |
+| `src/index.css` | Add `--input-container-bg` variable in `:root`, `.dark`, and `.jt-ev-chat-widget` |
+| `src/components/chat/ChatInput.tsx` | Use `bg-[hsl(var(--input-container-bg))]` for embedded container |
 | `src/pages/VindisPreview.tsx` | Set container background to white |
 
 ---
 
 ### Visual Result
 
-- **Container**: White background with teal border
-- **User bubble**: Green background (unchanged)
-- **Assistant bubble**: Dark blue background with white text
-- **Quick reply chips**: Inside the white container
+Before: The embedded input container blends into the grey page background
+After: The embedded input container has a distinct white background, making the input field and button appear as a unified control
 
