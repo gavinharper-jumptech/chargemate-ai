@@ -138,8 +138,51 @@
     @apply bg-background text-foreground;
   }
 
-  /* Widget container - applies font family from parent */
+  /* Widget container - scoped theming for embeddable contexts */
   .jt-ev-chat-widget {
     font-family: var(--jt-ev-chat-font-family, inherit);
+    
+    /* Re-declare all theme tokens within widget scope */
+    --background: var(--jt-ev-chat-background, 120 20% 98%);
+    --foreground: var(--jt-ev-chat-foreground, 150 30% 15%);
+    --card: var(--jt-ev-chat-card, 0 0% 100%);
+    --card-foreground: var(--jt-ev-chat-card-foreground, 150 30% 15%);
+    --popover: var(--jt-ev-chat-popover, 0 0% 100%);
+    --popover-foreground: var(--jt-ev-chat-popover-foreground, 150 30% 15%);
+    --primary: var(--jt-ev-chat-primary, 142 55% 40%);
+    --primary-foreground: var(--jt-ev-chat-primary-foreground, 0 0% 100%);
+    --secondary: var(--jt-ev-chat-secondary, 120 25% 92%);
+    --secondary-foreground: var(--jt-ev-chat-secondary-foreground, 150 30% 20%);
+    --muted: var(--jt-ev-chat-muted, 120 15% 94%);
+    --muted-foreground: var(--jt-ev-chat-muted-foreground, 150 10% 45%);
+    --accent: var(--jt-ev-chat-accent, 160 50% 45%);
+    --accent-foreground: var(--jt-ev-chat-accent-foreground, 0 0% 100%);
+    --destructive: var(--jt-ev-chat-destructive, 0 84.2% 60.2%);
+    --destructive-foreground: var(--jt-ev-chat-destructive-foreground, 210 40% 98%);
+    --border: var(--jt-ev-chat-border, 120 20% 88%);
+    --input: var(--jt-ev-chat-input, 120 20% 88%);
+    --ring: var(--jt-ev-chat-ring, 142 55% 40%);
+    --radius: var(--jt-ev-chat-radius, 1rem);
+    
+    /* Component-specific radius controls */
+    --input-radius: var(--jt-ev-chat-input-radius, var(--radius));
+    --button-radius: var(--jt-ev-chat-button-radius, var(--radius));
+    --chip-radius: var(--jt-ev-chat-chip-radius, 9999px);
+    
+    /* Chip styling */
+    --chip-border: var(--jt-ev-chat-chip-border, hsl(var(--primary) / 0.3));
+    --chip-hover-bg: var(--jt-ev-chat-chip-hover-bg, var(--primary));
+    --chip-hover-border: var(--jt-ev-chat-chip-hover-border, var(--primary));
+    --chip-hover-text: var(--jt-ev-chat-chip-hover-text, var(--primary-foreground));
+    
+    /* Message container styling */
+    --message-container-border: var(--jt-ev-chat-message-container-border, none);
+    --message-container-max-width: var(--jt-ev-chat-message-container-max-width, 100%);
+    
+    /* Chat-specific tokens */
+    --chat-user: var(--jt-ev-chat-user, 142 55% 40%);
+    --chat-user-foreground: var(--jt-ev-chat-user-foreground, 0 0% 100%);
+    --chat-assistant: var(--jt-ev-chat-assistant, 120 25% 96%);
+    --chat-assistant-foreground: var(--jt-ev-chat-assistant-foreground, 150 30% 15%);
   }
 }
