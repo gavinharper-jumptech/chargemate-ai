@@ -6,6 +6,7 @@ import CategorizedQuickActions from "./CategorizedQuickActions";
 import QuickReplies from "./QuickReplies";
 import { extractSuggestions } from "@/lib/extractSuggestions";
 import { useChatConfig } from "@/context/ChatConfigContext";
+import { cn } from "@/lib/utils";
 
 interface ChatMessage {
   id: string;
@@ -46,6 +47,10 @@ const ChatMessages = ({
   const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const prevMessageCountRef = useRef(0);
   const wasLoadingRef = useRef(false);
+  const { mode } = useChatConfig();
+
+  // Apply container styling only in fullscreen mode
+  const useContainerStyling = mode !== "window";
 
   // Filter to only user/assistant messages
   const filteredMessages = useMemo(
@@ -137,6 +142,13 @@ const ChatMessages = ({
                 messageRefs.current.delete(message.id);
               }
             }}
+            className={cn(
+              useContainerStyling && message.role === "assistant" && "mx-auto"
+            )}
+            style={useContainerStyling && message.role === "assistant" ? {
+              border: 'var(--message-container-border)',
+              maxWidth: 'var(--message-container-max-width)',
+            } : undefined}
           >
             <MessageBubble
               content={message.content}

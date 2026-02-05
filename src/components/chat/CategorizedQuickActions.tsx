@@ -78,19 +78,20 @@ const CategorizedQuickActions = ({ onSelect }: CategorizedQuickActionsProps) => 
            </select>
          ) : (
           <div className="flex flex-wrap gap-2 justify-center">
-             {activeQuestions.map((question) => (
-               <Button
-                 key={question}
-                 variant="outline"
-                 size="sm"
-                 onClick={() => onSelect(question)}
-                 className="rounded-full border-primary/30 bg-card text-foreground hover:bg-primary hover:text-primary-foreground transition-colors h-auto py-2 px-3"
-               >
-                 {question}
-               </Button>
-             ))}
-           </div>
-         )}
+              {activeQuestions.map((question) => (
+                <Button
+                  key={question}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onSelect(question)}
+                  className="border-primary/30 bg-card text-foreground transition-colors h-auto py-2 px-3 hover:bg-[hsl(var(--chip-hover-bg))] hover:border-[hsl(var(--chip-hover-border))] hover:text-[hsl(var(--chip-hover-text))]"
+                  style={{ borderRadius: 'var(--chip-radius)' }}
+                >
+                  {question}
+                </Button>
+              ))}
+            </div>
+          )}
        </div>
      </div>
    );

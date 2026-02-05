@@ -3,6 +3,7 @@ import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useChatConfig } from "@/context/ChatConfigContext";
+import { cn } from "@/lib/utils";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -13,6 +14,9 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
   const config = useChatConfig();
   const [input, setInput] = useState("");
 
+  // Embedded layout only applies in fullscreen mode
+  const useEmbeddedLayout = config.mode !== "window" && config.inputLayout === "embedded";
+  
   // Show text button only in fullscreen mode when sendButtonText is configured
   const showTextButton = config.mode !== "window" && config.i18n?.sendButtonText;
 
@@ -31,6 +35,42 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
     }
   };
 
+  // Embedded layout: input and button in one container
+  if (useEmbeddedLayout) {
+    return (
+      <form
+        onSubmit={handleSubmit}
+        className="border-t border-border bg-card p-4"
+      >
+        <div 
+          className="flex items-stretch border border-input bg-background overflow-hidden"
+          style={{ borderRadius: 'var(--input-radius)' }}
+        >
+          <Textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={config.i18n?.inputPlaceholder || "Ask me anything about EV home charging..."}
+            className="min-h-[44px] max-h-32 resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 flex-1"
+            disabled={isLoading}
+          />
+          <Button
+            type="submit"
+            disabled={!input.trim() || isLoading}
+            className={cn(
+              "h-auto shrink-0 bg-primary hover:bg-primary/90 px-6 self-stretch",
+              showTextButton ? "min-w-[140px]" : "w-14"
+            )}
+            style={{ borderRadius: 'var(--button-radius)' }}
+          >
+            {showTextButton ? config.i18n?.sendButtonText : <Send className="h-5 w-5" />}
+          </Button>
+        </div>
+      </form>
+    );
+  }
+
+  // Separate layout (default): input and button side by side with gap
   return (
     <form
       onSubmit={handleSubmit}
@@ -41,14 +81,16 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={config.i18n?.inputPlaceholder || "Ask me anything about EV home charging..."}
-        className="min-h-[44px] max-h-32 resize-none rounded-xl border-input bg-background"
+        className="min-h-[44px] max-h-32 resize-none border-input bg-background"
+        style={{ borderRadius: 'var(--input-radius)' }}
         disabled={isLoading}
       />
       {showTextButton ? (
         <Button
           type="submit"
           disabled={!input.trim() || isLoading}
-          className="h-11 shrink-0 rounded-xl bg-primary hover:bg-primary/90 px-4"
+          className="h-11 shrink-0 bg-primary hover:bg-primary/90 px-4"
+          style={{ borderRadius: 'var(--button-radius)' }}
         >
           {config.i18n?.sendButtonText}
         </Button>
@@ -57,7 +99,8 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
           type="submit"
           size="icon"
           disabled={!input.trim() || isLoading}
-          className="h-11 w-11 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
+          className="h-11 w-11 shrink-0 bg-primary hover:bg-primary/90"
+          style={{ borderRadius: 'var(--button-radius)' }}
         >
           <Send className="h-5 w-5" />
         </Button>
