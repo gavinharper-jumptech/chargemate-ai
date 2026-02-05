@@ -43,7 +43,7 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
         className="border-t border-border bg-card p-4"
       >
         <div 
-          className="flex items-stretch border border-input bg-background overflow-hidden"
+          className="flex items-stretch border border-input bg-[hsl(var(--input-container-bg))] overflow-hidden"
           style={{ borderRadius: 'var(--input-radius)' }}
         >
           <Textarea
