@@ -1,71 +1,64 @@
 
 
-## Add CSS Variables for Message Bubble Border-Radius
+## Fix: Separate Container Background from Assistant Bubble Color
 
-Currently, message bubble corners are hardcoded with Tailwind classes. This plan adds CSS variables to allow themes like Vindis to have square message bubbles.
+The issue is that the conversation container and the assistant message bubbles are both using the same CSS variable (`--chat-assistant`). When we changed it to dark blue for the bubbles, the entire container background also became dark blue.
 
 ---
 
-### Current Implementation
+### Current Problem
 
 ```tsx
-// MessageBubble.tsx - hardcoded radius
-className="rounded-2xl ... rounded-br-md"  // user
-className="rounded-2xl ... rounded-bl-md"  // assistant
+// ChatMessages.tsx line 140
+className="... bg-[hsl(var(--chat-assistant))]"  // Container background
+
+// MessageBubble.tsx
+className="... bg-chat-assistant"  // Bubble background
 ```
+
+Both use the same `--chat-assistant` variable, so changing one affects the other.
+
+---
+
+### Solution
+
+Add a new CSS variable specifically for the message container background, separate from the bubble colors:
+
+| Variable | Purpose | Vindis Value |
+|----------|---------|--------------|
+| `--jt-ev-chat-message-container-bg` | Background of the bordered conversation area | White (`0 0% 100%`) |
+| `--jt-ev-chat-assistant` | Background of AI message bubbles only | Dark blue (`203 100% 12%`) |
 
 ---
 
 ### Changes Required
 
-#### 1. Add New CSS Variables
+#### 1. Add New CSS Variable in `src/index.css`
 
-**File: `src/index.css`**
-
-Add to both `:root` and `.jt-ev-chat-widget`:
+Add to `:root` and `.jt-ev-chat-widget`:
 
 ```css
-/* Message bubble radius */
---message-bubble-radius: var(--jt-ev-chat-message-bubble-radius, 1rem);
---message-bubble-tail-radius: var(--jt-ev-chat-message-bubble-tail-radius, 0.375rem);
+--message-container-bg: var(--jt-ev-chat-message-container-bg, var(--card));
 ```
 
-- `--message-bubble-radius`: Main corner radius (default `1rem` = `rounded-2xl`)
-- `--message-bubble-tail-radius`: The small "tail" corner where the bubble points (default `0.375rem` = `rounded-md`)
+Default to `--card` (white) so existing themes work without changes.
 
-#### 2. Update MessageBubble Component
+#### 2. Update ChatMessages.tsx Container
 
-**File: `src/components/chat/MessageBubble.tsx`**
-
-Replace hardcoded Tailwind classes with inline styles using the CSS variables:
-
+Change line 140 from:
 ```tsx
-<div
-  className={cn(
-    "max-w-[85%] px-4 py-3 md:max-w-[70%]",
-    isUser
-      ? "bg-chat-user text-chat-user-foreground"
-      : "bg-chat-assistant text-chat-assistant-foreground"
-  )}
-  style={{
-    borderRadius: `var(--message-bubble-radius) var(--message-bubble-radius) ${
-      isUser 
-        ? 'var(--message-bubble-tail-radius) var(--message-bubble-radius)'
-        : 'var(--message-bubble-radius) var(--message-bubble-tail-radius)'
-    }`,
-  }}
->
+bg-[hsl(var(--chat-assistant))]
+```
+to:
+```tsx
+bg-[hsl(var(--message-container-bg))]
 ```
 
-#### 3. Update VindisPreview to Use Square Bubbles
+#### 3. Update VindisPreview.tsx
 
-**File: `src/pages/VindisPreview.tsx`**
-
-Add to the styles object:
-
+Add the container background variable to use white:
 ```tsx
-'--jt-ev-chat-message-bubble-radius': '0',
-'--jt-ev-chat-message-bubble-tail-radius': '0',
+'--jt-ev-chat-message-container-bg': '0 0% 100%',
 ```
 
 ---
@@ -74,15 +67,16 @@ Add to the styles object:
 
 | File | Changes |
 |------|---------|
-| `src/index.css` | Add `--message-bubble-radius` and `--message-bubble-tail-radius` variables |
-| `src/components/chat/MessageBubble.tsx` | Use CSS variables for border-radius instead of Tailwind classes |
-| `src/pages/VindisPreview.tsx` | Set bubble radius to `0` for square corners |
+| `src/index.css` | Add `--message-container-bg` variable |
+| `src/components/chat/ChatMessages.tsx` | Use new `--message-container-bg` variable for container |
+| `src/pages/VindisPreview.tsx` | Set container background to white |
 
 ---
 
-### Result
+### Visual Result
 
-- **Default theme**: Rounded bubbles with chat-style tail (current look preserved)
-- **Vindis theme**: Square bubbles matching the overall square aesthetic
-- **Full control**: Parent pages can set any radius value via `--jt-ev-chat-message-bubble-radius`
+- **Container**: White background with teal border
+- **User bubble**: Green background (unchanged)
+- **Assistant bubble**: Dark blue background with white text
+- **Quick reply chips**: Inside the white container
 
