@@ -18,11 +18,18 @@ const MessageBubble = ({ content, role }: MessageBubbleProps) => {
     >
       <div
         className={cn(
-          "max-w-[85%] rounded-2xl px-4 py-3 md:max-w-[70%]",
+          "max-w-[85%] px-4 py-3 md:max-w-[70%]",
           isUser
-            ? "rounded-br-md bg-chat-user text-chat-user-foreground"
-            : "rounded-bl-md bg-chat-assistant text-chat-assistant-foreground"
+            ? "bg-chat-user text-chat-user-foreground"
+            : "bg-chat-assistant text-chat-assistant-foreground"
         )}
+        style={{
+          borderRadius: `var(--message-bubble-radius) var(--message-bubble-radius) ${
+            isUser 
+              ? 'var(--message-bubble-tail-radius) var(--message-bubble-radius)'
+              : 'var(--message-bubble-radius) var(--message-bubble-tail-radius)'
+          }`,
+        }}
       >
         {isUser ? (
           <p className="text-sm leading-relaxed">{content}</p>
