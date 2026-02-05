@@ -58,7 +58,7 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
             type="submit"
             disabled={!input.trim() || isLoading}
             className={cn(
-              "h-auto shrink-0 px-6 self-stretch",
+              "h-auto shrink-0 px-6 self-stretch hover:bg-[hsl(var(--primary-hover))]",
               showTextButton ? "min-w-[140px]" : "w-14"
             )}
             style={{ 
@@ -92,7 +92,7 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
         <Button
           type="submit"
           disabled={!input.trim() || isLoading}
-          className="h-11 shrink-0 px-4"
+          className="h-11 shrink-0 px-4 hover:bg-[hsl(var(--primary-hover))]"
           style={{ 
             borderRadius: 'var(--button-radius)',
             backgroundColor: 'hsl(var(--primary))',
@@ -105,7 +105,7 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
           type="submit"
           size="icon"
           disabled={!input.trim() || isLoading}
-          className="h-11 w-11 shrink-0"
+          className="h-11 w-11 shrink-0 hover:bg-[hsl(var(--primary-hover))]"
           style={{ 
             borderRadius: 'var(--button-radius)',
             backgroundColor: 'hsl(var(--primary))',
