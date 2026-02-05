@@ -47,6 +47,7 @@
 
     /* Input container background */
     --input-container-bg: var(--jt-ev-chat-input-container-bg, var(--card));
+    --input-container-border: var(--jt-ev-chat-input-container-border, hsl(var(--border)));
 
     /* Chip styling */
     --chip-border: var(--jt-ev-chat-chip-border, hsl(var(--primary) / 0.3));
@@ -122,6 +123,7 @@
 
     /* Input container background (dark mode) */
     --input-container-bg: var(--jt-ev-chat-input-container-bg, var(--card));
+    --input-container-border: var(--jt-ev-chat-input-container-border, hsl(var(--border)));
 
     /* Chip styling (dark mode) */
     --chip-border: var(--jt-ev-chat-chip-border, hsl(var(--primary) / 0.3));
@@ -203,6 +205,7 @@
 
     /* Input container background */
     --input-container-bg: var(--jt-ev-chat-input-container-bg, var(--card));
+    --input-container-border: var(--jt-ev-chat-input-container-border, hsl(var(--border)));
     
     /* Chip styling */
     --chip-border: var(--jt-ev-chat-chip-border, hsl(var(--primary) / 0.3));
