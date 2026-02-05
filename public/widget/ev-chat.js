@@ -20336,7 +20336,8 @@ const MN = () => {
       else if (h.role === "assistant") {
         const g = i.current.get(h.id);
         g && requestAnimationFrame(() => {
-          g.scrollIntoView({ behavior: "smooth", block: "start" });
+          const v = p.getBoundingClientRect(), E = g.getBoundingClientRect(), P = p.scrollTop + (E.top - v.top);
+          p.scrollTo({ top: P, behavior: "smooth" });
         });
       }
     } else t && !m && (p.scrollTop = p.scrollHeight);
