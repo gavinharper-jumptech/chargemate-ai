@@ -1,150 +1,66 @@
 
 
-# Replace README with EV Chat Widget Documentation
+# Fix Page Jump When AI Responds
 
-## Overview
-Replace the current boilerplate README with a proper project README that explains the EV Chat Widget and removes all Lovable references.
+## Problem Identified
 
-## Changes to `README.md`
+When an AI response arrives, the widget calls `messageEl.scrollIntoView({ behavior: 'smooth', block: 'start' })` on line 95 of `ChatMessages.tsx`. 
 
-**Complete replacement** with the following content:
+The `scrollIntoView` method is designed to scroll the element into the browser's **main viewport**. When the chat widget is embedded in a container further down a webpage (like your Vindis mockup), the browser:
+1. Scrolls the widget's internal container
+2. **Also scrolls the main page** to try and bring the message to the top of the screen
 
----
+This causes the "page jump" you're experiencing.
 
-```markdown
-# Jumptech Chat Widget
+## Solution
 
-A customizable, embeddable chat widget. Built with React, TypeScript, and Tailwind CSS.
+Replace `scrollIntoView` with a manual scroll calculation that only affects the widget's internal scroll container, not the parent page.
 
-## Features
+## Technical Changes
 
-- **Two Display Modes**: Fullscreen (embedded) or floating window with trigger button
-- **Fully Customizable Theming**: 40+ CSS custom properties for complete brand control
-- **i18n Support**: Customize all user-facing text
-- **Quick Question Categories**: Tabbed navigation with predefined questions
-- **Markdown Rendering**: Rich text formatting in chat messages
-- **Responsive Design**: Works on desktop and mobile devices
+### File: `src/components/chat/ChatMessages.tsx`
 
-## Quick Start
+**Lines 89-98** - Replace `scrollIntoView` with contained scroll logic:
 
-Add the widget to any webpage using the jsDelivr CDN:
-
-```html
-<!-- Styles -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/style.css">
-
-<!-- Widget Script -->
-<script type="module">
-  import { createChat } from 'https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/ev-chat.js';
-  
-  createChat({
-    webhookUrl: 'https://your-webhook-url.com/chat'
-  });
-</script>
-```
-
-## Configuration
-
-```javascript
-createChat({
-  webhookUrl: 'https://your-api.com/chat',  // Chat API endpoint
-  target: '#chat-container',                 // Mount target (default: #ev-chat)
-  mode: 'fullscreen',                        // 'fullscreen' or 'window'
-  position: 'bottom-right',                  // Floating button position
-  inputPosition: 'below',                    // 'above' or 'below' messages
-  inputLayout: 'separate',                   // 'separate' or 'embedded'
-  
-  categories: [
-    {
-      title: 'Installation',
-      icon: 'Plug',
-      questions: ['How long does installation take?', 'What's included?']
-    }
-  ],
-  
-  i18n: {
-    title: 'Chat with us!',
-    subtitle: 'Ask anything about EV charging.',
-    inputPlaceholder: 'Type your message...',
-    sendButtonText: 'Send'
+```tsx
+// BEFORE (causes page jump)
+} else if (newMessage.role === "assistant") {
+  const messageEl = messageRefs.current.get(newMessage.id);
+  if (messageEl) {
+    requestAnimationFrame(() => {
+      messageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   }
-});
-```
+}
 
-## Theming
-
-Customize the widget using CSS custom properties with the `--jt-ev-chat-` prefix:
-
-```css
-#chat-container {
-  --jt-ev-chat-primary: 172 100% 35%;
-  --jt-ev-chat-background: 0 0% 100%;
-  --jt-ev-chat-radius: 0.5rem;
-  --jt-ev-chat-user: 172 100% 35%;
-  --jt-ev-chat-assistant: 220 13% 26%;
+// AFTER (scroll contained to widget only)
+} else if (newMessage.role === "assistant") {
+  const messageEl = messageRefs.current.get(newMessage.id);
+  if (messageEl) {
+    requestAnimationFrame(() => {
+      // Calculate scroll position relative to the widget's viewport only
+      const viewportRect = viewport.getBoundingClientRect();
+      const elementRect = messageEl.getBoundingClientRect();
+      const targetScrollTop = viewport.scrollTop + (elementRect.top - viewportRect.top);
+      viewport.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
+    });
+  }
 }
 ```
 
-See the [Widget Guide](docs/WIDGET_GUIDE.md) for complete theming reference.
+## Why This Works
 
-## Development
+| Method | Behavior |
+|--------|----------|
+| `scrollIntoView()` | Browser scrolls ALL scrollable ancestors (including the page body) |
+| `viewport.scrollTo()` | Only scrolls the specific container element |
 
-### Prerequisites
+The fix calculates where the message element is relative to the widget's viewport and scrolls just that container—leaving your page scroll position untouched.
 
-- Node.js 18+ or Bun
+## Verification
 
-### Setup
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-### Build Widget
-
-The widget is automatically built via GitHub Actions when changes are pushed to `main`. The built files are committed to `public/widget/`.
-
-To build manually:
-
-```bash
-bun run vite build --config vite.config.widget.ts
-```
-
-## Tech Stack
-
-- React - UI framework
-- TypeScript - Type safety
-- Vite - Build tool
-- Tailwind CSS - Styling
-- shadcn/ui - UI components
-
-## Documentation
-
-Full documentation including all configuration options, theming variables, and examples:
-
-[Widget Guide](docs/WIDGET_GUIDE.md)
-
-## License
-
-MIT
-```
-
----
-
-## Summary
-
-| Section | Content |
-|---------|---------|
-| Title | EV Chat Widget |
-| Description | Embeddable chat for EV charging assistance |
-| Features | Display modes, theming, i18n, categories, markdown |
-| Quick Start | jsDelivr CDN integration snippet |
-| Configuration | All main options with examples |
-| Theming | CSS variable overview with link to full docs |
-| Development | Setup and build instructions |
-| Tech Stack | React, TypeScript, Vite, Tailwind |
-| Documentation | Link to WIDGET_GUIDE.md |
+After this change:
+- User messages will still scroll the widget to show the message + typing indicator
+- AI responses will scroll the widget to show the start of the response
+- The parent page will **not** be affected by any widget scrolling
 
