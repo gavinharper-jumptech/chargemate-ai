@@ -51,7 +51,7 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={config.i18n?.inputPlaceholder || "Ask me anything about EV home charging..."}
-            className="min-h-[44px] max-h-32 resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 flex-1"
+            className="min-h-[44px] max-h-32 resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 flex-1 text-[hsl(var(--input-text))]"
             disabled={isLoading}
           />
           <Button
@@ -81,7 +81,7 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={config.i18n?.inputPlaceholder || "Ask me anything about EV home charging..."}
-        className="min-h-[44px] max-h-32 resize-none border-input bg-background"
+        className="min-h-[44px] max-h-32 resize-none border-input bg-background text-[hsl(var(--input-text))]"
         style={{ borderRadius: 'var(--input-radius)' }}
         disabled={isLoading}
       />

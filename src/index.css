@@ -34,6 +34,7 @@
 
     --border: var(--jt-ev-chat-border, 120 20% 88%);
     --input: var(--jt-ev-chat-input, 120 20% 88%);
+    --input-text: var(--jt-ev-chat-input-text, var(--foreground));
     --ring: var(--jt-ev-chat-ring, 142 55% 40%);
 
     --radius: var(--jt-ev-chat-radius, 1rem);
@@ -105,6 +106,7 @@
 
     --border: var(--jt-ev-chat-border, 150 20% 20%);
     --input: var(--jt-ev-chat-input, 150 20% 20%);
+    --input-text: var(--jt-ev-chat-input-text, var(--foreground));
     --ring: var(--jt-ev-chat-ring, 142 55% 45%);
 
     /* Component-specific radius controls (dark mode) */
@@ -179,6 +181,7 @@
     --destructive-foreground: var(--jt-ev-chat-destructive-foreground, 210 40% 98%);
     --border: var(--jt-ev-chat-border, 120 20% 88%);
     --input: var(--jt-ev-chat-input, 120 20% 88%);
+    --input-text: var(--jt-ev-chat-input-text, var(--foreground));
     --ring: var(--jt-ev-chat-ring, 142 55% 40%);
     --radius: var(--jt-ev-chat-radius, 1rem);
     
