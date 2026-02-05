@@ -21,17 +21,14 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install
 
       - name: Build widget
-        run: npx vite build --config vite.config.widget.ts
+        run: bun run vite build --config vite.config.widget.ts
 
       - name: Check for changes
         id: check_changes
