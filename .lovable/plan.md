@@ -1,51 +1,106 @@
 
 
-## Force Input Below in Window Mode
+## Fix Window Mode Content Overflow & Category Tab Handling
 
-A simple logic change to ensure window mode always uses the traditional "input below" layout, regardless of the `inputPosition` configuration.
-
----
-
-### Current Behavior
-
-The `inputPosition` setting applies to both:
-- Fullscreen/embedded mode ✓ (makes sense)
-- Window mode ✗ (causes overflow issues and unnatural UX)
+Two related fixes to ensure all content stays within the window panel bounds and handles multiple categories gracefully.
 
 ---
 
-### Solution
+### Issue 1: Content Overflowing Window Bounds
 
-**File:** `src/pages/Index.tsx`
+**Root Cause:**
+The layout containers lack proper overflow constraints. When using flexbox with `flex-1`, the child needs `min-h-0` to allow proper shrinking, and the parent needs `overflow-hidden` to contain content.
 
-**Line 30 - Update the conditional to exclude window mode:**
+**Solution:**
+
+**File: `src/pages/Index.tsx`**
+
+Update the default layout container (lines 57-67):
 
 ```tsx
 // Current:
-if (inputPosition === "above") {
+<div className={className || "flex h-full flex-col bg-background"}>
 
 // Updated:
-if (inputPosition === "above" && mode !== "window") {
+<div className={className || "flex h-full flex-col bg-background overflow-hidden"}>
 ```
 
-This single change ensures:
-- Window mode always uses "input below" layout (natural popup chat UX)
-- Fullscreen/embedded modes respect the `inputPosition` setting
-- Also fixes the overflow issue you reported earlier (since window mode won't use the "above" layout)
+**File: `src/components/chat/ChatMessages.tsx`**
+
+Update the ScrollArea to properly fill available space (line 120):
+
+```tsx
+// Current:
+<ScrollArea className="flex-1" ref={scrollRef}>
+
+// Updated:
+<ScrollArea className="flex-1 min-h-0" ref={scrollRef}>
+```
+
+The `min-h-0` is critical for flexbox - it overrides the default `min-height: auto` which prevents flex items from shrinking below their content size.
 
 ---
 
-### File Changes
+### Issue 2: Category Tabs Being Cut Off (4+ Categories)
+
+**Current Behavior:**
+- Tabs use `overflow-x-auto` - they scroll horizontally but the "PRODUCTS" tab is clipped at the edge
+- No visual indication that more tabs exist
+
+**Solution:**
+For the window's limited 380px width, we should:
+1. Make tabs more compact with smaller padding
+2. Keep horizontal scroll but ensure visible scroll indicators
+3. Optionally: For 4+ categories, consider a dropdown alternative
+
+**File: `src/components/chat/CategorizedQuickActions.tsx`**
+
+Update the tabs container and buttons (lines 40-57):
+
+```tsx
+{/* Category Tabs - compact for window mode */}
+<div className="flex border-b border-border overflow-x-auto overflow-y-hidden scrollbar-hide">
+  {categories.map((category) => (
+    <button
+      key={category.title}
+      type="button"
+      onClick={() => setActiveCategory(category.title)}
+      className={cn(
+        "px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors",
+        "border-b-2 -mb-px flex-shrink-0",
+        activeCategory === category.title
+          ? "border-primary text-primary"
+          : "border-transparent text-muted-foreground hover:text-foreground"
+      )}
+    >
+      {category.title.toUpperCase()}
+    </button>
+  ))}
+</div>
+```
+
+Key changes:
+- `px-3` instead of `px-4` (more compact)
+- `text-xs` instead of `text-sm` (smaller text)
+- Removed `justify-center` to let tabs flow naturally from left
+
+---
+
+### File Changes Summary
 
 | File | Action | Description |
 |------|--------|-------------|
-| `src/pages/Index.tsx` | **Edit** | Add `mode !== "window"` check to the input position conditional |
+| `src/pages/Index.tsx` | **Edit** | Add `overflow-hidden` to main container |
+| `src/components/chat/ChatMessages.tsx` | **Edit** | Add `min-h-0` to ScrollArea for proper flex shrinking |
+| `src/components/chat/CategorizedQuickActions.tsx` | **Edit** | Make tabs more compact with smaller padding and text |
 
 ---
 
 ### Result
 
-- Window mode popup will always have input at the bottom
-- Fullscreen mode can still use `inputPosition: 'above'` when configured
-- Overflow issue in window mode is resolved as a side effect
+- All content will stay within window bounds
+- Messages will scroll properly within the available space
+- Category tabs will be more compact and fit better
+- Horizontal scroll still works for many categories, but tabs are more visible
+- No visual clipping of the rightmost tab
 
