@@ -1,108 +1,71 @@
 
 
-## Fix Message Container Border Scope
+## Add CSS Variables for Message Bubble Border-Radius
 
-The current implementation applies a border to individual assistant message bubbles. Based on the mockup, the teal border should wrap around the **entire conversation area** including:
-- User's question
-- AI's response  
-- Quick reply suggestion chips
+Currently, message bubble corners are hardcoded with Tailwind classes. This plan adds CSS variables to allow themes like Vindis to have square message bubbles.
 
 ---
 
-### Current vs. Desired Layout
+### Current Implementation
 
-**Current behavior:**
+```tsx
+// MessageBubble.tsx - hardcoded radius
+className="rounded-2xl ... rounded-br-md"  // user
+className="rounded-2xl ... rounded-bl-md"  // assistant
 ```
-┌─────────────────────────────┐
-│ [User message - no border]  │
-└─────────────────────────────┘
-┌─────────────────────────────┐
-│ ┌─ teal border ──────────┐  │
-│ │ AI response            │  │
-│ └────────────────────────┘  │
-└─────────────────────────────┘
-[Quick replies - no border]
-```
-
-**Desired behavior (matches mockup):**
-```
-┌────────────────────────────────┐
-│ ┌─ teal border ─────────────┐  │
-│ │        [User message]     │  │
-│ │ AI response text...       │  │
-│ │ [Reply chip] [Reply chip] │  │
-│ └───────────────────────────┘  │
-└────────────────────────────────┘
-```
-
----
-
-### Implementation Strategy
-
-The border should wrap around the **messages content area** (not the welcome section or initial quick actions). In the "inputPosition: above" layout, this means wrapping the entire `<ChatMessages>` scrollable area content in a bordered container.
 
 ---
 
 ### Changes Required
 
-#### 1. Update ChatMessages.tsx
+#### 1. Add New CSS Variables
 
-Wrap the messages, typing indicator, and quick replies in a single bordered container:
+**File: `src/index.css`**
 
-```tsx
-// Inside the ScrollArea, wrap all message content in a container
-<div 
-  className={cn(
-    "flex flex-col gap-4 p-4",
-    useContainerStyling && filteredMessages.length > 0 && "pb-0"
-  )}
->
-  {!hideWelcome && <WelcomeMessage />}
-  {!hideWelcome && <CategorizedQuickActions ... />}
+Add to both `:root` and `.jt-ev-chat-widget`:
 
-  {/* Bordered conversation container - only appears when there are messages */}
-  {filteredMessages.length > 0 && (
-    <div
-      className={cn(
-        "flex flex-col gap-4 p-4",
-        useContainerStyling && "bg-[hsl(var(--chat-assistant))]"
-      )}
-      style={useContainerStyling ? {
-        border: 'var(--message-container-border)',
-        maxWidth: 'var(--message-container-max-width)',
-        width: '100%',
-      } : undefined}
-    >
-      {/* All messages inside the bordered container */}
-      {filteredMessages.map((message) => (
-        <div key={message.id} ref={...}>
-          <MessageBubble ... />
-        </div>
-      ))}
-
-      {isLoading && <TypingIndicator />}
-
-      {!isLoading && quickReplySuggestions.length > 0 && (
-        <QuickReplies ... />
-      )}
-    </div>
-  )}
-
-  {/* Show typing and quick replies outside container if no messages yet */}
-  {filteredMessages.length === 0 && isLoading && <TypingIndicator />}
-</div>
+```css
+/* Message bubble radius */
+--message-bubble-radius: var(--jt-ev-chat-message-bubble-radius, 1rem);
+--message-bubble-tail-radius: var(--jt-ev-chat-message-bubble-tail-radius, 0.375rem);
 ```
 
-#### 2. Remove Individual Message Border Styling
+- `--message-bubble-radius`: Main corner radius (default `1rem` = `rounded-2xl`)
+- `--message-bubble-tail-radius`: The small "tail" corner where the bubble points (default `0.375rem` = `rounded-md`)
 
-Remove the per-message border/maxWidth styling since the container now handles it:
+#### 2. Update MessageBubble Component
+
+**File: `src/components/chat/MessageBubble.tsx`**
+
+Replace hardcoded Tailwind classes with inline styles using the CSS variables:
 
 ```tsx
-// Remove this from individual messages:
-style={useContainerStyling && message.role === "assistant" ? {
-  border: 'var(--message-container-border)',
-  maxWidth: 'var(--message-container-max-width)',
-} : undefined}
+<div
+  className={cn(
+    "max-w-[85%] px-4 py-3 md:max-w-[70%]",
+    isUser
+      ? "bg-chat-user text-chat-user-foreground"
+      : "bg-chat-assistant text-chat-assistant-foreground"
+  )}
+  style={{
+    borderRadius: `var(--message-bubble-radius) var(--message-bubble-radius) ${
+      isUser 
+        ? 'var(--message-bubble-tail-radius) var(--message-bubble-radius)'
+        : 'var(--message-bubble-radius) var(--message-bubble-tail-radius)'
+    }`,
+  }}
+>
+```
+
+#### 3. Update VindisPreview to Use Square Bubbles
+
+**File: `src/pages/VindisPreview.tsx`**
+
+Add to the styles object:
+
+```tsx
+'--jt-ev-chat-message-bubble-radius': '0',
+'--jt-ev-chat-message-bubble-tail-radius': '0',
 ```
 
 ---
@@ -111,24 +74,15 @@ style={useContainerStyling && message.role === "assistant" ? {
 
 | File | Changes |
 |------|---------|
-| `src/components/chat/ChatMessages.tsx` | Move border from individual messages to conversation container wrapping all messages + quick replies |
+| `src/index.css` | Add `--message-bubble-radius` and `--message-bubble-tail-radius` variables |
+| `src/components/chat/MessageBubble.tsx` | Use CSS variables for border-radius instead of Tailwind classes |
+| `src/pages/VindisPreview.tsx` | Set bubble radius to `0` for square corners |
 
 ---
 
-### Visual Result
+### Result
 
-After this change, the Vindis preview will show:
-- Grey background everywhere
-- When a conversation starts, a **single teal-bordered white container** appears
-- Inside the container: user question, AI response, and quick reply chips
-- The entire conversation thread is visually grouped together
-
----
-
-### Technical Notes
-
-- The border container only renders when there are messages (`filteredMessages.length > 0`)
-- Window mode remains unaffected (`useContainerStyling` guard)
-- The container uses `--chat-assistant` background color to make the entire box white in Vindis
-- Quick replies are now inside the bordered container, matching the mockup
+- **Default theme**: Rounded bubbles with chat-style tail (current look preserved)
+- **Vindis theme**: Square bubbles matching the overall square aesthetic
+- **Full control**: Parent pages can set any radius value via `--jt-ev-chat-message-bubble-radius`
 
