@@ -39,15 +39,27 @@ const Index = ({ className, onClearMessagesRef }: IndexProps) => {
   // Window mode always uses input-below for natural popup chat UX
   if (inputPosition === "above" && mode !== "window") {
     return (
-      <div className={className || "flex h-full flex-col bg-background"}>
+      <div className={className || "flex h-full flex-col bg-background overflow-hidden relative"}>
         {showHeader && <ChatHeader onNewChat={clearMessages} />}
+        
+        {/* Floating New Chat button when header is hidden */}
+        {!showHeader && messages.length > 0 && (
+          <button
+            onClick={clearMessages}
+            className="absolute top-2 right-2 p-2 rounded-lg hover:bg-muted transition-colors z-10"
+            aria-label="Start new chat"
+            title="New chat"
+          >
+            <RotateCcw className="h-5 w-5 text-muted-foreground" />
+          </button>
+        )}
         
         {/* Static top section */}
         <div className="flex-shrink-0">
           <WelcomeSection />
-        <div className="flex justify-center px-4 pb-4">
-          <CategorizedQuickActions onSelect={handleQuickAction} />
-        </div>
+          <div className="flex justify-center px-4 pb-4">
+            <CategorizedQuickActions onSelect={handleQuickAction} />
+          </div>
           <ChatInput onSend={handleSend} isLoading={isLoading} />
         </div>
         
