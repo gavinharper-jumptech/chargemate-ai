@@ -1,63 +1,159 @@
 
 
-## Remove Lightning Bolt Icon from Welcome Message
+## Refactor Category Quick Actions to Tabbed Interface with Mobile Dropdown
 
-This is a simple change to remove the Zap icon from the welcome message area, leaving just the title and subtitle.
-
----
-
-### What Will Change
-
-**Before:**
-- Lightning bolt icon in a green circle
-- Title below
-- Subtitle below title
-
-**After:**
-- Title only
-- Subtitle below title
-- Cleaner, more minimal welcome area
+Transform the current categorized quick actions from a vertical list layout to a tabbed interface that works well on both desktop and mobile.
 
 ---
 
-### Implementation
+### Current vs New Design
 
-**File to modify:** `src/components/chat/ChatMessages.tsx`
+**Current Implementation:**
+- Categories displayed vertically with icons + headers
+- All questions shown at once as chips below each category
+- Same layout on mobile and desktop
 
-1. Remove the `Zap` import from lucide-react (line 9)
-2. Remove the icon container div entirely (lines 28-31):
-   ```tsx
-   // DELETE THIS:
-   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-     <Zap className="h-8 w-8 text-primary" />
-   </div>
-   ```
-3. Adjust spacing on the remaining container (reduce top padding since there's no icon above)
+**New Implementation:**
+
+| Device | Categories | Questions |
+|--------|------------|-----------|
+| **Desktop** | Horizontal tabs with underline indicator | Chips displayed below selected tab |
+| **Mobile** | Horizontal scrollable tabs (swipeable) | Native `<select>` dropdown instead of chips |
 
 ---
 
-### Updated WelcomeMessage Component
+### Technical Approach
+
+#### 1. Rewrite `CategorizedQuickActions.tsx`
+
+Replace the current vertical list with a tabbed interface:
+
+```text
++------------------------------------------------------------------+
+|  [INSTALLATION]  [COSTS & GRANTS]  [TECHNOLOGY]  [RANGE]         |  <- Tabs
+|       ────                                                        |  <- Active underline
++------------------------------------------------------------------+
+|                                                                   |
+|  [ Question chip 1 ]  [ Question chip 2 ]  [ Question chip 3 ]   |  <- Desktop
+|                                                                   |
+|  ┌─────────────────────────────────────────┐                     |  <- Mobile
+|  │ Select a question...                  ▼ │                     |
+|  └─────────────────────────────────────────┘                     |
++------------------------------------------------------------------+
+```
+
+**Component Structure:**
+- `useState` for `activeCategory` (defaults to first category)
+- Use existing `useIsMobile()` hook to toggle between chip view and dropdown view
+- Map over category titles for tabs
+- Only render questions for the active category
+
+#### 2. Desktop Tab Bar
 
 ```tsx
-const WelcomeMessage = () => {
-  const { welcomeTitle, welcomeMessage } = useChatConfig();
+<div className="flex gap-1 border-b border-border overflow-x-auto">
+  {categories.map((category) => (
+    <button
+      key={category.title}
+      onClick={() => setActiveCategory(category.title)}
+      className={cn(
+        "px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors",
+        "border-b-2 -mb-px",
+        activeCategory === category.title
+          ? "border-primary text-primary"
+          : "border-transparent text-muted-foreground hover:text-foreground"
+      )}
+    >
+      {category.title.toUpperCase()}
+    </button>
+  ))}
+</div>
+```
 
-  return (
-    <div className="flex flex-col items-center justify-center gap-2 px-4 py-6 text-center">
-      <h2 className="text-xl font-semibold text-foreground">
-        {welcomeTitle}
-      </h2>
-      <p className="max-w-md text-muted-foreground">
-        {welcomeMessage}
-      </p>
-    </div>
-  );
-};
+#### 3. Desktop Question Chips
+
+```tsx
+<div className="flex flex-wrap gap-2 p-4">
+  {activeQuestions.map((question) => (
+    <Button
+      key={question}
+      variant="outline"
+      size="sm"
+      onClick={() => onSelect(question)}
+      className="rounded-full ..."
+    >
+      {question}
+    </Button>
+  ))}
+</div>
+```
+
+#### 4. Mobile Native Dropdown
+
+```tsx
+<select
+  onChange={(e) => onSelect(e.target.value)}
+  value=""
+  className="w-full px-4 py-3 border rounded-md bg-background text-foreground"
+>
+  <option value="" disabled>
+    Select a question...
+  </option>
+  {activeQuestions.map((question) => (
+    <option key={question} value={question}>
+      {question}
+    </option>
+  ))}
+</select>
 ```
 
 ---
 
-### Result
+### File Changes
 
-The welcome area will show just the configurable title and subtitle text, without any icon, giving a cleaner look that works for any brand.
+| File | Action | Description |
+|------|--------|-------------|
+| `src/components/chat/CategorizedQuickActions.tsx` | **Rewrite** | Replace vertical layout with tabbed interface + responsive mobile dropdown |
+
+---
+
+### Implementation Details
+
+1. **State Management**
+   - `activeCategory: string` - tracks selected tab (defaults to first category title)
+   - Derive `activeQuestions` from the selected category
+
+2. **Responsive Behavior**
+   - Use existing `useIsMobile()` hook from `src/hooks/use-mobile.tsx`
+   - Conditionally render chips (desktop) or native select (mobile)
+
+3. **Tab Styling**
+   - Horizontal flex container with `overflow-x-auto` for scroll on mobile
+   - Active tab: primary color with bottom border
+   - Inactive tabs: muted color, no border
+
+4. **Accessibility**
+   - Tab buttons use semantic `<button>` elements
+   - Native `<select>` provides full mobile accessibility
+   - Clear visual focus states
+
+5. **CSS Variables**
+   - Continue using existing Tailwind classes that map to the `--jt-ev-chat-*` CSS variables
+   - No new CSS variables needed
+
+---
+
+### Expected Result
+
+**Desktop (768px+):**
+- Clean horizontal tabs at top
+- Question chips appear in a wrapping flex layout below
+- Clicking a chip sends the question
+
+**Mobile (<768px):**
+- Same horizontal tabs (scrollable if needed)
+- Native dropdown replaces chips
+- Selecting from dropdown sends the question
+
+This matches your mockup design and optimizes mobile screen real estate.
 
