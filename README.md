@@ -1,73 +1,118 @@
-# Welcome to your Lovable project
+# Jumptech Chat Widget
 
-## Project info
+A customizable, embeddable chat widget. Built with React, TypeScript, and Tailwind CSS.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- **Two Display Modes**: Fullscreen (embedded) or floating window with trigger button
+- **Fully Customizable Theming**: 40+ CSS custom properties for complete brand control
+- **i18n Support**: Customize all user-facing text
+- **Quick Question Categories**: Tabbed navigation with predefined questions
+- **Markdown Rendering**: Rich text formatting in chat messages
+- **Responsive Design**: Works on desktop and mobile devices
 
-There are several ways of editing your application.
+## Quick Start
 
-**Use Lovable**
+Add the widget to any webpage using the jsDelivr CDN:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+```html
+<!-- Styles -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/style.css">
 
-Changes made via Lovable will be committed automatically to this repo.
+<!-- Widget Script -->
+<script type="module">
+  import { createChat } from 'https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/ev-chat.js';
+  
+  createChat({
+    webhookUrl: 'https://your-webhook-url.com/chat'
+  });
+</script>
+```
 
-**Use your preferred IDE**
+## Configuration
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+```javascript
+createChat({
+  webhookUrl: 'https://your-api.com/chat',  // Chat API endpoint
+  target: '#chat-container',                 // Mount target (default: #ev-chat)
+  mode: 'fullscreen',                        // 'fullscreen' or 'window'
+  position: 'bottom-right',                  // Floating button position
+  inputPosition: 'below',                    // 'above' or 'below' messages
+  inputLayout: 'separate',                   // 'separate' or 'embedded'
+  
+  categories: [
+    {
+      title: 'Installation',
+      icon: 'Plug',
+      questions: ['How long does installation take?', 'What\'s included?']
+    }
+  ],
+  
+  i18n: {
+    title: 'Chat with us!',
+    subtitle: 'Ask anything about EV charging.',
+    inputPlaceholder: 'Type your message...',
+    sendButtonText: 'Send'
+  }
+});
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Theming
 
-Follow these steps:
+Customize the widget using CSS custom properties with the `--jt-ev-chat-` prefix:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+```css
+#chat-container {
+  --jt-ev-chat-primary: 172 100% 35%;
+  --jt-ev-chat-background: 0 0% 100%;
+  --jt-ev-chat-radius: 0.5rem;
+  --jt-ev-chat-user: 172 100% 35%;
+  --jt-ev-chat-assistant: 220 13% 26%;
+}
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+See the [Widget Guide](docs/WIDGET_GUIDE.md) for complete theming reference.
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Development
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Prerequisites
+
+- Node.js 18+ or Bun
+
+### Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Build Widget
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+The widget is automatically built via GitHub Actions when changes are pushed to `main`. The built files are committed to `public/widget/`.
 
-**Use GitHub Codespaces**
+To build manually:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```bash
+bun run vite build --config vite.config.widget.ts
+```
 
-## What technologies are used for this project?
+## Tech Stack
 
-This project is built with:
+- React - UI framework
+- TypeScript - Type safety
+- Vite - Build tool
+- Tailwind CSS - Styling
+- shadcn/ui - UI components
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Documentation
 
-## How can I deploy this project?
+Full documentation including all configuration options, theming variables, and examples:
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+[Widget Guide](docs/WIDGET_GUIDE.md)
 
-## Can I connect a custom domain to my Lovable project?
+## License
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+MIT
