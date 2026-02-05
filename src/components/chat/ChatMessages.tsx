@@ -16,7 +16,6 @@ interface ChatMessage {
 interface ChatMessagesProps {
   messages: ChatMessage[];
   isLoading: boolean;
-  showQuickActions: boolean;
   onQuickAction: (message: string) => void;
   /** Hide welcome section and quick actions (used when inputPosition is 'above') */
   hideWelcome?: boolean;
@@ -40,7 +39,6 @@ const WelcomeMessage = () => {
 const ChatMessages = ({
   messages,
   isLoading,
-  showQuickActions,
   onQuickAction,
   hideWelcome = false,
 }: ChatMessagesProps) => {
@@ -123,7 +121,7 @@ const ChatMessages = ({
       <div className="flex flex-col gap-4 p-4">
         {!hideWelcome && <WelcomeMessage />}
         
-        {!hideWelcome && showQuickActions && (
+        {!hideWelcome && (
           <div className="flex justify-center">
             <CategorizedQuickActions onSelect={onQuickAction} />
           </div>
