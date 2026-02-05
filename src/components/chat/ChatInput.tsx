@@ -58,10 +58,13 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
             type="submit"
             disabled={!input.trim() || isLoading}
             className={cn(
-              "h-auto shrink-0 bg-primary hover:bg-[hsl(var(--primary-hover))] px-6 self-stretch",
+              "h-auto shrink-0 px-6 self-stretch",
               showTextButton ? "min-w-[140px]" : "w-14"
             )}
-            style={{ borderRadius: 'var(--button-radius)' }}
+            style={{ 
+              borderRadius: 'var(--button-radius)',
+              backgroundColor: 'hsl(var(--primary))',
+            }}
           >
             {showTextButton ? config.i18n?.sendButtonText : <Send className="h-5 w-5" />}
           </Button>
@@ -89,8 +92,11 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
         <Button
           type="submit"
           disabled={!input.trim() || isLoading}
-          className="h-11 shrink-0 bg-primary hover:bg-[hsl(var(--primary-hover))] px-4"
-          style={{ borderRadius: 'var(--button-radius)' }}
+          className="h-11 shrink-0 px-4"
+          style={{ 
+            borderRadius: 'var(--button-radius)',
+            backgroundColor: 'hsl(var(--primary))',
+          }}
         >
           {config.i18n?.sendButtonText}
         </Button>
@@ -99,8 +105,11 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
           type="submit"
           size="icon"
           disabled={!input.trim() || isLoading}
-          className="h-11 w-11 shrink-0 bg-primary hover:bg-[hsl(var(--primary-hover))]"
-          style={{ borderRadius: 'var(--button-radius)' }}
+          className="h-11 w-11 shrink-0"
+          style={{ 
+            borderRadius: 'var(--button-radius)',
+            backgroundColor: 'hsl(var(--primary))',
+          }}
         >
           <Send className="h-5 w-5" />
         </Button>
