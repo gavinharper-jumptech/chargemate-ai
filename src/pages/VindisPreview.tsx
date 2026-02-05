@@ -56,8 +56,8 @@ const vindisConfig = {
 // Vindis CSS variables - demonstrates theming via CSS only
 const vindisStyles: React.CSSProperties & Record<string, string> = {
   // Grey background throughout
-  '--jt-ev-chat-background': '210 15% 93%',
-  '--jt-ev-chat-card': '210 15% 93%',
+  '--jt-ev-chat-background': '210 20% 98%',
+  '--jt-ev-chat-card': '210 20% 98%',
   
   // Primary = dark teal/blue for button
   '--jt-ev-chat-primary': '200 50% 25%',
