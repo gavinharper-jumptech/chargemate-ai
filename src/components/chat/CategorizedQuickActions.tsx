@@ -37,7 +37,7 @@
    return (
      <div className="flex flex-col w-full">
        {/* Category Tabs */}
-       <div className="flex border-b border-border overflow-x-auto scrollbar-hide">
+        <div className="flex justify-center border-b border-border overflow-x-auto scrollbar-hide">
          {categories.map((category) => (
            <button
              key={category.title}
