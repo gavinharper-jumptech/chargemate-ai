@@ -89,6 +89,10 @@ const vindisStyles: React.CSSProperties & Record<string, string> = {
   '--jt-ev-chat-assistant': '0 0% 100%',
   '--jt-ev-chat-assistant-foreground': '200 50% 20%',
   
+  // Square message bubbles
+  '--jt-ev-chat-message-bubble-radius': '0',
+  '--jt-ev-chat-message-bubble-tail-radius': '0',
+  
   // Font
   '--jt-ev-chat-font-family': 'system-ui, sans-serif',
 };
