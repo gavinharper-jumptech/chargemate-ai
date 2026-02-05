@@ -1,65 +1,43 @@
 
 
-## Show Message Container Box Always (Not Just After First Message)
+## Add Configurable Min-Height for Conversation Container
 
-Currently, the bordered conversation container (with the teal-green border) only appears after the user submits their first question. You want this container to always be visible.
-
----
-
-### Root Cause
-
-In `ChatMessages.tsx`, line 136 has this condition:
-
-```tsx
-{filteredMessages.length > 0 && (
-  <div className="..." style={{ border: 'var(--message-container-border)', ... }}>
-    {/* messages, typing indicator, quick replies */}
-  </div>
-)}
-```
-
-This means the entire bordered container is hidden until there are messages.
-
----
-
-### Solution
-
-Remove the conditional rendering so the container always shows, and move the typing indicator inside it. When empty, the container will display as an empty bordered box ready to receive the conversation.
+Add a new CSS variable to control the minimum height of the message container, following the existing theming pattern.
 
 ---
 
 ### Changes Required
 
-#### ChatMessages.tsx
+#### 1. Add CSS Variable in `src/index.css`
 
-**Before (lines 135-179):**
-```tsx
-{/* Bordered conversation container - only appears when there are messages */}
-{filteredMessages.length > 0 && (
-  <div className={cn(...)} style={...}>
-    {filteredMessages.map(...)}
-    {isLoading && <TypingIndicator />}
-    {!isLoading && quickReplySuggestions.length > 0 && <QuickReplies ... />}
-  </div>
-)}
+Add to `:root`, `.dark`, and `.jt-ev-chat-widget`:
 
-{/* Show typing indicator outside container if no messages yet */}
-{filteredMessages.length === 0 && isLoading && <TypingIndicator />}
+```css
+--message-container-min-height: var(--jt-ev-chat-message-container-min-height, auto);
 ```
 
-**After:**
+Default to `auto` so existing implementations are unaffected.
+
+#### 2. Apply Variable in `ChatMessages.tsx`
+
+Update the container style object to include the min-height:
+
 ```tsx
-{/* Bordered conversation container - always visible */}
-<div className={cn(...)} style={...}>
-  {filteredMessages.map(...)}
-  {isLoading && <TypingIndicator />}
-  {!isLoading && quickReplySuggestions.length > 0 && <QuickReplies ... />}
-</div>
+style={useContainerStyling ? {
+  border: 'var(--message-container-border)',
+  maxWidth: 'var(--message-container-max-width)',
+  minHeight: 'var(--message-container-min-height)',
+  width: '100%',
+} : undefined}
 ```
 
-- Remove the `filteredMessages.length > 0 &&` condition
-- Remove the separate typing indicator that was outside the container
-- The container will now always render, showing as an empty bordered box when no messages exist
+#### 3. Set Value in VindisPreview.tsx
+
+Add the new variable with 120px:
+
+```tsx
+'--jt-ev-chat-message-container-min-height': '120px',
+```
 
 ---
 
@@ -67,13 +45,15 @@ Remove the conditional rendering so the container always shows, and move the typ
 
 | File | Changes |
 |------|---------|
-| `src/components/chat/ChatMessages.tsx` | Remove conditional wrapper, always show the bordered container |
+| `src/index.css` | Add `--message-container-min-height` in `:root`, `.dark`, and `.jt-ev-chat-widget` |
+| `src/components/chat/ChatMessages.tsx` | Add `minHeight` to the container style object |
+| `src/pages/VindisPreview.tsx` | Set min-height to `120px` |
 
 ---
 
-### Visual Result
+### Result
 
-- **Before first message**: Empty white box with teal-green border visible
-- **After first message**: Same box now contains the conversation
-- The container serves as a visual "stage" where the conversation will appear
+- New variable: `--jt-ev-chat-message-container-min-height`
+- Default: `auto` (no change to existing behavior)
+- Vindis preview: `120px` minimum height for the conversation container
 
