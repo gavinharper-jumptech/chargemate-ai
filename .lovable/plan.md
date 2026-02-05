@@ -1,53 +1,108 @@
 
 
-## Fix CSS Variable Inheritance for Widget Theming
+## Fix Message Container Border Scope
 
-The core issue is that CSS variables defined at `:root` level are resolved **at that level** and don't dynamically inherit from parent elements. The current approach sets `--jt-ev-chat-*` variables on the wrapper div, but the `:root` fallbacks were already resolved when the page loaded.
+The current implementation applies a border to individual assistant message bubbles. Based on the mockup, the teal border should wrap around the **entire conversation area** including:
+- User's question
+- AI's response  
+- Quick reply suggestion chips
 
 ---
 
-### The Problem
+### Current vs. Desired Layout
 
-```css
-/* In :root */
---background: var(--jt-ev-chat-background, 120 20% 98%);
+**Current behavior:**
+```
+┌─────────────────────────────┐
+│ [User message - no border]  │
+└─────────────────────────────┘
+┌─────────────────────────────┐
+│ ┌─ teal border ──────────┐  │
+│ │ AI response            │  │
+│ └────────────────────────┘  │
+└─────────────────────────────┘
+[Quick replies - no border]
 ```
 
-When this is evaluated at `:root`, `--jt-ev-chat-background` doesn't exist on `:root`, so it uses the fallback `120 20% 98%`. Later setting `--jt-ev-chat-background` on a child element **does not re-evaluate** the `:root` declaration.
+**Desired behavior (matches mockup):**
+```
+┌────────────────────────────────┐
+│ ┌─ teal border ─────────────┐  │
+│ │        [User message]     │  │
+│ │ AI response text...       │  │
+│ │ [Reply chip] [Reply chip] │  │
+│ └───────────────────────────┘  │
+└────────────────────────────────┘
+```
 
 ---
 
-### The Solution
+### Implementation Strategy
 
-Add a scoped CSS block for `.jt-ev-chat-widget` that re-declares all the internal theme variables using the `--jt-ev-chat-*` prefix. This ensures the variables are resolved **within the widget scope** where the custom properties are actually set.
+The border should wrap around the **messages content area** (not the welcome section or initial quick actions). In the "inputPosition: above" layout, this means wrapping the entire `<ChatMessages>` scrollable area content in a bordered container.
 
 ---
 
-### Changes to `src/index.css`
+### Changes Required
 
-Add a new CSS block that scopes all theme variables to `.jt-ev-chat-widget`:
+#### 1. Update ChatMessages.tsx
 
-```css
-/* Widget-scoped theming - inherits from --jt-ev-chat-* on this element or ancestors */
-.jt-ev-chat-widget {
-  font-family: var(--jt-ev-chat-font-family, inherit);
-  
-  /* Re-declare all theme tokens within widget scope */
-  --background: var(--jt-ev-chat-background, 120 20% 98%);
-  --foreground: var(--jt-ev-chat-foreground, 150 30% 15%);
-  --card: var(--jt-ev-chat-card, 0 0% 100%);
-  --card-foreground: var(--jt-ev-chat-card-foreground, 150 30% 15%);
-  --primary: var(--jt-ev-chat-primary, 142 55% 40%);
-  --primary-foreground: var(--jt-ev-chat-primary-foreground, 0 0% 100%);
-  /* ... all other variables ... */
-  
-  /* Component-specific controls */
-  --input-radius: var(--jt-ev-chat-input-radius, var(--radius));
-  --button-radius: var(--jt-ev-chat-button-radius, var(--radius));
-  --chip-radius: var(--jt-ev-chat-chip-radius, 9999px);
-  --chip-border: var(--jt-ev-chat-chip-border, hsl(var(--primary) / 0.3));
-  /* ... etc ... */
-}
+Wrap the messages, typing indicator, and quick replies in a single bordered container:
+
+```tsx
+// Inside the ScrollArea, wrap all message content in a container
+<div 
+  className={cn(
+    "flex flex-col gap-4 p-4",
+    useContainerStyling && filteredMessages.length > 0 && "pb-0"
+  )}
+>
+  {!hideWelcome && <WelcomeMessage />}
+  {!hideWelcome && <CategorizedQuickActions ... />}
+
+  {/* Bordered conversation container - only appears when there are messages */}
+  {filteredMessages.length > 0 && (
+    <div
+      className={cn(
+        "flex flex-col gap-4 p-4",
+        useContainerStyling && "bg-[hsl(var(--chat-assistant))]"
+      )}
+      style={useContainerStyling ? {
+        border: 'var(--message-container-border)',
+        maxWidth: 'var(--message-container-max-width)',
+        width: '100%',
+      } : undefined}
+    >
+      {/* All messages inside the bordered container */}
+      {filteredMessages.map((message) => (
+        <div key={message.id} ref={...}>
+          <MessageBubble ... />
+        </div>
+      ))}
+
+      {isLoading && <TypingIndicator />}
+
+      {!isLoading && quickReplySuggestions.length > 0 && (
+        <QuickReplies ... />
+      )}
+    </div>
+  )}
+
+  {/* Show typing and quick replies outside container if no messages yet */}
+  {filteredMessages.length === 0 && isLoading && <TypingIndicator />}
+</div>
+```
+
+#### 2. Remove Individual Message Border Styling
+
+Remove the per-message border/maxWidth styling since the container now handles it:
+
+```tsx
+// Remove this from individual messages:
+style={useContainerStyling && message.role === "assistant" ? {
+  border: 'var(--message-container-border)',
+  maxWidth: 'var(--message-container-max-width)',
+} : undefined}
 ```
 
 ---
@@ -56,27 +111,24 @@ Add a new CSS block that scopes all theme variables to `.jt-ev-chat-widget`:
 
 | File | Changes |
 |------|---------|
-| `src/index.css` | Add `.jt-ev-chat-widget { ... }` block with all scoped theme variables |
+| `src/components/chat/ChatMessages.tsx` | Move border from individual messages to conversation container wrapping all messages + quick replies |
 
 ---
 
-### Why This Works
+### Visual Result
 
-When the VindisPreview sets:
-```tsx
-<div className="jt-ev-chat-widget" style={{ '--jt-ev-chat-background': '210 15% 93%' }}>
-```
-
-The `.jt-ev-chat-widget` CSS rule evaluates `var(--jt-ev-chat-background, fallback)` **within the context of that element**, where `--jt-ev-chat-background` IS defined. So it picks up the correct value!
+After this change, the Vindis preview will show:
+- Grey background everywhere
+- When a conversation starts, a **single teal-bordered white container** appears
+- Inside the container: user question, AI response, and quick reply chips
+- The entire conversation thread is visually grouped together
 
 ---
 
-### Technical Summary
+### Technical Notes
 
-This is the standard pattern for building embeddable widgets with CSS custom property theming:
-
-1. `:root` provides global defaults for the app
-2. `.widget-class` provides scoped variable resolution for embedded contexts
-3. Parent pages set `--prefix-*` variables on the widget container
-4. The widget-scoped rules pick them up correctly
+- The border container only renders when there are messages (`filteredMessages.length > 0`)
+- Window mode remains unaffected (`useContainerStyling` guard)
+- The container uses `--chat-assistant` background color to make the entire box white in Vindis
+- Quick replies are now inside the bordered container, matching the mockup
 
