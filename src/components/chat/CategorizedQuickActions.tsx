@@ -46,13 +46,14 @@ const CategorizedQuickActions = ({ onSelect }: CategorizedQuickActionsProps) => 
               key={category.title}
               type="button"
               onClick={() => setActiveCategory(category.title)}
-              className={cn(
-                "px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors",
-                "border-b-2 -mb-px flex-shrink-0",
-                activeCategory === category.title
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              )}
+               className={cn(
+                 "px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors",
+                 "border-b-2 -mb-px flex-shrink-0",
+                 activeCategory === category.title
+                   ? "text-primary"
+                   : "border-transparent text-muted-foreground hover:text-foreground"
+               )}
+               style={activeCategory === category.title ? { borderColor: 'hsl(var(--tab-active-border))' } : undefined}
             >
               {category.title.toUpperCase()}
             </button>
