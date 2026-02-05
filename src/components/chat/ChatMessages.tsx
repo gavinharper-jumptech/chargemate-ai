@@ -6,7 +6,6 @@ import CategorizedQuickActions from "./CategorizedQuickActions";
 import QuickReplies from "./QuickReplies";
 import { extractSuggestions } from "@/lib/extractSuggestions";
 import { useChatConfig } from "@/context/ChatConfigContext";
-import { Zap } from "lucide-react";
 
 interface ChatMessage {
   id: string;
@@ -25,18 +24,13 @@ const WelcomeMessage = () => {
   const { welcomeTitle, welcomeMessage } = useChatConfig();
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 px-4 py-8 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-        <Zap className="h-8 w-8 text-primary" />
-      </div>
-      <div className="space-y-2">
-        <h2 className="text-xl font-semibold text-foreground">
-          {welcomeTitle}
-        </h2>
-        <p className="max-w-md text-muted-foreground">
-          {welcomeMessage}
-        </p>
-      </div>
+    <div className="flex flex-col items-center justify-center gap-2 px-4 py-6 text-center">
+      <h2 className="text-xl font-semibold text-foreground">
+        {welcomeTitle}
+      </h2>
+      <p className="max-w-md text-muted-foreground">
+        {welcomeMessage}
+      </p>
     </div>
   );
 };
