@@ -84,7 +84,7 @@ const CategorizedQuickActions = ({ onSelect }: CategorizedQuickActionsProps) => 
                   variant="outline"
                   size="sm"
                   onClick={() => onSelect(question)}
-                  className="border-primary/30 bg-card text-foreground transition-colors h-auto py-2 px-3 hover:bg-[hsl(var(--chip-hover-bg))] hover:border-[hsl(var(--chip-hover-border))] hover:text-[hsl(var(--chip-hover-text))]"
+                  className="border-[var(--chip-border)] bg-card text-foreground transition-colors h-auto py-2 px-3 hover:bg-[hsl(var(--chip-hover-bg))] hover:border-[hsl(var(--chip-hover-border))] hover:text-[hsl(var(--chip-hover-text))]"
                   style={{ borderRadius: 'var(--chip-radius)' }}
                 >
                   {question}
