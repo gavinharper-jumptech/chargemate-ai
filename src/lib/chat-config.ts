@@ -22,6 +22,9 @@ export interface CreateChatOptions {
   mode?: "window" | "fullscreen"; // Default: 'fullscreen'
   position?: "bottom-right" | "bottom-left"; // For window mode
 
+  // Layout
+  inputPosition?: "above" | "below"; // Default: 'below'
+
   // Content
   categories?: QuestionCategory[];
   initialMessages?: string[];
@@ -101,6 +104,9 @@ export function getConfig(options?: CreateChatOptions): EVChatConfig {
     // Mode and position
     mode: mergedOptions.mode || "fullscreen",
     position: mergedOptions.position || "bottom-right",
+
+    // Layout
+    inputPosition: mergedOptions.inputPosition || "below",
 
     // Webhook
     webhookUrl: mergedOptions.webhookUrl || DEFAULT_WEBHOOK_URL,

@@ -18,6 +18,8 @@ interface ChatMessagesProps {
   isLoading: boolean;
   showQuickActions: boolean;
   onQuickAction: (message: string) => void;
+  /** Hide welcome section and quick actions (used when inputPosition is 'above') */
+  hideWelcome?: boolean;
 }
 
 const WelcomeMessage = () => {
@@ -40,6 +42,7 @@ const ChatMessages = ({
   isLoading,
   showQuickActions,
   onQuickAction,
+  hideWelcome = false,
 }: ChatMessagesProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -118,9 +121,9 @@ const ChatMessages = ({
   return (
     <ScrollArea className="flex-1" ref={scrollRef}>
       <div className="flex flex-col gap-4 p-4">
-        <WelcomeMessage />
+        {!hideWelcome && <WelcomeMessage />}
         
-        {showQuickActions && (
+        {!hideWelcome && showQuickActions && (
           <div className="flex justify-center">
             <CategorizedQuickActions onSelect={onQuickAction} />
           </div>

@@ -4,6 +4,8 @@ import { useChatConfig } from "@/context/ChatConfigContext";
 import ChatHeader from "@/components/chat/ChatHeader";
 import ChatMessages from "@/components/chat/ChatMessages";
 import ChatInput from "@/components/chat/ChatInput";
+import WelcomeSection from "@/components/chat/WelcomeSection";
+import CategorizedQuickActions from "@/components/chat/CategorizedQuickActions";
 
 interface IndexProps {
   /** Override default height behavior for embedded contexts */
@@ -13,7 +15,7 @@ interface IndexProps {
 const Index = ({ className }: IndexProps) => {
   const [showQuickActions, setShowQuickActions] = useState(true);
   const { messages, sendMessage, isLoading } = useN8nChat();
-  const { isEmbedded, mode } = useChatConfig();
+  const { isEmbedded, mode, inputPosition } = useChatConfig();
 
   const handleSend = (content: string) => {
     setShowQuickActions(false);
@@ -27,6 +29,36 @@ const Index = ({ className }: IndexProps) => {
   // Hide header when embedded OR when any mode is explicitly set (widget usage)
   const showHeader = !isEmbedded && mode !== "window" && mode !== "fullscreen";
 
+  // Input above layout: welcome + quick actions + input at top, messages scroll below
+  if (inputPosition === "above") {
+    return (
+      <div className={className || "flex h-full flex-col bg-background"}>
+        {showHeader && <ChatHeader />}
+        
+        {/* Static top section */}
+        <div className="flex-shrink-0">
+          <WelcomeSection />
+          {showQuickActions && (
+            <div className="flex justify-center px-4 pb-4">
+              <CategorizedQuickActions onSelect={handleQuickAction} />
+            </div>
+          )}
+          <ChatInput onSend={handleSend} isLoading={isLoading} />
+        </div>
+        
+        {/* Scrollable messages section */}
+        <ChatMessages
+          messages={messages}
+          isLoading={isLoading}
+          showQuickActions={false}
+          onQuickAction={handleQuickAction}
+          hideWelcome
+        />
+      </div>
+    );
+  }
+
+  // Default: input below layout (traditional chat style)
   return (
     <div className={className || "flex h-full flex-col bg-background"}>
       {showHeader && <ChatHeader />}
