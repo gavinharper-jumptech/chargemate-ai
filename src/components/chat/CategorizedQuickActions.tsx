@@ -8,9 +8,9 @@
    onSelect: (message: string) => void;
  }
  
- const CategorizedQuickActions = ({ onSelect }: CategorizedQuickActionsProps) => {
-   const { categories } = useChatConfig();
-   const isMobile = useIsMobile();
+const CategorizedQuickActions = ({ onSelect }: CategorizedQuickActionsProps) => {
+  const { categories, mode } = useChatConfig();
+  const isMobile = useIsMobile();
    
    const [activeCategory, setActiveCategory] = useState<string>(() => 
      categories?.[0]?.title ?? ""
@@ -36,9 +36,12 @@
  
    return (
      <div className="flex flex-col w-full">
-       {/* Category Tabs */}
-        <div className="flex border-b border-border overflow-x-auto overflow-y-hidden scrollbar-hide">
-          {categories.map((category) => (
+        {/* Category Tabs */}
+         <div className={cn(
+           "flex border-b border-border overflow-x-auto overflow-y-hidden scrollbar-hide",
+           mode !== "window" && "justify-center"
+         )}>
+           {categories.map((category) => (
             <button
               key={category.title}
               type="button"

@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { MessageCircle, X, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Index from "@/pages/Index";
-import { useN8nChat } from "@/hooks/use-n8n-chat";
 
 interface ChatWindowProps {
   position?: "bottom-right" | "bottom-left";
@@ -10,7 +9,11 @@ interface ChatWindowProps {
 
 const ChatWindow = ({ position = "bottom-right" }: ChatWindowProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { clearMessages } = useN8nChat();
+  const clearMessagesRef = useRef<(() => void) | null>(null);
+
+  const handleNewChat = () => {
+    clearMessagesRef.current?.();
+  };
 
   const positionClasses = {
     "bottom-right": "right-4 bottom-4",
@@ -45,7 +48,7 @@ const ChatWindow = ({ position = "bottom-right" }: ChatWindowProps) => {
             <span className="font-medium text-foreground">Chat Assistant</span>
           </div>
           <button
-            onClick={clearMessages}
+            onClick={handleNewChat}
             className="p-1.5 rounded-lg hover:bg-muted transition-colors"
             aria-label="Start new chat"
             title="New chat"
@@ -63,7 +66,7 @@ const ChatWindow = ({ position = "bottom-right" }: ChatWindowProps) => {
 
         {/* Chat Content */}
         <div className="h-[calc(100%-56px)]">
-          <Index />
+          <Index onClearMessagesRef={(fn) => { clearMessagesRef.current = fn; }} />
         </div>
       </div>
 
