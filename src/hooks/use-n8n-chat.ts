@@ -21,7 +21,7 @@ const generateSessionId = (): string => {
 export const useN8nChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionId] = useState(generateSessionId);
+  const [sessionId, setSessionId] = useState(generateSessionId);
 
   const sendMessage = useCallback(
     async (content: string) => {
@@ -122,7 +122,10 @@ export const useN8nChat = () => {
 
   const clearMessages = useCallback(() => {
     setMessages([]);
-    sessionStorage.removeItem("n8n-session-id");
+    // Generate fresh session ID for new conversation
+    const newId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    sessionStorage.setItem("n8n-session-id", newId);
+    setSessionId(newId);
   }, []);
 
   return {

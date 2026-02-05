@@ -12,7 +12,7 @@ interface IndexProps {
 }
 
 const Index = ({ className }: IndexProps) => {
-  const { messages, sendMessage, isLoading } = useN8nChat();
+  const { messages, sendMessage, isLoading, clearMessages } = useN8nChat();
   const { isEmbedded, mode, inputPosition } = useChatConfig();
 
   const handleSend = (content: string) => {
@@ -31,7 +31,7 @@ const Index = ({ className }: IndexProps) => {
   if (inputPosition === "above" && mode !== "window") {
     return (
       <div className={className || "flex h-full flex-col bg-background"}>
-        {showHeader && <ChatHeader />}
+        {showHeader && <ChatHeader onNewChat={clearMessages} />}
         
         {/* Static top section */}
         <div className="flex-shrink-0">
@@ -56,7 +56,7 @@ const Index = ({ className }: IndexProps) => {
   // Default: input below layout (traditional chat style)
   return (
     <div className={className || "flex h-full flex-col bg-background overflow-hidden"}>
-      {showHeader && <ChatHeader />}
+      {showHeader && <ChatHeader onNewChat={clearMessages} />}
       <ChatMessages
         messages={messages}
         isLoading={isLoading}
