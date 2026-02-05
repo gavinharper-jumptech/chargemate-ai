@@ -74,7 +74,7 @@
              ))}
            </select>
          ) : (
-           <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 justify-center">
              {activeQuestions.map((question) => (
                <Button
                  key={question}
