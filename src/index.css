@@ -52,6 +52,7 @@
     /* Message container styling (fullscreen mode only) */
     --message-container-border: var(--jt-ev-chat-message-container-border, none);
     --message-container-max-width: var(--jt-ev-chat-message-container-max-width, 100%);
+    --message-container-bg: var(--jt-ev-chat-message-container-bg, var(--card));
 
     /* Message bubble radius */
     --message-bubble-radius: var(--jt-ev-chat-message-bubble-radius, 1rem);
@@ -116,6 +117,7 @@
     /* Message container styling (dark mode) */
     --message-container-border: var(--jt-ev-chat-message-container-border, none);
     --message-container-max-width: var(--jt-ev-chat-message-container-max-width, 100%);
+    --message-container-bg: var(--jt-ev-chat-message-container-bg, var(--card));
 
     /* Message bubble radius (dark mode) */
     --message-bubble-radius: var(--jt-ev-chat-message-bubble-radius, 1rem);
@@ -186,6 +188,7 @@
     /* Message container styling */
     --message-container-border: var(--jt-ev-chat-message-container-border, none);
     --message-container-max-width: var(--jt-ev-chat-message-container-max-width, 100%);
+    --message-container-bg: var(--jt-ev-chat-message-container-bg, var(--card));
 
     /* Message bubble radius */
     --message-bubble-radius: var(--jt-ev-chat-message-bubble-radius, 1rem);
