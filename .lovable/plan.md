@@ -1,57 +1,59 @@
 
 
-## Add "New Chat" Button to Reset Conversation
+## Fix New Chat Button & Category Tab Alignment
 
-Add a button to the chat header that clears all messages and generates a fresh session ID, giving users a clean slate to start a new conversation.
-
----
-
-### Changes Overview
-
-**1. Update the chat hook to properly reset the session**
-
-The current `clearMessages` function removes the session ID but doesn't regenerate one. We need to update it to also set a new session ID so subsequent messages use the fresh ID.
-
-**File: `src/hooks/use-n8n-chat.ts`**
-
-- Convert `sessionId` from `useState` to a ref or mutable state
-- Update `clearMessages` to generate and set a new session ID
+Three issues to address:
 
 ---
 
-**2. Pass the reset function to ChatHeader**
+### Issue 1: Window Mode - New Chat Button Doesn't Clear Messages
 
-ChatHeader needs access to the clear/reset function. We'll pass it as a prop from Index.tsx.
+**Root Cause:**
+`ChatWindow.tsx` calls `useN8nChat()` to get `clearMessages`, but `Index.tsx` (rendered inside) also calls `useN8nChat()` separately. Since the hook uses `useState`, these are **two completely independent state instances** - clearing one doesn't affect the other.
 
-**File: `src/components/chat/ChatHeader.tsx`**
+**Solution:**
+Instead of using the hook in `ChatWindow`, we need to pass the `clearMessages` function as a prop from `Index` up to the header. Since `Index` is the component that owns the chat state, its `clearMessages` is the one that matters.
 
-- Add `onNewChat` prop
-- Add a "New Chat" button with a `RotateCcw` or `Plus` icon
-- Style it to match the existing header aesthetic
+We'll add an optional `onNewChat` prop to `Index` and have it call back when the internal header's New Chat button is clicked. For window mode, we'll lift the reset logic by having `ChatWindow` listen to the same function.
 
----
-
-**3. Wire up the reset function in Index.tsx**
-
-Extract `clearMessages` from the hook and pass it to ChatHeader.
-
-**File: `src/pages/Index.tsx`**
-
-- Destructure `clearMessages` from `useN8nChat()`
-- Pass it to `<ChatHeader onNewChat={clearMessages} />`
-
----
-
-**4. Add "New Chat" button to ChatWindow header**
-
-The window mode has its own inline header. We need to add the reset button there too, which means lifting the reset function up.
+Actually, the simpler fix: **Make `Index` expose its clearMessages through a callback prop OR don't call useN8nChat in ChatWindow at all** - just remove that call since it's not doing anything useful.
 
 **File: `src/components/chat/ChatWindow.tsx`**
+- Remove the separate `useN8nChat` call 
+- Add the New Chat button that triggers a custom event or calls a prop
+- Actually best approach: Pass `onNewChat` prop to Index and have Index handle the reset
 
-- Use `useN8nChat` directly in ChatWindow OR
-- Create a shared context for the reset function
+---
 
-The cleanest approach: Move the chat state to ChatWindow level for window mode, passing the reset function to its header.
+### Issue 2: Fullscreen Mode - No New Chat Button Visible
+
+**Root Cause:**
+The header is hidden in fullscreen mode (line 27 of Index.tsx), so the New Chat button inside it is never rendered.
+
+**Solution:**
+Add a New Chat button that appears in fullscreen mode. Good options:
+1. Add it to the welcome section area
+2. Add it floating in the top-right corner
+3. Add it next to the input field
+
+Best UX: Add a subtle New Chat button in the top-right corner of the chat area when header is hidden.
+
+**File: `src/pages/Index.tsx`**
+- Add a floating New Chat button when `!showHeader` and there are messages
+
+---
+
+### Issue 3: Fullscreen Mode - Category Tabs Left-Aligned
+
+**Root Cause:**
+We removed centering from tabs to fix window mode overflow, but this affected fullscreen too.
+
+**Solution:**
+Use the `mode` from config to conditionally apply centering - center in fullscreen, left-align in window mode.
+
+**File: `src/components/chat/CategorizedQuickActions.tsx`**
+- Get `mode` from `useChatConfig()`
+- Apply `justify-center` only when `mode !== "window"`
 
 ---
 
@@ -59,47 +61,54 @@ The cleanest approach: Move the chat state to ChatWindow level for window mode, 
 
 | File | Action | Description |
 |------|--------|-------------|
-| `src/hooks/use-n8n-chat.ts` | **Edit** | Update `clearMessages` to regenerate session ID |
-| `src/components/chat/ChatHeader.tsx` | **Edit** | Add `onNewChat` prop and "New Chat" button |
-| `src/pages/Index.tsx` | **Edit** | Pass `clearMessages` to ChatHeader |
-| `src/components/chat/ChatWindow.tsx` | **Edit** | Integrate reset button into window header |
+| `src/components/chat/ChatWindow.tsx` | **Edit** | Remove duplicate useN8nChat call, pass onNewChat prop to Index |
+| `src/pages/Index.tsx` | **Edit** | Add onNewChat prop, add floating New Chat button for fullscreen mode |
+| `src/components/chat/CategorizedQuickActions.tsx` | **Edit** | Conditionally center tabs based on mode |
 
 ---
 
 ### Technical Details
 
-**Updated hook logic:**
-```typescript
-// Use state instead of one-time generation
-const [sessionId, setSessionId] = useState(generateSessionId);
+**ChatWindow.tsx changes:**
+```tsx
+// Remove: const { clearMessages } = useN8nChat();
 
-const clearMessages = useCallback(() => {
-  setMessages([]);
-  sessionStorage.removeItem("n8n-session-id");
-  // Generate fresh session ID
-  const newId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-  sessionStorage.setItem("n8n-session-id", newId);
-  setSessionId(newId);
-}, []);
+// Add prop to Index
+<Index onNewChat={handleNewChat} />
+
+// Header button calls a function that forces Index to reset
 ```
 
-**ChatHeader button:**
+**Index.tsx - floating button for fullscreen:**
 ```tsx
-<button
-  onClick={onNewChat}
-  className="p-2 rounded-lg hover:bg-muted transition-colors"
-  aria-label="Start new chat"
->
-  <RotateCcw className="h-5 w-5 text-muted-foreground" />
-</button>
+{!showHeader && messages.length > 0 && (
+  <button
+    onClick={clearMessages}
+    className="absolute top-2 right-2 p-2 rounded-lg hover:bg-muted transition-colors z-10"
+    aria-label="Start new chat"
+    title="New chat"
+  >
+    <RotateCcw className="h-5 w-5 text-muted-foreground" />
+  </button>
+)}
+```
+
+**CategorizedQuickActions.tsx - conditional centering:**
+```tsx
+const { categories, mode } = useChatConfig();
+// ...
+<div className={cn(
+  "flex border-b border-border overflow-x-auto overflow-y-hidden scrollbar-hide",
+  mode !== "window" && "justify-center"
+)}>
 ```
 
 ---
 
 ### Result
 
-- Users can start fresh conversations at any time
-- The n8n backend will treat it as a new session with no prior context
-- Button is accessible in both window mode and fullscreen/standalone mode
-- Consistent UX across all display modes
+- Window mode: New Chat button properly clears conversation
+- Fullscreen mode: New Chat button visible in top-right when messages exist
+- Fullscreen mode: Category tabs centered again
+- Window mode: Category tabs remain left-aligned for better fit
 
