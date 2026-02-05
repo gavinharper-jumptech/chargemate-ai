@@ -67,19 +67,23 @@ const vindisStyles: React.CSSProperties & Record<string, string> = {
   // Muted text styling
   '--jt-ev-chat-muted-foreground': '210 10% 45%',
   
-  // Border color for chips (grey)
-  '--jt-ev-chat-border': '210 10% 75%',
-  '--jt-ev-chat-chip-border': '210 10% 75%',
+  // Border color
+  '--jt-ev-chat-border': '214 32% 91%',
   
   // SQUARE corners for everything
   '--jt-ev-chat-input-radius': '0',
   '--jt-ev-chat-button-radius': '0',
   '--jt-ev-chat-chip-radius': '0',
   
-  // Chip hover: white bg, teal-green border
+  // Chip styling: white bg, #e2e8f0 border, dark navy text
+  '--jt-ev-chat-chip-bg': '0 0% 100%',
+  '--jt-ev-chat-chip-text': '203 100% 12%',
+  '--jt-ev-chat-chip-border': 'hsl(214 32% 91%)',
+  
+  // Chip hover: white bg, teal border, dark navy text
   '--jt-ev-chat-chip-hover-bg': '0 0% 100%',
   '--jt-ev-chat-chip-hover-border': '172 100% 35%',
-  '--jt-ev-chat-chip-hover-text': '172 100% 35%',
+  '--jt-ev-chat-chip-hover-text': '203 100% 12%',
   
   // Input box: light gray border, white background, dark text
   '--jt-ev-chat-input': '220 13% 91%',
