@@ -80,9 +80,10 @@ const vindisStyles: React.CSSProperties & Record<string, string> = {
   '--jt-ev-chat-chip-hover-border': '172 100% 35%',
   '--jt-ev-chat-chip-hover-text': '172 100% 35%',
   
-  // Input box: white background
-  '--jt-ev-chat-input': '0 0% 100%',
+  // Input box: light gray border, white background, dark text
+  '--jt-ev-chat-input': '220 13% 91%',
   '--jt-ev-chat-input-container-bg': '0 0% 100%',
+  '--jt-ev-chat-input-text': '220 13% 26%',
   
   // Message container: teal-green border, white bg
   '--jt-ev-chat-message-container-border': '2px solid hsl(172 100% 35%)',
