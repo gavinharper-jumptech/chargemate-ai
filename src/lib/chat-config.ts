@@ -25,6 +25,7 @@ export interface CreateChatOptions {
 
   // Layout
   inputPosition?: "above" | "below"; // Default: 'below'
+  inputLayout?: "separate" | "embedded"; // Default: 'separate' (embedded only works in fullscreen)
 
   // Content
   categories?: QuestionCategory[];
@@ -108,6 +109,7 @@ export function getConfig(options?: CreateChatOptions): EVChatConfig {
 
     // Layout
     inputPosition: mergedOptions.inputPosition || "below",
+    inputLayout: mergedOptions.inputLayout || "separate",
 
     // Webhook
     webhookUrl: mergedOptions.webhookUrl || DEFAULT_WEBHOOK_URL,
