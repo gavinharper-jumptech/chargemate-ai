@@ -1,54 +1,61 @@
 
+# Fix Widget Internal Scrolling
 
-# Add Test HTML Page to Public Folder
+## Problem Summary
+The chat widget's internal scrolling is completely broken when embedded. Messages don't scroll within the widget because the height chain is broken:
 
-## Overview
-Add your Vindis mockup HTML file to the `public` folder so we can test the widget embedding directly within the Lovable preview environment. This will help isolate whether the scroll jump is caused by the widget or by specific CSS/structure in your HTML.
+1. Your `#ev-chat` container has `height: 700px` ✓
+2. But `.jt-ev-chat-widget` (created by `createChat`) has no height set → defaults to `auto`
+3. The `Index` component uses `h-full` (100% of parent) → but parent is `auto`
+4. The `ScrollArea` uses `flex-1` → but without a constrained parent, it expands infinitely
+5. Result: Content grows past 700px, gets clipped by `overflow: hidden`, no internal scroll
 
-## Plan
+## Solution
 
-### Step 1: Add HTML Test Page
-Create `public/test-vindis.html` with your mockup content.
+### 1. Add `height: 100%` to the widget wrapper class
 
-After this is added, you'll be able to access it at:
-- **Preview URL**: `https://id-preview--6802abd8-f688-443a-9b18-9769b00fc3f6.lovable.app/test-vindis.html`
+**File: `src/index.css`** (line 178)
 
-### Step 2: Potential Widget Fixes to Investigate
-
-Based on my analysis, there are a few things that could still cause scroll issues:
-
-1. **Quick Replies Scroll (lines 116-127)** - There's another scroll trigger when quick reply chips appear that could affect the page
-
-2. **Loading State Scroll (lines 106-108)** - When the typing indicator appears, it also triggers a scroll
-
-3. **Missing `overflow: hidden` on container** - If your HTML container doesn't prevent scroll propagation, the widget's internal scroll events might bubble up
-
-### Step 3: Add Debug Logging (Optional)
-We can temporarily add console logs to track which scroll events are firing, helping us pinpoint the exact cause.
-
-## Technical Details
-
-### Files to Create
-| File | Purpose |
-|------|---------|
-| `public/test-vindis.html` | Your mockup page for testing |
-
-### Accessing the Test Page
-Once added, navigate to `/test-vindis.html` in the preview to test the embedded widget behavior.
-
-### CSS Investigation Points
-Your HTML container should have:
+Add height to `.jt-ev-chat-widget`:
 ```css
-#chat-container {
-  overflow: hidden; /* Prevents scroll events from bubbling */
-  position: relative;
+.jt-ev-chat-widget {
+  height: 100%;  /* NEW - inherit height from parent container */
+  font-family: var(--jt-ev-chat-font-family, inherit);
+  /* ... rest of existing variables ... */
 }
 ```
 
-## Next Steps After Testing
-1. Access the test page in the preview
-2. Trigger a chat response and observe behavior
-3. Check browser console for any scroll-related logs
-4. If the issue persists in our controlled environment, we'll know it's the widget
-5. If it works here but not on your server, it's likely a CSS conflict in your page
+### 2. Fix the overflow on embedded Index component
 
+**File: `src/pages/Index.tsx`** (line 42 and 79)
+
+The `className` fallback uses `overflow-hidden` which clips content. But when embedded (`className` is undefined), we need the internal layout to allow scrolling while the outer container handles clipping:
+
+```tsx
+// Line 42 (inputPosition above layout)
+<div className={className || "flex h-full flex-col bg-background relative"}>
+
+// Line 79 (default layout) 
+<div className={className || "flex h-full flex-col bg-background relative"}>
+```
+
+Note: `overflow-hidden` is removed since the host page's container (`#ev-chat`) already handles clipping.
+
+## Why This Fixes Both Issues
+
+| Before | After |
+|--------|-------|
+| Widget has no height → expands infinitely | Widget has `100%` height → constrained to container |
+| ScrollArea has infinite space → never scrolls | ScrollArea fills fixed space → scrolls naturally |
+| Page jumps when AI responds | Page stays put, only widget scrolls |
+
+## Technical Details
+
+The height chain will now be:
+```
+#ev-chat (700px)
+  └── .jt-ev-chat-widget (100% = 700px)
+        └── Index div (h-full = 700px)
+              └── ScrollArea (flex-1, fills remaining space)
+                    └── Internal content scrolls here
+```
