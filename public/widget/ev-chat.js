@@ -1237,7 +1237,7 @@ function Jm(e) {
   }
   return null;
 }
-var eg = Et.unstable_scheduleCallback, Bd = Et.unstable_cancelCallback, fx = Et.unstable_shouldYield, dx = Et.unstable_requestPaint, Ae = Et.unstable_now, px = Et.unstable_getCurrentPriorityLevel, nf = Et.unstable_ImmediatePriority, tg = Et.unstable_UserBlockingPriority, ds = Et.unstable_NormalPriority, hx = Et.unstable_LowPriority, ng = Et.unstable_IdlePriority, qs = null, dn = null;
+var eg = Et.unstable_scheduleCallback, Bd = Et.unstable_cancelCallback, fx = Et.unstable_shouldYield, dx = Et.unstable_requestPaint, Re = Et.unstable_now, px = Et.unstable_getCurrentPriorityLevel, nf = Et.unstable_ImmediatePriority, tg = Et.unstable_UserBlockingPriority, ds = Et.unstable_NormalPriority, hx = Et.unstable_LowPriority, ng = Et.unstable_IdlePriority, qs = null, dn = null;
 function mx(e) {
   if (dn && typeof dn.onCommitFiberRoot == "function") try {
     dn.onCommitFiberRoot(qs, e, void 0, (e.current.flags & 128) === 128);
@@ -3964,15 +3964,15 @@ function _1(e, t, n) {
           }
           e = e.sibling;
         }
-        o.tail !== null && Ae() > $i && (t.flags |= 128, r = !0, uo(o, !1), t.lanes = 4194304);
+        o.tail !== null && Re() > $i && (t.flags |= 128, r = !0, uo(o, !1), t.lanes = 4194304);
       }
       else {
         if (!r) if (e = Es(l), e !== null) {
           if (t.flags |= 128, r = !0, n = e.updateQueue, n !== null && (t.updateQueue = n, t.flags |= 4), uo(o, !0), o.tail === null && o.tailMode === "hidden" && !l.alternate && !be) return Ve(t), null;
-        } else 2 * Ae() - o.renderingStartTime > $i && n !== 1073741824 && (t.flags |= 128, r = !0, uo(o, !1), t.lanes = 4194304);
+        } else 2 * Re() - o.renderingStartTime > $i && n !== 1073741824 && (t.flags |= 128, r = !0, uo(o, !1), t.lanes = 4194304);
         o.isBackwards ? (l.sibling = t.child, t.child = l) : (n = o.last, n !== null ? n.sibling = l : t.child = l, o.last = l);
       }
-      return o.tail !== null ? (t = o.tail, o.rendering = t, o.tail = t.sibling, o.renderingStartTime = Ae(), t.sibling = null, n = Se.current, ye(Se, r ? n & 1 | 2 : n & 1), t) : (Ve(t), null);
+      return o.tail !== null ? (t = o.tail, o.rendering = t, o.tail = t.sibling, o.renderingStartTime = Re(), t.sibling = null, n = Se.current, ye(Se, r ? n & 1 | 2 : n & 1), t) : (Ve(t), null);
     case 22:
     case 23:
       return Lf(), r = t.memoizedState !== null, e !== null && e.memoizedState !== null !== r && (t.flags |= 8192), r && t.mode & 1 ? wt & 1073741824 && (Ve(t), t.subtreeFlags & 6 && (t.flags |= 8192)) : Ve(t), null;
@@ -4351,7 +4351,7 @@ function vy(e, t) {
       Ut(t, e), on(e);
       break;
     case 13:
-      Ut(t, e), on(e), i = e.child, i.flags & 8192 && (o = i.memoizedState !== null, i.stateNode.isHidden = o, !o || i.alternate !== null && i.alternate.memoizedState !== null || (If = Ae())), r & 4 && Ap(e);
+      Ut(t, e), on(e), i = e.child, i.flags & 8192 && (o = i.memoizedState !== null, i.stateNode.isHidden = o, !o || i.alternate !== null && i.alternate.memoizedState !== null || (If = Re())), r & 4 && Ap(e);
       break;
     case 22:
       if (f = n !== null && n.memoizedState !== null, e.mode & 1 ? (Qe = (u = Qe) || f, Ut(t, e), Qe = u) : Ut(t, e), on(e), r & 8192) {
@@ -4654,14 +4654,14 @@ function Ip(e) {
 }
 var z1 = Math.ceil, As = Dn.ReactCurrentDispatcher, Rf = Dn.ReactCurrentOwner, Ot = Dn.ReactCurrentBatchConfig, ae = 0, ze = null, _e = null, je = 0, wt = 0, gi = xr(0), Oe = 0, Xo = null, Wr = 0, na = 0, Nf = 0, Ao = null, ut = null, If = 0, $i = 1 / 0, bn = null, Rs = !1, pc = null, cr = null, Ol = !1, ir = null, Ns = 0, Ro = 0, hc = null, es = -1, ts = 0;
 function rt() {
-  return ae & 6 ? Ae() : es !== -1 ? es : es = Ae();
+  return ae & 6 ? Re() : es !== -1 ? es : es = Re();
 }
 function fr(e) {
   return e.mode & 1 ? ae & 2 && je !== 0 ? je & -je : x1.transition !== null ? (ts === 0 && (ts = rg()), ts) : (e = fe, e !== 0 || (e = window.event, e = e === void 0 ? 16 : cg(e.type)), e) : 1;
 }
 function Gt(e, t, n, r) {
   if (50 < Ro) throw Ro = 0, hc = null, Error(F(185));
-  ll(e, n, r), (!(ae & 2) || e !== ze) && (e === ze && (!(ae & 2) && (na |= n), Oe === 4 && Gn(e, je)), pt(e, r), n === 1 && ae === 0 && !(t.mode & 1) && ($i = Ae() + 500, Zs && kr()));
+  ll(e, n, r), (!(ae & 2) || e !== ze) && (e === ze && (!(ae & 2) && (na |= n), Oe === 4 && Gn(e, je)), pt(e, r), n === 1 && ae === 0 && !(t.mode & 1) && ($i = Re() + 500, Zs && kr()));
 }
 function pt(e, t) {
   var n = e.callbackNode;
@@ -4706,7 +4706,7 @@ function xy(e, t) {
     var i = ae;
     ae |= 2;
     var o = by();
-    (ze !== e || je !== t) && (bn = null, $i = Ae() + 500, Br(e, t));
+    (ze !== e || je !== t) && (bn = null, $i = Re() + 500, Br(e, t));
     do
       try {
         B1();
@@ -4718,10 +4718,10 @@ function xy(e, t) {
     gf(), As.current = o, ae = i, _e !== null ? t = 0 : (ze = null, je = 0, t = Oe);
   }
   if (t !== 0) {
-    if (t === 2 && (i = $u(e), i !== 0 && (r = i, t = mc(e, i))), t === 1) throw n = Xo, Br(e, 0), Gn(e, r), pt(e, Ae()), n;
+    if (t === 2 && (i = $u(e), i !== 0 && (r = i, t = mc(e, i))), t === 1) throw n = Xo, Br(e, 0), Gn(e, r), pt(e, Re()), n;
     if (t === 6) Gn(e, r);
     else {
-      if (i = e.current.alternate, !(r & 30) && !F1(i) && (t = Is(e, r), t === 2 && (o = $u(e), o !== 0 && (r = o, t = mc(e, o))), t === 1)) throw n = Xo, Br(e, 0), Gn(e, r), pt(e, Ae()), n;
+      if (i = e.current.alternate, !(r & 30) && !F1(i) && (t = Is(e, r), t === 2 && (o = $u(e), o !== 0 && (r = o, t = mc(e, o))), t === 1)) throw n = Xo, Br(e, 0), Gn(e, r), pt(e, Re()), n;
       switch (e.finishedWork = i, e.finishedLanes = r, t) {
         case 0:
         case 1:
@@ -4730,7 +4730,7 @@ function xy(e, t) {
           Rr(e, ut, bn);
           break;
         case 3:
-          if (Gn(e, r), (r & 130023424) === r && (t = If + 500 - Ae(), 10 < t)) {
+          if (Gn(e, r), (r & 130023424) === r && (t = If + 500 - Re(), 10 < t)) {
             if (ps(e, 0) !== 0) break;
             if (i = e.suspendedLanes, (i & r) !== r) {
               rt(), e.pingedLanes |= e.suspendedLanes & i;
@@ -4747,7 +4747,7 @@ function xy(e, t) {
             var l = 31 - Xt(r);
             o = 1 << l, l = t[l], l > i && (i = l), r &= ~o;
           }
-          if (r = i, r = Ae() - r, r = (120 > r ? 120 : 480 > r ? 480 : 1080 > r ? 1080 : 1920 > r ? 1920 : 3e3 > r ? 3e3 : 4320 > r ? 4320 : 1960 * z1(r / 1960)) - r, 10 < r) {
+          if (r = i, r = Re() - r, r = (120 > r ? 120 : 480 > r ? 480 : 1080 > r ? 1080 : 1920 > r ? 1920 : 3e3 > r ? 3e3 : 4320 > r ? 4320 : 1960 * z1(r / 1960)) - r, 10 < r) {
             e.timeoutHandle = Ku(Rr.bind(null, e, ut, bn), r);
             break;
           }
@@ -4761,7 +4761,7 @@ function xy(e, t) {
       }
     }
   }
-  return pt(e, Ae()), e.callbackNode === n ? xy.bind(null, e) : null;
+  return pt(e, Re()), e.callbackNode === n ? xy.bind(null, e) : null;
 }
 function mc(e, t) {
   var n = Ao;
@@ -4806,15 +4806,15 @@ function _p(e) {
   if (ae & 6) throw Error(F(327));
   bi();
   var t = ps(e, 0);
-  if (!(t & 1)) return pt(e, Ae()), null;
+  if (!(t & 1)) return pt(e, Re()), null;
   var n = Is(e, t);
   if (e.tag !== 0 && n === 2) {
     var r = $u(e);
     r !== 0 && (t = r, n = mc(e, r));
   }
-  if (n === 1) throw n = Xo, Br(e, 0), Gn(e, t), pt(e, Ae()), n;
+  if (n === 1) throw n = Xo, Br(e, 0), Gn(e, t), pt(e, Re()), n;
   if (n === 6) throw Error(F(345));
-  return e.finishedWork = e.current.alternate, e.finishedLanes = t, Rr(e, ut, bn), pt(e, Ae()), null;
+  return e.finishedWork = e.current.alternate, e.finishedLanes = t, Rr(e, ut, bn), pt(e, Re()), null;
 }
 function _f(e, t) {
   var n = ae;
@@ -4822,7 +4822,7 @@ function _f(e, t) {
   try {
     return e(t);
   } finally {
-    ae = n, ae === 0 && ($i = Ae() + 500, Zs && kr());
+    ae = n, ae === 0 && ($i = Re() + 500, Zs && kr());
   }
 }
 function Qr(e) {
@@ -5049,7 +5049,7 @@ function $1(e, t, n, r) {
     var s = ae;
     ae |= 4, Rf.current = null, D1(e, n), vy(n, e), s1(qu), hs = !!Qu, qu = Qu = null, e.current = n, M1(n), dx(), ae = s, fe = l, Ot.transition = o;
   } else e.current = n;
-  if (Ol && (Ol = !1, ir = e, Ns = i), o = e.pendingLanes, o === 0 && (cr = null), mx(n.stateNode), pt(e, Ae()), t !== null) for (r = e.onRecoverableError, n = 0; n < t.length; n++) i = t[n], r(i.value, { componentStack: i.stack, digest: i.digest });
+  if (Ol && (Ol = !1, ir = e, Ns = i), o = e.pendingLanes, o === 0 && (cr = null), mx(n.stateNode), pt(e, Re()), t !== null) for (r = e.onRecoverableError, n = 0; n < t.length; n++) i = t[n], r(i.value, { componentStack: i.stack, digest: i.digest });
   if (Rs) throw Rs = !1, e = pc, pc = null, e;
   return Ns & 1 && e.tag !== 0 && bi(), o = e.pendingLanes, o & 1 ? e === hc ? Ro++ : (Ro = 0, hc = e) : Ro = 0, kr(), null;
 }
@@ -5185,7 +5185,7 @@ function Pe(e, t, n) {
 }
 function U1(e, t, n) {
   var r = e.pingCache;
-  r !== null && r.delete(t), t = rt(), e.pingedLanes |= e.suspendedLanes & n, ze === e && (je & n) === n && (Oe === 4 || Oe === 3 && (je & 130023424) === je && 500 > Ae() - If ? Br(e, 0) : Nf |= n), pt(e, t);
+  r !== null && r.delete(t), t = rt(), e.pingedLanes |= e.suspendedLanes & n, ze === e && (je & n) === n && (Oe === 4 || Oe === 3 && (je & 130023424) === je && 500 > Re() - If ? Br(e, 0) : Nf |= n), pt(e, t);
 }
 function Ey(e, t) {
   t === 0 && (e.mode & 1 ? (t = Cl, Cl <<= 1, !(Cl & 130023424) && (Cl = 4194304)) : t = 1);
@@ -5588,7 +5588,7 @@ og = function(e) {
       var t = e.stateNode;
       if (t.current.memoizedState.isDehydrated) {
         var n = wo(t.pendingLanes);
-        n !== 0 && (rf(t, n | 1), pt(t, Ae()), !(ae & 6) && ($i = Ae() + 500, kr()));
+        n !== 0 && (rf(t, n | 1), pt(t, Re()), !(ae & 6) && ($i = Re() + 500, kr()));
       }
       break;
     case 13:
@@ -9171,14 +9171,14 @@ const ve = (e) => {
     }
   };
 }, Lb = /* @__PURE__ */ hb(_b);
-function Re(...e) {
+function Ae(...e) {
   return Lb(av(e));
 }
 const Ob = Xk, gv = k.forwardRef(({ className: e, ...t }, n) => /* @__PURE__ */ T.jsx(
   tv,
   {
     ref: n,
-    className: Re(
+    className: Ae(
       "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
       e
     ),
@@ -9199,13 +9199,13 @@ const Db = uv(
       variant: "default"
     }
   }
-), yv = k.forwardRef(({ className: e, variant: t, ...n }, r) => /* @__PURE__ */ T.jsx(nv, { ref: r, className: Re(Db({ variant: t }), e), ...n }));
+), yv = k.forwardRef(({ className: e, variant: t, ...n }, r) => /* @__PURE__ */ T.jsx(nv, { ref: r, className: Ae(Db({ variant: t }), e), ...n }));
 yv.displayName = nv.displayName;
 const Mb = k.forwardRef(({ className: e, ...t }, n) => /* @__PURE__ */ T.jsx(
   ov,
   {
     ref: n,
-    className: Re(
+    className: Ae(
       "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors group-[.destructive]:border-muted/40 hover:bg-secondary group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 group-[.destructive]:focus:ring-destructive disabled:pointer-events-none disabled:opacity-50",
       e
     ),
@@ -9217,7 +9217,7 @@ const vv = k.forwardRef(({ className: e, ...t }, n) => /* @__PURE__ */ T.jsx(
   lv,
   {
     ref: n,
-    className: Re(
+    className: Ae(
       "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity group-hover:opacity-100 group-[.destructive]:text-red-300 hover:text-foreground group-[.destructive]:hover:text-red-50 focus:opacity-100 focus:outline-none focus:ring-2 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
       e
     ),
@@ -9227,9 +9227,9 @@ const vv = k.forwardRef(({ className: e, ...t }, n) => /* @__PURE__ */ T.jsx(
   }
 ));
 vv.displayName = lv.displayName;
-const wv = k.forwardRef(({ className: e, ...t }, n) => /* @__PURE__ */ T.jsx(rv, { ref: n, className: Re("text-sm font-semibold", e), ...t }));
+const wv = k.forwardRef(({ className: e, ...t }, n) => /* @__PURE__ */ T.jsx(rv, { ref: n, className: Ae("text-sm font-semibold", e), ...t }));
 wv.displayName = rv.displayName;
-const xv = k.forwardRef(({ className: e, ...t }, n) => /* @__PURE__ */ T.jsx(iv, { ref: n, className: Re("text-sm opacity-90", e), ...t }));
+const xv = k.forwardRef(({ className: e, ...t }, n) => /* @__PURE__ */ T.jsx(iv, { ref: n, className: Ae("text-sm opacity-90", e), ...t }));
 xv.displayName = iv.displayName;
 function zb() {
   const { toasts: e } = rk();
@@ -11312,7 +11312,7 @@ const $C = BC, UC = k.forwardRef(({ className: e, sideOffset: t = 4, ...n }, r) 
   {
     ref: r,
     sideOffset: t,
-    className: Re(
+    className: Ae(
       "z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
       e
     ),
@@ -13374,7 +13374,7 @@ function Vi(e, t) {
   }, [e, n]);
 }
 var h0 = r0, ME = o0, zE = c0;
-const m0 = k.forwardRef(({ className: e, children: t, ...n }, r) => /* @__PURE__ */ T.jsxs(h0, { ref: r, className: Re("relative overflow-hidden", e), ...n, children: [
+const m0 = k.forwardRef(({ className: e, children: t, ...n }, r) => /* @__PURE__ */ T.jsxs(h0, { ref: r, className: Ae("relative overflow-hidden", e), ...n, children: [
   /* @__PURE__ */ T.jsx(ME, { className: "h-full w-full rounded-[inherit]", children: t }),
   /* @__PURE__ */ T.jsx(g0, {}),
   /* @__PURE__ */ T.jsx(zE, {})
@@ -13385,7 +13385,7 @@ const g0 = k.forwardRef(({ className: e, orientation: t = "vertical", ...n }, r)
   {
     ref: r,
     orientation: t,
-    className: Re(
+    className: Ae(
       "flex touch-none select-none transition-colors",
       t === "vertical" && "h-full w-2.5 border-l border-l-transparent p-[1px]",
       t === "horizontal" && "h-2.5 flex-col border-t border-t-transparent p-[1px]",
@@ -22039,14 +22039,14 @@ const RI = ({ content: e, role: t }) => {
   return /* @__PURE__ */ T.jsx(
     "div",
     {
-      className: Re(
+      className: Ae(
         "flex w-full animate-fade-in",
         n ? "justify-end" : "justify-start"
       ),
       children: /* @__PURE__ */ T.jsx(
         "div",
         {
-          className: Re(
+          className: Ae(
             "max-w-[85%] px-4 py-3 md:max-w-[70%] text-left",
             n ? "bg-chat-user text-chat-user-foreground" : "bg-chat-assistant text-chat-assistant-foreground"
           ),
@@ -22064,7 +22064,10 @@ const RI = ({ content: e, role: t }) => {
                     href: r,
                     target: "_blank",
                     rel: "noopener noreferrer",
-                    className: "underline break-all opacity-90 hover:opacity-100",
+                    className: Ae(
+                      "underline break-all font-medium transition-colors",
+                      t === "assistant" ? "text-chat-assistant-link hover:text-chat-assistant-link-hover" : "text-chat-user-link hover:text-chat-user-link-hover"
+                    ),
                     children: i
                   }
                 ),
@@ -22134,7 +22137,7 @@ const RI = ({ content: e, role: t }) => {
 ), Ti = k.forwardRef(
   ({ className: e, variant: t, size: n, asChild: r = !1, ...i }, o) => {
     const l = r ? ok : "button";
-    return /* @__PURE__ */ T.jsx(l, { className: Re(II({ variant: t, size: n, className: e })), ref: o, ...i });
+    return /* @__PURE__ */ T.jsx(l, { className: Ae(II({ variant: t, size: n, className: e })), ref: o, ...i });
   }
 );
 Ti.displayName = "Button";
@@ -22168,7 +22171,7 @@ const bw = ({ onSelect: e }) => {
     /* @__PURE__ */ T.jsx(
       "div",
       {
-        className: Re(
+        className: Ae(
           "flex overflow-x-auto overflow-y-hidden scrollbar-hide",
           n !== "window" && "justify-center"
         ),
@@ -22178,7 +22181,7 @@ const bw = ({ onSelect: e }) => {
           {
             type: "button",
             onClick: () => o(a.title),
-            className: Re(
+            className: Ae(
               "px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors",
               "-mb-px flex-shrink-0",
               i === a.title ? "text-primary" : "border-b-2 border-transparent text-muted-foreground hover:text-foreground"
@@ -22305,7 +22308,7 @@ const DI = () => {
     /* @__PURE__ */ T.jsx(
       "div",
       {
-        className: Re(
+        className: Ae(
           "flex-1 min-h-0 flex flex-col overflow-hidden",
           u && "mx-auto bg-[hsl(var(--message-container-bg))]"
         ),
@@ -22347,7 +22350,7 @@ const DI = () => {
 }, Vc = k.forwardRef(({ className: e, ...t }, n) => /* @__PURE__ */ T.jsx(
   "textarea",
   {
-    className: Re(
+    className: Ae(
       "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
       e
     ),
@@ -22391,7 +22394,7 @@ const cm = ({ onSend: e, isLoading: t }) => {
               {
                 type: "submit",
                 disabled: !r.trim() || t,
-                className: Re(
+                className: Ae(
                   "h-auto shrink-0 px-6 self-stretch hover:bg-[hsl(var(--primary-hover))]",
                   l ? "min-w-[140px]" : "w-14"
                 ),
@@ -22530,7 +22533,7 @@ const cm = ({ onSend: e, isLoading: t }) => {
     /* @__PURE__ */ T.jsxs(
       "div",
       {
-        className: Re(
+        className: Ae(
           "fixed z-50 w-[380px] h-[600px] max-h-[80vh] rounded-2xl shadow-2xl overflow-hidden",
           "bg-background border border-border",
           "transition-all duration-300 ease-out",
@@ -22561,7 +22564,7 @@ const cm = ({ onSend: e, isLoading: t }) => {
       "button",
       {
         onClick: () => n(!t),
-        className: Re(
+        className: Ae(
           "fixed z-50 flex items-center justify-center",
           "w-14 h-14 rounded-full shadow-lg",
           "bg-primary text-primary-foreground",
@@ -22574,7 +22577,7 @@ const cm = ({ onSend: e, isLoading: t }) => {
           /* @__PURE__ */ T.jsx(
             "div",
             {
-              className: Re(
+              className: Ae(
                 "transition-transform duration-200",
                 t ? "rotate-90 scale-0" : "rotate-0 scale-100"
               ),
@@ -22584,7 +22587,7 @@ const cm = ({ onSend: e, isLoading: t }) => {
           /* @__PURE__ */ T.jsx(
             "div",
             {
-              className: Re(
+              className: Ae(
                 "absolute transition-transform duration-200",
                 t ? "rotate-0 scale-100" : "-rotate-90 scale-0"
               ),
