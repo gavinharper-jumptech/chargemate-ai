@@ -20126,7 +20126,7 @@ const RN = ({ content: e, role: t }) => {
         "div",
         {
           className: Ne(
-            "max-w-[85%] px-4 py-3 md:max-w-[70%]",
+            "max-w-[85%] px-4 py-3 md:max-w-[70%] text-left",
             n ? "bg-chat-user text-chat-user-foreground" : "bg-chat-assistant text-chat-assistant-foreground"
           ),
           style: {
