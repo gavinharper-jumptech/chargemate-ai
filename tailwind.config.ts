@@ -52,6 +52,10 @@ export default {
           "user-foreground": "hsl(var(--chat-user-foreground))",
           assistant: "hsl(var(--chat-assistant))",
           "assistant-foreground": "hsl(var(--chat-assistant-foreground))",
+          "assistant-link": "hsl(var(--chat-assistant-link))",
+          "assistant-link-hover": "hsl(var(--chat-assistant-link-hover))",
+          "user-link": "hsl(var(--chat-user-link))",
+          "user-link-hover": "hsl(var(--chat-user-link-hover))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

@@ -44,7 +44,12 @@ const MessageBubble = ({ content, role }: MessageBubbleProps) => {
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="underline break-all opacity-90 hover:opacity-100"
+                    className={cn(
+                      "underline break-all font-medium transition-colors",
+                      role === "assistant"
+                        ? "text-chat-assistant-link hover:text-chat-assistant-link-hover"
+                        : "text-chat-user-link hover:text-chat-user-link-hover"
+                    )}
                   >
                     {children}
                   </a>
