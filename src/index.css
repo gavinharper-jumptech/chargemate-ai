@@ -76,6 +76,10 @@
     --chat-user-foreground: var(--jt-ev-chat-user-foreground, 0 0% 100%);
     --chat-assistant: var(--jt-ev-chat-assistant, 120 25% 96%);
     --chat-assistant-foreground: var(--jt-ev-chat-assistant-foreground, 150 30% 15%);
+    --chat-assistant-link: var(--jt-ev-chat-assistant-link, 199 89% 70%);
+    --chat-assistant-link-hover: var(--jt-ev-chat-assistant-link-hover, 199 89% 80%);
+    --chat-user-link: var(--jt-ev-chat-user-link, var(--chat-user-foreground));
+    --chat-user-link-hover: var(--jt-ev-chat-user-link-hover, var(--chat-user-foreground));
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
