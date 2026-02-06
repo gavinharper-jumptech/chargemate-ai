@@ -39,7 +39,7 @@ const Index = ({ className, onClearMessagesRef }: IndexProps) => {
   // Window mode always uses input-below for natural popup chat UX
   if (inputPosition === "above" && mode !== "window") {
     return (
-      <div className={className || "flex h-full flex-col bg-background relative"}>
+      <div className={className || "flex h-full flex-col bg-background relative overflow-hidden"}>
         {showHeader && <ChatHeader onNewChat={clearMessages} />}
         
         {/* Floating New Chat button when header is hidden */}
@@ -76,7 +76,7 @@ const Index = ({ className, onClearMessagesRef }: IndexProps) => {
 
   // Default: input below layout (traditional chat style)
   return (
-    <div className={className || "flex h-full flex-col bg-background relative"}>
+    <div className={className || "flex h-full flex-col bg-background relative overflow-hidden"}>
       {showHeader && <ChatHeader onNewChat={clearMessages} />}
       
       {/* Floating New Chat button for fullscreen mode (when header is hidden) */}
