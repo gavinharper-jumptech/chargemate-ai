@@ -1,67 +1,81 @@
 
 
-# Fix: Chat Bubble Text Alignment
+# Enhance Image & Link Handling in Chat Bubbles
 
-## Problem
-The text inside chat bubbles is being centered instead of left-aligned. This happens because the widget inherits `text-center` from the parent page's container.
+## What This Covers
 
-**In `public/test-vindis.html` (line 321):**
-```html
-<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <!-- ... -->
-    <div id="ev-chat"></div>
-</div>
-```
+Two improvements to how AI responses display URLs and images:
 
-The widget doesn't explicitly reset `text-align`, so it inherits `center` from the parent.
+1. **Auto-link bare URLs** -- If the AI returns a plain URL like `https://example.com/page`, it will become a clickable link instead of plain text.
+2. **Style images properly** -- If the AI returns a markdown image like `![photo](https://...)`, the image will be constrained to fit neatly inside the chat bubble with rounded corners.
 
 ---
 
-## Solution
-Add `text-align: left` to the widget's root CSS class to prevent inheritance from parent pages.
+## Changes
 
----
+### `src/components/chat/MessageBubble.tsx`
 
-## Files to modify
+**1. Auto-link bare URLs using `react-markdown`'s `remarkGfm` plugin:**
 
-### 1) `src/index.css`
-Add `text-align: left;` to the `.jt-ev-chat-widget` class:
-
-```css
-.jt-ev-chat-widget {
-  height: 100%;
-  font-family: var(--jt-ev-chat-font-family, inherit);
-  text-align: left;  /* NEW: Prevent text-center inheritance from parent sites */
-  
-  /* ... rest of variables ... */
-}
-```
-
-### 2) `src/components/chat/MessageBubble.tsx` (extra safety)
-Add `text-left` class to the bubble div to ensure it's always left-aligned:
+The `remark-gfm` plugin enables GitHub Flavored Markdown, which automatically converts bare URLs into clickable links.
 
 ```tsx
-<div
-  className={cn(
-    "max-w-[85%] px-4 py-3 md:max-w-[70%] text-left",  // Add text-left
-    isUser
-      ? "bg-chat-user text-chat-user-foreground"
-      : "bg-chat-assistant text-chat-assistant-foreground"
-  )}
+import remarkGfm from "remark-gfm";
+
+<ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
 ```
+
+**2. Custom component overrides for links and images:**
+
+Pass a `components` prop to `ReactMarkdown` to control how `<a>` and `<img>` elements render:
+
+```tsx
+<ReactMarkdown
+  remarkPlugins={[remarkGfm]}
+  components={{
+    a: ({ href, children }) => (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline break-all opacity-90 hover:opacity-100"
+      >
+        {children}
+      </a>
+    ),
+    img: ({ src, alt }) => (
+      <img
+        src={src}
+        alt={alt || ""}
+        className="rounded max-w-full h-auto my-2"
+        loading="lazy"
+      />
+    ),
+  }}
+>
+  {content}
+</ReactMarkdown>
+```
+
+**3. Add image-related prose styles to the container div:**
+
+```
+prose-img:rounded prose-img:max-w-full prose-img:h-auto prose-img:my-2
+```
+
+---
+
+### New Dependency
+
+- **`remark-gfm`** -- Enables auto-linking of bare URLs and other GitHub Flavored Markdown features (tables, strikethrough, etc.)
 
 ---
 
 ## Result
-| Before | After |
-|--------|-------|
-| Text centered inside bubbles | Text left-aligned (standard chat style) |
-| Depends on parent page styles | Widget controls its own alignment |
 
----
-
-## Note
-The welcome title ("ASK VINDIS AI SPECIALIST") will remain centered because `WelcomeSection.tsx` explicitly uses `text-center` on its own container.
-
-After this fix, remember to purge the jsDelivr CDN cache for the changes to appear in the CDN version.
+| Scenario | Before | After |
+|----------|--------|-------|
+| Bare URL `https://example.com/image.png` | Plain text, not clickable | Clickable link |
+| Markdown image `![alt](url)` | Image renders but may overflow | Image constrained, rounded, styled |
+| Markdown link `[text](url)` | Already works | Now opens in new tab safely |
 
