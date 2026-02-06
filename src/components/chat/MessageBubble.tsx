@@ -1,4 +1,5 @@
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
 
 interface MessageBubbleProps {
@@ -34,8 +35,32 @@ const MessageBubble = ({ content, role }: MessageBubbleProps) => {
         {isUser ? (
           <p className="text-sm leading-relaxed">{content}</p>
         ) : (
-          <div className="prose prose-sm max-w-none text-left text-chat-assistant-foreground prose-headings:text-chat-assistant-foreground prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-h1:text-lg prose-h2:text-base prose-p:text-chat-assistant-foreground prose-p:my-2 prose-p:leading-relaxed prose-strong:text-chat-assistant-foreground prose-ul:my-2 prose-ul:pl-6 prose-ul:list-disc prose-ol:my-2 prose-ol:pl-6 prose-ol:list-decimal prose-li:text-chat-assistant-foreground prose-li:my-1 prose-li:marker:text-chat-assistant-foreground [&>*]:text-left">
-            <ReactMarkdown>{content}</ReactMarkdown>
+          <div className="prose prose-sm max-w-none text-left text-chat-assistant-foreground prose-headings:text-chat-assistant-foreground prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-h1:text-lg prose-h2:text-base prose-p:text-chat-assistant-foreground prose-p:my-2 prose-p:leading-relaxed prose-strong:text-chat-assistant-foreground prose-ul:my-2 prose-ul:pl-6 prose-ul:list-disc prose-ol:my-2 prose-ol:pl-6 prose-ol:list-decimal prose-li:text-chat-assistant-foreground prose-li:my-1 prose-li:marker:text-chat-assistant-foreground prose-img:rounded prose-img:max-w-full prose-img:h-auto prose-img:my-2 [&>*]:text-left">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                a: ({ href, children }) => (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline break-all opacity-90 hover:opacity-100"
+                  >
+                    {children}
+                  </a>
+                ),
+                img: ({ src, alt }) => (
+                  <img
+                    src={src}
+                    alt={alt || ""}
+                    className="rounded max-w-full h-auto my-2"
+                    loading="lazy"
+                  />
+                ),
+              }}
+            >
+              {content}
+            </ReactMarkdown>
           </div>
         )}
       </div>
