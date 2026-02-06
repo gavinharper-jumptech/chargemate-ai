@@ -127,58 +127,61 @@ const ChatMessages = ({
   }, [quickReplySuggestions, isLoading]);
 
   return (
-    <ScrollArea className="flex-1 min-h-0" ref={scrollRef}>
-      <div className="flex flex-col gap-4 p-4">
-        {!hideWelcome && <WelcomeMessage />}
-        
-        {!hideWelcome && (
-          <div className="flex justify-center">
-            <CategorizedQuickActions onSelect={onQuickAction} />
-          </div>
-        )}
-
-        {/* Bordered conversation container - always visible */}
-        <div
-          className={cn(
-            "flex flex-col gap-4",
-            useContainerStyling && "p-4 mx-auto bg-[hsl(var(--message-container-bg))]"
-          )}
-          style={useContainerStyling ? {
-            border: 'var(--message-container-border)',
-            maxWidth: 'var(--message-container-max-width)',
-            minHeight: 'var(--message-container-min-height)',
-            width: '100%',
-          } : undefined}
-        >
-          {filteredMessages.map((message) => (
-            <div
-              key={message.id}
-              ref={(el) => {
-                if (el) {
-                  messageRefs.current.set(message.id, el);
-                } else {
-                  messageRefs.current.delete(message.id);
-                }
-              }}
-            >
-              <MessageBubble
-                content={message.content}
-                role={message.role as "user" | "assistant"}
-              />
-            </div>
-          ))}
-
-          {isLoading && <TypingIndicator />}
-
-          {!isLoading && quickReplySuggestions.length > 0 && (
-            <QuickReplies
-              suggestions={quickReplySuggestions}
-              onSelect={onQuickAction}
-            />
-          )}
+    <div className="flex-1 min-h-0 flex flex-col gap-4 p-4">
+      {!hideWelcome && <WelcomeMessage />}
+      
+      {!hideWelcome && (
+        <div className="flex justify-center">
+          <CategorizedQuickActions onSelect={onQuickAction} />
         </div>
+      )}
+
+      {/* Bordered conversation container - border stays fixed, content scrolls inside */}
+      <div
+        className={cn(
+          "flex-1 min-h-0 flex flex-col",
+          useContainerStyling && "mx-auto bg-[hsl(var(--message-container-bg))]"
+        )}
+        style={useContainerStyling ? {
+          border: 'var(--message-container-border)',
+          maxWidth: 'var(--message-container-max-width)',
+          minHeight: 'var(--message-container-min-height)',
+          width: '100%',
+        } : undefined}
+      >
+        {/* ScrollArea INSIDE the border - only messages scroll */}
+        <ScrollArea className="flex-1 min-h-0" ref={scrollRef}>
+          <div className="flex flex-col gap-4 p-4">
+            {filteredMessages.map((message) => (
+              <div
+                key={message.id}
+                ref={(el) => {
+                  if (el) {
+                    messageRefs.current.set(message.id, el);
+                  } else {
+                    messageRefs.current.delete(message.id);
+                  }
+                }}
+              >
+                <MessageBubble
+                  content={message.content}
+                  role={message.role as "user" | "assistant"}
+                />
+              </div>
+            ))}
+
+            {isLoading && <TypingIndicator />}
+
+            {!isLoading && quickReplySuggestions.length > 0 && (
+              <QuickReplies
+                suggestions={quickReplySuggestions}
+                onSelect={onQuickAction}
+              />
+            )}
+          </div>
+        </ScrollArea>
       </div>
-    </ScrollArea>
+    </div>
   );
 };
 
