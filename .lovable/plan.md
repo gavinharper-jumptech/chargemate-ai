@@ -1,46 +1,64 @@
 
-# Fix: ScrollArea Not Scrollable After Overflow Fix
+# Add Configurable Link Colors for Chat Bubbles
 
 ## Problem
-Adding `overflow-hidden` to the outer wrapper (line 130 in ChatMessages.tsx) correctly prevents content from overflowing the viewport, but the messages are now clipped without any ability to scroll. The content is hidden but not scrollable.
+Links in chat bubbles inherit the bubble's text color, making them hard to see (especially white-on-dark assistant bubbles). Hardcoding a fix would break for widget users who set custom bubble backgrounds.
 
-## Root Cause
-The bordered container (line 140-150) sits between the `overflow-hidden` outer wrapper and the `ScrollArea`, but it lacks `overflow-hidden` itself. Without it:
+## Solution
+Add new CSS variables for assistant and user link colors, following the existing pattern. Widget users can override them; sensible defaults are provided.
 
-1. The bordered container grows to fit all its content (the full message list)
-2. The outer `overflow-hidden` clips it visually
-3. The ScrollArea never gets a constrained height, so its viewport never activates scrolling
+## Changes
 
-The containment chain is broken at the bordered container level.
+### 1. `src/index.css` -- add 4 new variables (after line 78)
 
-## Fix
-
-### `src/components/chat/ChatMessages.tsx` -- line 142
-
-Add `overflow-hidden` to the bordered container div:
-
-```
-Before: "flex-1 min-h-0 flex flex-col"
-After:  "flex-1 min-h-0 flex flex-col overflow-hidden"
+```css
+--chat-assistant-link: var(--jt-ev-chat-assistant-link, 199 89% 70%);
+--chat-assistant-link-hover: var(--jt-ev-chat-assistant-link-hover, 199 89% 80%);
+--chat-user-link: var(--jt-ev-chat-user-link, var(--chat-user-foreground));
+--chat-user-link-hover: var(--jt-ev-chat-user-link-hover, var(--chat-user-foreground));
 ```
 
-This completes the height constraint chain:
+The assistant default (`199 89% 70%`) is a light sky-blue -- visible on dark backgrounds. User links default to the existing user foreground color since user bubbles are typically dark-on-light.
 
-```text
-outer div (overflow-hidden)           -- constrains total height
-  bordered container (overflow-hidden) -- constrains to available space
-    ScrollArea Root (overflow-hidden)  -- Radix default
-      Viewport (overflow: scroll)      -- actually scrolls
+### 2. `tailwind.config.ts` -- register the new colors (inside the `chat` color block)
+
+```ts
+"assistant-link": "hsl(var(--chat-assistant-link))",
+"assistant-link-hover": "hsl(var(--chat-assistant-link-hover))",
+"user-link": "hsl(var(--chat-user-link))",
+"user-link-hover": "hsl(var(--chat-user-link-hover))",
 ```
 
-### Single-line change
+### 3. `src/components/chat/MessageBubble.tsx` -- line 47
 
-Only the `cn()` call on line 142 needs updating. No other files are affected.
+Apply the correct link color based on the message role:
 
-## Why This Works
-Every flex parent in the chain from the root down to the ScrollArea viewport needs to enforce its height constraint. Adding `overflow-hidden` to the bordered container forces it to respect its `flex-1 min-h-0` sizing instead of growing to fit content. The ScrollArea viewport then gets a constrained height and its internal `overflow: scroll` activates.
+```tsx
+className={cn(
+  "underline break-all font-medium transition-colors",
+  role === "assistant"
+    ? "text-chat-assistant-link hover:text-chat-assistant-link-hover"
+    : "text-chat-user-link hover:text-chat-user-link-hover"
+)}
+```
+
+The `role` prop is already available in the component.
+
+### 4. `docs/WIDGET_GUIDE.md` -- document the new variables
+
+Add the 4 new variables to the CSS variable reference table so widget users know they can override them.
+
+## How widget users override
+
+In the Vindis example, they would just add to their `:root` CSS:
+
+```css
+--jt-ev-chat-assistant-link: 172 100% 35%;
+--jt-ev-chat-assistant-link-hover: 172 100% 45%;
+```
 
 ## Impact
-- Main preview: messages will scroll inside the chat area
-- Vindis preview: no regression (already constrained by host container)
-- Auto-scroll behavior: unaffected (operates on the viewport ref inside ScrollArea)
+- Default experience: assistant links are now visibly sky-blue instead of invisible white
+- User bubble links: unchanged (inherit foreground by default)
+- Fully customisable via CSS variables, consistent with the existing theming system
+- No breaking changes
