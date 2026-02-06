@@ -1,34 +1,40 @@
 
 
-# Fix: Chat Messages Overflowing Beyond Container
+# Fix: Chat Messages Still Overflowing Container
 
 ## Problem
-Messages overflow past the chat input and beyond the viewport on the main preview page (`/`). The flex layout containers lack `overflow-hidden`, so `flex-1 min-h-0` children expand beyond their parent instead of scrolling internally.
+The previous fix added `overflow-hidden` to the outermost containers (`App.tsx`, `Index.tsx`, `VindisPreview.tsx`) but missed the intermediate flex container inside `ChatMessages.tsx`. The flex containment chain must have `overflow-hidden` at every level -- if any link in the chain is missing it, children can expand beyond their parent.
 
-## Why This Is Safe
-- The scrolling fix (internal `ScrollArea` relative calculations) lives in `ChatMessages.tsx` and is completely untouched
-- `overflow-hidden` works at the outer container level -- it enforces the height constraint that lets the internal `ScrollArea` activate properly
-- The Vindis preview is unaffected because its host div already has a fixed height
+## Root Cause
 
-## Changes
+The layout chain is:
 
-### 1. `src/App.tsx` (line 70)
-Add `overflow-hidden` to the className passed to Index:
-```
-"flex h-screen flex-col bg-background" -> "flex h-screen flex-col bg-background overflow-hidden"
+```text
+Index (h-screen flex-col overflow-hidden)          -- OK
+  ChatMessages outer div (flex-1 min-h-0 flex-col)  -- MISSING overflow-hidden
+    bordered container (flex-1 min-h-0 flex-col)     -- OK
+      ScrollArea (flex-1 min-h-0)                    -- OK
 ```
 
-### 2. `src/pages/Index.tsx` (lines 42 and 79)
-Add `overflow-hidden` to both layout wrapper default classNames:
+Without `overflow-hidden` on the ChatMessages outer div, the browser allows its children (welcome section, quick actions, bordered container) to collectively grow beyond the available space, pushing messages past the input.
+
+## Fix
+
+### `src/components/chat/ChatMessages.tsx` (line 130)
+
+Add `overflow-hidden` to the outer wrapper div:
+
 ```
-"flex h-full flex-col bg-background relative" -> "flex h-full flex-col bg-background relative overflow-hidden"
+Before: "flex-1 min-h-0 flex flex-col gap-4 p-4"
+After:  "flex-1 min-h-0 flex flex-col gap-4 p-4 overflow-hidden"
 ```
 
-### 3. `src/pages/VindisPreview.tsx` (line 125)
-Add `overflow-hidden` to the className passed to Index:
-```
-"flex h-full flex-col bg-background" -> "flex h-full flex-col bg-background overflow-hidden"
-```
+This is a single class addition on one line. No other files need changes.
 
-## Result
-Messages scroll inside the chat container instead of overflowing the viewport. No impact on the internal scrolling behavior.
+## Why This Works
+Adding `overflow-hidden` here completes the containment chain. Every flex parent from the root (`h-screen`) down to the `ScrollArea` will now enforce height constraints, ensuring the `ScrollArea` viewport activates its internal scrolling instead of expanding the page.
+
+## Impact
+- Main preview (`/`): messages will scroll inside the container
+- Vindis preview: no change (already works via fixed host container height)
+- Internal scroll behavior (smooth scroll to new messages): completely unaffected -- that logic reads from the viewport inside `ScrollArea` which remains unchanged
