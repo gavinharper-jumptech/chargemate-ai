@@ -6,7 +6,7 @@
     <title>Vindis Group | EV Home Charging Solutions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/style.css">
+    <!-- Widget CSS is loaded dynamically based on ?cdn=1 param -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -495,14 +495,46 @@
 
     <!-- Chat Widget Implementation Script -->
     <script type="module">
-        import { createChat } from 'https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/ev-chat.js';
+        const useCdn = new URLSearchParams(location.search).has('cdn');
+        
+        let createChat;
+        
+        if (useCdn) {
+            // Load from jsDelivr CDN (production/external build)
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/style.css';
+            document.head.appendChild(link);
+            
+            const module = await import('https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/ev-chat.js');
+            createChat = module.createChat;
+            console.log('[test-vindis] Widget source: CDN (jsDelivr)');
+        } else {
+            // Load from local built widget (public/widget/) with CSS fixes applied via inline style
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = '/widget/style.css';
+            document.head.appendChild(link);
+            
+            // Apply the height fix that's in src/index.css but not yet in the built widget
+            const fixStyle = document.createElement('style');
+            fixStyle.textContent = `
+                .jt-ev-chat-widget {
+                    height: 100%;
+                }
+            `;
+            document.head.appendChild(fixStyle);
+            
+            const module = await import('/widget/ev-chat.js');
+            createChat = module.createChat;
+            console.log('[test-vindis] Widget source: LOCAL (/widget/ev-chat.js with CSS fix)');
+        }
         
         createChat({
-            mode: 'fullscreen', // Switched from 'fullscreen' to fix page jumping
+            target: '#ev-chat',
+            mode: 'fullscreen',
             inputPosition: 'above',
             inputLayout: 'embedded',
-            isEmbedded: true,
-            containerId: 'ev-chat',
             
             categories: [
                 {
