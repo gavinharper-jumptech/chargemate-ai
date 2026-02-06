@@ -22299,7 +22299,7 @@ const DI = () => {
         m > 0 && m < 100 && (d.scrollTop = d.scrollHeight);
       }
     }
-  }, [c, t]), /* @__PURE__ */ T.jsxs("div", { className: "flex-1 min-h-0 flex flex-col gap-4 p-4", children: [
+  }, [c, t]), /* @__PURE__ */ T.jsxs("div", { className: "flex-1 min-h-0 flex flex-col gap-4 p-4 overflow-hidden", children: [
     !r && /* @__PURE__ */ T.jsx(DI, {}),
     !r && /* @__PURE__ */ T.jsx("div", { className: "flex justify-center", children: /* @__PURE__ */ T.jsx(bw, { onSelect: n }) }),
     /* @__PURE__ */ T.jsx(
