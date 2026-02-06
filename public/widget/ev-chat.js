@@ -20522,7 +20522,7 @@ const zh = ({ onSend: e, isLoading: t }) => {
   }, c = (p) => {
     u(p);
   }, f = !l && s !== "window" && s !== "fullscreen";
-  return a === "above" && s !== "window" ? /* @__PURE__ */ C.jsxs("div", { className: e || "flex h-full flex-col bg-background overflow-hidden relative", children: [
+  return a === "above" && s !== "window" ? /* @__PURE__ */ C.jsxs("div", { className: e || "flex h-full flex-col bg-background relative", children: [
     f && /* @__PURE__ */ C.jsx(Vp, { onNewChat: i }),
     !f && n.length > 0 && /* @__PURE__ */ C.jsx(
       "button",
@@ -20548,7 +20548,7 @@ const zh = ({ onSend: e, isLoading: t }) => {
         hideWelcome: !0
       }
     )
-  ] }) : /* @__PURE__ */ C.jsxs("div", { className: e || "flex h-full flex-col bg-background overflow-hidden relative", children: [
+  ] }) : /* @__PURE__ */ C.jsxs("div", { className: e || "flex h-full flex-col bg-background relative", children: [
     f && /* @__PURE__ */ C.jsx(Vp, { onNewChat: i }),
     !f && n.length > 0 && /* @__PURE__ */ C.jsx(
       "button",

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vindis Group | EV Home Charging Solutions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --vindis-navy: #00263e;
+            --vindis-green: #00b198; 
+            --vindis-gray-light: #f7f7f7;
+            --vindis-border: #e2e8f0;
+            --section-divider: #ddd;
+
+            /* Live Chat Widget Theme Variables */
+            --jt-ev-chat-background: 210 20% 98%;
+            --jt-ev-chat-card: 210 20% 98%;
+            --jt-ev-chat-primary: 203 100% 12%;
+            --jt-ev-chat-primary-hover: 203 100% 18%;
+            --jt-ev-chat-primary-foreground: 0 0% 100%;
+            --jt-ev-chat-muted-foreground: 210 10% 45%;
+            --jt-ev-chat-border: 214 32% 91%;
+            --jt-ev-chat-input-radius: 0;
+            --jt-ev-chat-button-radius: 0;
+            --jt-ev-chat-chip-radius: 0;
+            --jt-ev-chat-chip-bg: 0 0% 100%;
+            --jt-ev-chat-chip-text: 203 100% 12%;
+            --jt-ev-chat-chip-border: hsl(214 32% 91%);
+            --jt-ev-chat-chip-hover-bg: 0 0% 100%;
+            --jt-ev-chat-chip-hover-border: 172 100% 35%;
+            --jt-ev-chat-chip-hover-text: 203 100% 12%;
+            --jt-ev-chat-input: 220 13% 91%;
+            --jt-ev-chat-input-container-bg: 0 0% 100%;
+            --jt-ev-chat-input-container-border: transparent;
+            --jt-ev-chat-input-text: 220 13% 26%;
+            --jt-ev-chat-tab-active-border: 172 100% 35%;
+            --jt-ev-chat-tab-container-border: transparent;
+            --jt-ev-chat-message-container-border: 2px solid hsl(172 100% 35%);
+            --jt-ev-chat-message-container-max-width: 100%;
+            --jt-ev-chat-message-container-bg: 0 0% 100%;
+            --jt-ev-chat-message-container-min-height: 120px;
+            --jt-ev-chat-assistant: 203 100% 12%;
+            --jt-ev-chat-assistant-foreground: 0 0% 100%;
+            --jt-ev-chat-user: 172 100% 35%;
+            --jt-ev-chat-user-foreground: 0 0% 100%;
+            --jt-ev-chat-message-bubble-radius: 0;
+            --jt-ev-chat-message-bubble-tail-radius: 0;
+            --jt-ev-chat-font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            padding-bottom: 80px; 
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            body { padding-bottom: 100px; }
+        }
+
+        /* Typography Standard */
+        .section-heading {
+            font-size: 1.875rem; /* text-3xl */
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -0.025em;
+            color: var(--vindis-navy);
+        }
+
+        @media (min-width: 768px) {
+            .section-heading {
+                font-size: 2.25rem; /* text-4xl */
+            }
+        }
+
+        .section-label {
+            display: inline-block;
+            border-bottom: 2px solid var(--vindis-green);
+            padding-bottom: 0.25rem;
+            margin-bottom: 1rem;
+            font-size: 0.5625rem; /* text-[9px] */
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--vindis-navy);
+        }
+
+        @media (min-width: 768px) {
+            .section-label {
+                font-size: 0.625rem; /* text-[10px] */
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        .bg-vindis-navy { background-color: var(--vindis-navy); }
+        .text-vindis-navy { color: var(--vindis-navy); }
+        .bg-vindis-green { background-color: var(--vindis-green); }
+        .text-vindis-green { color: var(--vindis-green); }
+        .border-vindis-green { border-color: var(--vindis-green); }
+        
+        .section-divider-y {
+            border-top: 1px solid var(--section-divider);
+            border-bottom: 1px solid var(--section-divider);
+        }
+
+        .hero-section {
+            position: relative;
+            background-image: linear-gradient(to right, rgba(0, 38, 62, 0.9) 20%, rgba(0, 38, 62, 0.2) 100%), 
+                              url('https://jumptech-shared-assets.s3.eu-west-2.amazonaws.com/dealer-home-charge/VW_ID3_Gemini_Generated_Image.webp');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .nav-card {
+            background: #ffffff;
+            border: 2px solid transparent; 
+            border-color: var(--vindis-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            border-radius: 2px;
+        }
+
+        .nav-card:hover {
+            background-color: var(--vindis-navy);
+            border-color: var(--vindis-green); 
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-card:hover h3 { color: #ffffff; }
+        .nav-card:hover p { color: #94a3b8; }
+        .nav-card:hover .icon-container { 
+            background-color: rgba(255, 255, 255, 0.1) !important; 
+            color: var(--vindis-green) !important; 
+        }
+
+        .step-number {
+            background: var(--vindis-navy);
+            color: white;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 4px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .charger-img-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #ffffff;
+            border-radius: 2px;
+        }
+
+        .persistent-bar {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #e2e8f0;
+            width: 100%;
+        }
+
+        /* Fixed Widget Height and Stability Tweak */
+        #ev-chat {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            border-radius: 0;
+            overflow: hidden;
+            height: 700px; /* Force stable height to prevent layout jumps */
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="sticky top-0 w-full z-50 shadow-sm">
+        <nav class="w-full bg-white border-b border-gray-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16 md:h-20 items-center">
+                    <div class="flex items-center gap-4">
+                        <img src="https://d2638j3z8ek976.cloudfront.net/84ad7aea53245a4f609ee8eae98ede30f11d20b1/1769793325/images/logo.webp" alt="Vindis Logo" class="h-8 md:h-10">
+                        <div class="hidden xl:flex h-6 w-[1px] bg-gray-300"></div>
+                        <span class="hidden xl:inline text-[10px] font-bold text-gray-500 uppercase tracking-[0.3em] mt-1 text-sky-900">Electric</span>
+                    </div>
+                    <div class="hidden lg:flex space-x-6 xl:space-x-8 text-[10px] xl:text-[11px] font-bold uppercase tracking-[0.2em] text-gray-800">
+                        <a href="#" class="hover:text-vindis-green transition-colors">Find, Buy & Sell</a>
+                        <a href="#" class="hover:text-vindis-green transition-colors">Brands</a>
+                        <a href="#" class="hover:text-vindis-green transition-colors">Owners</a>
+                        <a href="#" class="hover:text-vindis-green transition-colors">Locations</a>
+                    </div>
+                    <div class="flex items-center gap-4 md:gap-6">
+                        <div class="hidden sm:flex items-center gap-4 md:gap-6 text-gray-700">
+                            <i class="far fa-user cursor-pointer hover:text-vindis-green"></i>
+                            <i class="fas fa-phone-alt cursor-pointer hover:text-vindis-green"></i>
+                        </div>
+                        <button class="bg-vindis-navy text-white px-4 md:px-8 py-2 md:py-3 text-[10px] md:text-[11px] font-bold uppercase tracking-widest hover:bg-slate-800 transition">Contact Us</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="bg-vindis-green py-2 text-white text-center text-[10px] md:text-[12px] font-medium tracking-wide">
+            <div class="max-w-7xl mx-auto px-4 flex items-center justify-center gap-2">
+                <i class="fas fa-bolt text-[8px] md:text-[10px]"></i>
+                <span class="truncate uppercase tracking-wider">Explore the Vindis End-to-End Home Charging Solution</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section pt-16 md:pt-32 pb-16 md:pb-24 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-left mb-12 md:mb-20 max-w-2xl">
+                <h1 class="text-4xl md:text-7xl font-light mb-4 md:mb-6 tracking-tight leading-tight uppercase">Your Home <span class="font-bold text-vindis-green">Charging</span> Hub.</h1>
+                <p class="text-lg md:text-xl text-gray-200 max-w-xl font-light leading-relaxed mb-10">Premium charging experiences tailored to your vehicle and home setup.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                <a href="#process" class="nav-card p-6 md:p-10 flex flex-col items-center text-center group">
+                    <div class="icon-container w-12 h-12 md:w-14 md:h-14 bg-gray-50 rounded-full flex items-center justify-center mb-4 md:mb-6 text-vindis-navy transition-all">
+                        <i class="fas fa-clipboard-check text-lg md:text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-[11px] md:text-[13px] uppercase tracking-widest text-vindis-navy transition-colors">What's the process?</h3>
+                    <p class="text-[11px] text-gray-500 mt-2 font-medium transition-colors">Remote survey to install</p>
+                </a>
+                <a href="#chargers" class="nav-card p-6 md:p-10 flex flex-col items-center text-center group">
+                    <div class="icon-container w-12 h-12 md:w-14 md:h-14 bg-gray-50 rounded-full flex items-center justify-center mb-4 md:mb-6 text-vindis-navy transition-all">
+                        <i class="fas fa-charging-station text-lg md:text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-[11px] md:text-[13px] uppercase tracking-widest text-vindis-navy transition-colors">Browse Chargers</h3>
+                    <p class="text-[11px] text-gray-500 mt-2 font-medium transition-colors">Market leading hardware</p>
+                </a>
+                <a href="#learn" class="nav-card p-6 md:p-10 flex flex-col items-center text-center group">
+                    <div class="icon-container w-12 h-12 md:w-14 md:h-14 bg-gray-50 rounded-full flex items-center justify-center mb-4 md:mb-6 text-vindis-navy transition-all">
+                        <i class="fas fa-info-circle text-lg md:text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-[11px] md:text-[13px] uppercase tracking-widest text-vindis-navy transition-colors">Ask Vindis</h3>
+                    <p class="text-[11px] text-gray-500 mt-2 font-medium transition-colors">Consult our Specialist AI</p>
+                </a>
+                <a href="#costs" class="nav-card p-6 md:p-10 flex flex-col items-center text-center group">
+                    <div class="icon-container w-12 h-12 md:w-14 md:h-14 bg-gray-50 rounded-full flex items-center justify-center mb-4 md:mb-6 text-vindis-navy transition-all">
+                        <i class="fas fa-pound-sign text-lg md:text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-[11px] md:text-[13px] uppercase tracking-widest text-vindis-navy transition-colors">Cost Analysis</h3>
+                    <p class="text-[11px] text-gray-500 mt-2 font-medium transition-colors">Compare charging rates</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section id="process" class="py-16 md:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+                <div class="w-full lg:w-1/2">
+                    <span class="section-label">The Process</span>
+                    <h2 class="section-heading mb-8 md:mb-10">SIMPLIFIED INSTALLATION.</h2>
+                    <div class="space-y-8 md:space-y-10">
+                        <div class="flex gap-4 md:gap-6">
+                            <div class="step-number">01</div>
+                            <div>
+                                <h4 class="font-bold text-sm uppercase tracking-wider text-vindis-navy">Instant Quote</h4>
+                                <p class="text-gray-500 text-sm mt-1 md:mt-2 leading-relaxed">Select your charger and get an immediate estimate based on your home setup.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 md:gap-6">
+                            <div class="step-number">02</div>
+                            <div>
+                                <h4 class="font-bold text-sm uppercase tracking-wider text-vindis-navy">Remote Survey</h4>
+                                <p class="text-gray-500 text-sm mt-1 md:mt-2 leading-relaxed">We'll use the info you send us to check if you are eligible for this charger.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 md:gap-6">
+                            <div class="step-number">03</div>
+                            <div>
+                                <h4 class="font-bold text-sm uppercase tracking-wider text-vindis-navy">Agree Installation Date</h4>
+                                <p class="text-gray-500 text-sm mt-1 md:mt-2 leading-relaxed">We'll find a date that works for you to install your chosen charger.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 md:gap-6">
+                            <div class="step-number">04</div>
+                            <div>
+                                <h4 class="font-bold text-sm uppercase tracking-wider text-vindis-navy">Handover & Live Demo</h4>
+                                <p class="text-gray-500 text-sm mt-1 md:mt-2 leading-relaxed">Full handover with a live demo on how to manage your charging via the app.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full lg:w-1/2 relative mt-8 lg:mt-0">
+                    <img src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=1200" alt="EV Install" class="rounded-sm shadow-xl w-full h-auto">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LIVE AI SPECIALIST SECTION -->
+    <section id="learn" class="py-16 md:py-32 bg-gray-50 section-divider-y">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-10">
+                <div class="flex justify-center items-center gap-2 mb-3 md:mb-4">
+                    <i class="fas fa-sparkle text-vindis-green text-lg"></i>
+                    <h2 class="section-heading">ASK VINDIS AI SPECIALIST</h2>
+                </div>
+            </div>
+            <!-- Integrated Live Chat Widget -->
+            <div id="ev-chat"></div>
+        </div>
+    </section>
+
+    <!-- Cost Analysis Section -->
+    <section id="costs" class="py-16 md:py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span class="section-label">Value Analysis</span>
+            <h2 class="section-heading mb-4">HOW MUCH DOES IT COST TO CHARGE?</h2>
+            <p class="text-sm md:text-base text-gray-500 mb-12 md:mb-16 font-medium">Estimated cost to charge an average 60kWh vehicle from 0% to 100%.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch">
+                <!-- Public -->
+                <div class="border border-gray-100 bg-gray-50 p-8 flex flex-col items-center text-center rounded-sm">
+                    <div class="w-14 h-14 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-charging-station text-gray-400 text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2">Public Infrastructure</span>
+                    <h4 class="text-lg font-bold text-vindis-navy mb-4 uppercase">Public Charge</h4>
+                    <div class="text-4xl font-bold text-gray-400 mb-2">£39.00<span class="text-sm font-normal"> /charge</span></div>
+                </div>
+
+                <!-- Day -->
+                <div class="border border-gray-200 bg-white p-8 flex flex-col items-center text-center rounded-sm shadow-sm">
+                    <div class="w-14 h-14 bg-amber-50 border border-amber-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-sun text-amber-500 text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-2">Standard Home Tariff</span>
+                    <h4 class="text-lg font-bold text-vindis-navy mb-4 uppercase">Day Charge</h4>
+                    <div class="text-4xl font-bold text-vindis-navy mb-2">£16.20<span class="text-sm font-normal"> /charge</span></div>
+                </div>
+
+                <!-- Night -->
+                <div class="border-2 border-vindis-green bg-white p-8 flex flex-col items-center text-center rounded-sm relative shadow-xl transform md:scale-105 z-10 mt-4 md:mt-0">
+                    <div class="absolute -top-4 bg-vindis-green text-white px-4 py-1 text-[9px] font-bold uppercase tracking-widest">Recommended</div>
+                    <div class="w-14 h-14 bg-teal-50 border border-teal-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-moon text-vindis-green text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-vindis-green mb-2">Smart EV Tariff</span>
+                    <h4 class="text-lg font-bold text-vindis-navy mb-4 uppercase">Night Charge</h4>
+                    <div class="text-4xl font-bold text-vindis-green mb-2">£4.20<span class="text-sm font-normal"> /charge</span></div>
+                </div>
+            </div>
+
+            <div class="mt-20 bg-vindis-navy p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-10 max-w-6xl mx-auto rounded-sm border border-white/10">
+                <div class="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
+                    <div class="w-16 h-16 bg-white flex items-center justify-center text-vindis-navy shrink-0 rounded-sm">
+                        <i class="fas fa-credit-card text-2xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg text-white uppercase tracking-widest">Order Your Vindis Charging Card</h4>
+                        <p class="text-gray-400 text-sm mt-1 leading-relaxed font-light">Significant savings across 450,000+ UK and European public chargers.</p>
+                    </div>
+                </div>
+                <button class="bg-white text-vindis-navy px-12 py-4 text-[11px] font-bold uppercase tracking-widest hover:bg-gray-100 transition whitespace-nowrap shadow-xl rounded-sm">Order Now</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chargers Section -->
+    <section id="chargers" class="py-16 md:py-24 bg-gray-50 section-divider-y">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span class="section-label">Hardware Showcase</span>
+            <h2 class="section-heading mb-12 md:mb-16">HOME EV CHARGERS</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+                <div class="p-6 md:p-10 border border-gray-100 bg-white flex flex-col items-center group transition-all hover:border-vindis-green hover:shadow-xl">
+                    <div class="charger-img-container mb-8 md:mb-10 p-6 md:p-8">
+                         <img src="https://www.indra.co.uk/wp-content/uploads/2023/11/20230405_factor3_indra_0058.png" alt="Indra" class="h-full w-full object-contain">
+                    </div>
+                    <div class="text-center w-full">
+                        <h3 class="text-base md:text-lg font-bold uppercase tracking-widest text-vindis-navy min-h-[2.5rem]">Indra Smart Lux</h3>
+                        <p class="text-gray-500 text-[11px] md:text-[12px] mt-1 md:mt-2 mb-6 md:mb-8 leading-relaxed min-h-[3rem]">Slim smart charger with solar matching.</p>
+                        <div class="mt-auto border-t border-gray-100 pt-6 md:pt-8">
+                            <div class="text-xl md:text-2xl font-bold mb-4 md:mb-6">£949.00</div>
+                            <button class="w-full bg-vindis-navy text-white py-3 md:py-4 text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition rounded-sm">View Details</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 md:p-10 border-2 border-vindis-green bg-white flex flex-col items-center relative shadow-2xl">
+                    <div class="absolute -top-3 md:-top-4 bg-vindis-green text-white px-4 md:px-6 py-1 text-[9px] md:text-[10px] font-bold uppercase tracking-widest">Most Advanced</div>
+                    <div class="charger-img-container mb-8 md:mb-10 bg-gray-50 p-6 md:p-8">
+                        <img src="https://cdn.prod.website-files.com/661e1928d040d5c09a8516ba/6628cf4a37746174b8015fc3_product.webp" alt="Hypervolt" class="h-full w-full object-contain">
+                    </div>
+                    <div class="text-center w-full">
+                        <h3 class="text-base md:text-lg font-bold uppercase tracking-widest text-vindis-navy min-h-[2.5rem]">Hypervolt Home 3</h3>
+                        <p class="text-gray-500 text-[11px] md:text-[12px] mt-1 md:mt-2 mb-6 md:mb-8 leading-relaxed min-h-[3rem]">High-performance with LED lighting.</p>
+                        <div class="mt-auto border-t border-gray-100 pt-6 md:pt-8">
+                            <div class="text-xl md:text-2xl font-bold mb-4 md:mb-6">£975.00</div>
+                            <button class="w-full bg-vindis-navy text-white py-3 md:py-4 text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition rounded-sm">View Details</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 md:p-10 border border-gray-100 bg-white flex flex-col items-center group transition-all hover:border-vindis-green hover:shadow-xl">
+                    <div class="charger-img-container mb-8 md:mb-10 p-6 md:p-8">
+                        <img src="https://jumptech-shared-assets.s3.eu-west-2.amazonaws.com/dealer-home-charge/masterplug.png" alt="Masterplug" class="h-full w-full object-contain">
+                    </div>
+                    <div class="text-center w-full">
+                        <h3 class="text-base md:text-lg font-bold uppercase tracking-widest text-vindis-navy min-h-[2.5rem]">Masterplug Smart</h3>
+                        <p class="text-gray-500 text-[11px] md:text-[12px] mt-1 md:mt-2 mb-6 md:mb-8 leading-relaxed min-h-[3rem]">Robust and reliable for every home.</p>
+                        <div class="mt-auto border-t border-gray-100 pt-6 md:pt-8">
+                            <div class="text-xl md:text-2xl font-bold mb-4 md:mb-6">£799.00</div>
+                            <button class="w-full bg-vindis-navy text-white py-3 md:py-4 text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition rounded-sm">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Compact Persistent Bottom Bar -->
+    <div class="fixed bottom-0 left-0 w-full z-[60] persistent-bar shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
+        <div class="hidden md:flex max-w-7xl mx-auto py-5 px-6 items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="w-2 h-2 bg-vindis-green rounded-full animate-pulse"></span>
+                <span class="text-gray-600 font-bold text-[10px] uppercase tracking-widest">Specialist Online</span>
+            </div>
+            <div class="flex gap-3">
+                <button class="border border-gray-300 text-gray-800 px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50 transition rounded-sm">
+                    Start a home survey
+                </button>
+                <button class="border border-gray-300 text-gray-800 px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50 transition rounded-sm">
+                    Call me to discuss
+                </button>
+                <button class="bg-vindis-navy text-white px-8 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-slate-800 transition rounded-sm">
+                    Browse EV Range
+                </button>
+            </div>
+        </div>
+
+        <div class="flex md:hidden w-full h-[72px] items-stretch">
+            <button class="flex-1 flex flex-col items-center justify-center gap-1 bg-white border-r border-gray-100">
+                <i class="fas fa-clipboard-list text-vindis-navy text-lg"></i>
+                <span class="text-[9px] font-bold uppercase tracking-tight text-gray-600">Survey</span>
+            </button>
+            <button class="flex-1 flex flex-col items-center justify-center gap-1 bg-white border-r border-gray-100">
+                <i class="fas fa-phone text-vindis-navy text-lg"></i>
+                <span class="text-[9px] font-bold uppercase tracking-tight text-gray-600">Call Me</span>
+            </button>
+            <button class="flex-[1.2] flex flex-col items-center justify-center gap-1 bg-vindis-green">
+                <i class="fas fa-car text-white text-lg"></i>
+                <span class="text-[9px] font-bold uppercase tracking-tight text-white">Browse Range</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-50 border-t border-[#ddd] py-12 md:py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12">
+            <img src="https://d2638j3z8ek976.cloudfront.net/84ad7aea53245a4f609ee8eae98ede30f11d20b1/1769793325/images/logo.webp" alt="Vindis" class="h-6 md:h-8 grayscale opacity-70">
+            <div class="flex space-x-6 md:space-x-12 text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                <a href="#" class="hover:text-vindis-green transition-colors">Privacy</a>
+                <a href="#" class="hover:text-vindis-green transition-colors">Legal</a>
+                <a href="#" class="hover:text-vindis-green transition-colors">Contact</a>
+            </div>
+            <div class="flex space-x-6 text-gray-400">
+                <i class="fab fa-linkedin hover:text-vindis-green cursor-pointer"></i>
+                <i class="fab fa-instagram hover:text-vindis-green cursor-pointer"></i>
+            </div>
+        </div>
+        <div class="text-center mt-8 md:mt-12 text-[8px] md:text-[9px] text-gray-400 font-bold uppercase tracking-[0.3em] px-4">
+            &copy; 2026 Vindis Group Limited.
+        </div>
+    </footer>
+
+    <!-- Chat Widget Implementation Script -->
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/ev-chat.js';
+        
+        createChat({
+            mode: 'fullscreen', // Switched from 'fullscreen' to fix page jumping
+            inputPosition: 'above',
+            inputLayout: 'embedded',
+            isEmbedded: true,
+            containerId: 'ev-chat',
+            
+            categories: [
+                {
+                    title: 'Installation',
+                    questions: [
+                        'How long does a home survey take?',
+                        'What photos do I need to provide?',
+                        'Do I need my own driveway for install?',
+                        'Is standard installation included?'
+                    ]
+                },
+                {
+                    title: 'Costs & Grants',
+                    questions: [
+                        'What grants are available?',
+                        'How much does installation cost?',
+                        'Are there any hidden fees?'
+                    ]
+                },
+                {
+                    title: 'Technology',
+                    questions: [
+                        'What charger types do you offer?',
+                        'Do you support solar integration?',
+                        'Can I use any charging app?'
+                    ]
+                },
+                {
+                    title: 'Range & Battery',
+                    questions: [
+                        'How far can I drive on a full charge?',
+                        'How long does charging take?',
+                        'Does cold weather affect range?'
+                    ]
+                }
+            ],
+            
+            i18n: {
+                title: 'ASK VINDIS AI SPECIALIST',
+                subtitle: 'Explore common questions by category or ask our specialist a bespoke inquiry.',
+                inputPlaceholder: 'Type your own question here...',
+                sendButtonText: 'ASK AI SPECIALIST',
+                getStarted: 'Choose a topic to explore'
+            }
+        });
+    </script>
+
+    <script>
+        // Smooth Scroll Logic
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href === "#") return;
+                try {
+                    const target = document.querySelector(href);
+                    if (target) {
+                        e.preventDefault();
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                } catch(err) {}
+            });
+        });
+    </script>
+</body>
+</html>
