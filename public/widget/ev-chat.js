@@ -22470,7 +22470,7 @@ const cm = ({ onSend: e, isLoading: t }) => {
   }, f = (p) => {
     u(p);
   }, c = !l && s !== "window" && s !== "fullscreen";
-  return a === "above" && s !== "window" ? /* @__PURE__ */ T.jsxs("div", { className: e || "flex h-full flex-col bg-background relative", children: [
+  return a === "above" && s !== "window" ? /* @__PURE__ */ T.jsxs("div", { className: e || "flex h-full flex-col bg-background relative overflow-hidden", children: [
     c && /* @__PURE__ */ T.jsx(dh, { onNewChat: o }),
     !c && n.length > 0 && /* @__PURE__ */ T.jsx(
       "button",
@@ -22496,7 +22496,7 @@ const cm = ({ onSend: e, isLoading: t }) => {
         hideWelcome: !0
       }
     )
-  ] }) : /* @__PURE__ */ T.jsxs("div", { className: e || "flex h-full flex-col bg-background relative", children: [
+  ] }) : /* @__PURE__ */ T.jsxs("div", { className: e || "flex h-full flex-col bg-background relative overflow-hidden", children: [
     c && /* @__PURE__ */ T.jsx(dh, { onNewChat: o }),
     !c && n.length > 0 && /* @__PURE__ */ T.jsx(
       "button",
