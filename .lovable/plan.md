@@ -1,89 +1,110 @@
 
-## What’s happening (root cause)
-Your `/test-vindis.html` page is **not loading the widget code you just fixed in this Lovable project**.
 
-Right now it loads:
-- **CSS** from jsDelivr: `https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/style.css`
-- **JS** from jsDelivr: `https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/ev-chat.js`
+# Fix: Scroll Only Messages Inside the Bordered Container
 
-So even though we updated:
-- `src/index.css` (adds `.jt-ev-chat-widget { height: 100% }`)
-- `src/pages/Index.tsx` (removes the overflow clipping)
+## Problem
+Currently, the entire bordered message container (with the teal border) scrolls away when you scroll through messages. The scroll should be **contained inside** the bordered box, keeping the border always visible.
 
-…those changes **won’t show up** on that test page until:
-1) the CDN bundle is rebuilt and published, OR  
-2) the test page is changed to load the widget from the local Lovable preview (dev) code.
+**Current structure:**
+```
+<ScrollArea>                              ← Scrolls everything
+  <div className="p-4">
+    <WelcomeMessage />
+    <CategorizedQuickActions />
+    <div style={{ border: 'teal...' }}>   ← Border scrolls away!
+      {messages}
+      {typing indicator}
+      {quick replies}
+    </div>
+  </div>
+</ScrollArea>
+```
 
-That’s why you still see the message area cut off with no internal scroll.
-
----
-
-## Goal
-Make `/test-vindis.html` reliably test the **current** Lovable widget code so:
-- internal message scrolling works
-- no parent-page “scroll jumping” happens
-
----
-
-## Implementation approach
-### A) Update the test page to use the local (Lovable preview) widget by default
-Change `public/test-vindis.html` to load the widget from:
-- `await import("/src/widget.tsx")`
-
-This guarantees it uses the code we just edited (including the scroll fixes), without requiring any widget build step.
-
-### B) Keep an optional “CDN mode” switch for comparison
-Add a simple toggle so you can still test the CDN build when needed:
-- `?cdn=1` -> load from jsDelivr
-- default (no param) -> load local `/src/widget.tsx`
-
-### C) Fix the widget options passed in the test file
-The test file currently passes `containerId` and `isEmbedded`, which are not used by our `createChat()` API.
-
-We’ll update to:
-- `target: "#ev-chat"`
-- keep `mode`, `inputPosition`, `inputLayout`, `categories`, `i18n`
-
-### D) Add a tiny debug log (and/or badge) so it’s obvious which build is running
-Example: `console.log("[test-vindis] Widget source: LOCAL")` vs `CDN`.
-
----
-
-## File changes (what I will edit)
-### 1) `public/test-vindis.html`
-- Remove the hard-coded `<link>` to CDN `style.css` (or leave it out when local mode is used).
-- Replace the existing module script with a conditional loader:
-
-Pseudo-structure:
-```js
-const useCdn = new URLSearchParams(location.search).has("cdn");
-
-if (useCdn) {
-  // inject CDN CSS link
-  // import createChat from jsDelivr
-} else {
-  // import createChat from /src/widget.tsx (brings CSS via import "./index.css")
-}
-
-createChat({ target: "#ev-chat", ... });
+**Desired structure:**
+```
+<div className="p-4">
+  <WelcomeMessage />
+  <CategorizedQuickActions />
+  <div style={{ border: 'teal...' }}>     ← Border stays fixed
+    <ScrollArea>                           ← Scroll ONLY the content inside
+      {messages}
+      {typing indicator}
+      {quick replies}
+    </ScrollArea>
+  </div>
+</div>
 ```
 
 ---
 
-## How you’ll test (verification checklist)
-1) Open (local dev widget):
-   - `/test-vindis.html`
-2) Send multiple questions until the response area overflows.
-3) Confirm:
-   - Messages scroll **inside** the widget
-   - The page itself does **not** jump when AI responds
-4) Optional comparison:
-   - `/test-vindis.html?cdn=1` to confirm the CDN build is the “old behavior” until rebuilt
+## Solution
+
+Refactor `ChatMessages.tsx` so the ScrollArea is **inside** the bordered container, not wrapping it.
+
+### Key changes to `src/components/chat/ChatMessages.tsx`:
+
+1. **Move the bordered container outside the ScrollArea**
+2. **Wrap only the messages/typing/quick-replies inside ScrollArea**
+3. **Give the bordered container a fixed/flex height** so the ScrollArea inside has room to scroll
+4. **Keep the welcome section and quick actions outside** (they're already static in the `inputPosition: above` layout)
+
+### New structure:
+
+```tsx
+return (
+  <div className="flex-1 min-h-0 flex flex-col gap-4 p-4">
+    {!hideWelcome && <WelcomeMessage />}
+    {!hideWelcome && <CategorizedQuickActions ... />}
+
+    {/* Bordered container - FIXED, border always visible */}
+    <div
+      className={cn(
+        "flex-1 min-h-0 flex flex-col",  // flex-1 to fill remaining space
+        useContainerStyling && "mx-auto bg-[hsl(var(--message-container-bg))]"
+      )}
+      style={useContainerStyling ? {
+        border: 'var(--message-container-border)',
+        maxWidth: 'var(--message-container-max-width)',
+        minHeight: 'var(--message-container-min-height)',
+        width: '100%',
+      } : undefined}
+    >
+      {/* ScrollArea INSIDE the border - only messages scroll */}
+      <ScrollArea className="flex-1 min-h-0" ref={scrollRef}>
+        <div className="flex flex-col gap-4 p-4">
+          {messages.map(...)}
+          {isLoading && <TypingIndicator />}
+          {quickReplySuggestions && <QuickReplies ... />}
+        </div>
+      </ScrollArea>
+    </div>
+  </div>
+);
+```
 
 ---
 
-## (Optional) Next step for production / CDN
-Once we confirm local mode is fixed, if you want the jsDelivr CDN version to include these fixes, we’ll need to ensure the **built output** (`public/widget/ev-chat.js` + `public/widget/style.css`) is regenerated and published to whatever repo/tag jsDelivr is pointing at (or switch your embed to load from the Lovable-hosted built assets instead).
+## Visual result
 
-(We can decide this after the local test is confirmed.)
+| Before | After |
+|--------|-------|
+| Scroll moves the entire bordered box | Border stays fixed, content scrolls inside |
+| Top border disappears when scrolling | Top border always visible |
+| Feels like page/container is moving | Feels like a proper chat window |
+
+---
+
+## Files to modify
+
+### `src/components/chat/ChatMessages.tsx`
+- Restructure the component so ScrollArea is nested inside the bordered container
+- Ensure the outer container uses `flex-1 min-h-0` to constrain height properly
+- Move padding from the outer ScrollArea wrapper to inside the content
+
+---
+
+## Build/CDN Note
+After this fix is merged, you'll need to either:
+1. Purge the jsDelivr cache again, OR
+2. Test with the local widget (default in `/test-vindis.html`)
 
