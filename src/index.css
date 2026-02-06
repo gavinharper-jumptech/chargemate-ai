@@ -178,6 +178,7 @@
   .jt-ev-chat-widget {
     height: 100%;  /* Inherit height from parent container for proper scroll containment */
     font-family: var(--jt-ev-chat-font-family, inherit);
+    text-align: left;  /* Prevent text-center inheritance from parent sites */
     
     /* Re-declare all theme tokens within widget scope */
     --background: var(--jt-ev-chat-background, 120 20% 98%);

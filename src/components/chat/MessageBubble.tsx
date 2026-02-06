@@ -18,7 +18,7 @@ const MessageBubble = ({ content, role }: MessageBubbleProps) => {
     >
       <div
         className={cn(
-          "max-w-[85%] px-4 py-3 md:max-w-[70%]",
+          "max-w-[85%] px-4 py-3 md:max-w-[70%] text-left",
           isUser
             ? "bg-chat-user text-chat-user-foreground"
             : "bg-chat-assistant text-chat-assistant-foreground"
