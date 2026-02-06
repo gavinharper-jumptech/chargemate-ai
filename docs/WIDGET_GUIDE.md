@@ -274,6 +274,10 @@ Theme the widget using CSS custom properties with the `--jt-ev-chat-` prefix. Se
 | `--jt-ev-chat-user-foreground` | User message text |
 | `--jt-ev-chat-assistant` | Assistant message background |
 | `--jt-ev-chat-assistant-foreground` | Assistant message text |
+| `--jt-ev-chat-assistant-link` | Assistant message link color (default: sky-blue) |
+| `--jt-ev-chat-assistant-link-hover` | Assistant message link hover color |
+| `--jt-ev-chat-user-link` | User message link color (default: inherits foreground) |
+| `--jt-ev-chat-user-link-hover` | User message link hover color |
 
 ### Message Container (Fullscreen Only)
 
