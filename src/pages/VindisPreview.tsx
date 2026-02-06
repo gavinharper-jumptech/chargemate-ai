@@ -122,7 +122,7 @@ const VindisPreview = () => {
       style={vindisStyles}
     >
       <ChatConfigProvider overrideConfig={vindisConfig}>
-        <Index className="flex h-full flex-col bg-background" />
+        <Index className="flex h-full flex-col bg-background overflow-hidden" />
       </ChatConfigProvider>
     </div>
   );

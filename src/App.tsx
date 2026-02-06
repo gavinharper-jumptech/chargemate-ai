@@ -67,7 +67,7 @@ const App = () => {
                       <ChatWindow position="bottom-right" />
                     </div>
                   ) : (
-                    <Index className="flex h-screen flex-col bg-background" />
+                    <Index className="flex h-screen flex-col bg-background overflow-hidden" />
                   )
                 } 
               />
