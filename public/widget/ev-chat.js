@@ -20351,15 +20351,15 @@ const MN = () => {
         y > 0 && y < 100 && (d.scrollTop = d.scrollHeight);
       }
     }
-  }, [f, t]), /* @__PURE__ */ C.jsx(Uv, { className: "flex-1 min-h-0", ref: o, children: /* @__PURE__ */ C.jsxs("div", { className: "flex flex-col gap-4 p-4", children: [
+  }, [f, t]), /* @__PURE__ */ C.jsxs("div", { className: "flex-1 min-h-0 flex flex-col gap-4 p-4", children: [
     !r && /* @__PURE__ */ C.jsx(MN, {}),
     !r && /* @__PURE__ */ C.jsx("div", { className: "flex justify-center", children: /* @__PURE__ */ C.jsx(P0, { onSelect: n }) }),
-    /* @__PURE__ */ C.jsxs(
+    /* @__PURE__ */ C.jsx(
       "div",
       {
         className: Ne(
-          "flex flex-col gap-4",
-          u && "p-4 mx-auto bg-[hsl(var(--message-container-bg))]"
+          "flex-1 min-h-0 flex flex-col",
+          u && "mx-auto bg-[hsl(var(--message-container-bg))]"
         ),
         style: u ? {
           border: "var(--message-container-border)",
@@ -20367,7 +20367,7 @@ const MN = () => {
           minHeight: "var(--message-container-min-height)",
           width: "100%"
         } : void 0,
-        children: [
+        children: /* @__PURE__ */ C.jsx(Uv, { className: "flex-1 min-h-0", ref: o, children: /* @__PURE__ */ C.jsxs("div", { className: "flex flex-col gap-4 p-4", children: [
           c.map((p) => /* @__PURE__ */ C.jsx(
             "div",
             {
@@ -20392,10 +20392,10 @@ const MN = () => {
               onSelect: n
             }
           )
-        ]
+        ] }) })
       }
     )
-  ] }) });
+  ] });
 }, Pc = S.forwardRef(({ className: e, ...t }, n) => /* @__PURE__ */ C.jsx(
   "textarea",
   {
