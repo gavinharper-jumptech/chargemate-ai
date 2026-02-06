@@ -1,81 +1,34 @@
 
 
-# Enhance Image & Link Handling in Chat Bubbles
+# Fix: Chat Messages Overflowing Beyond Container
 
-## What This Covers
+## Problem
+Messages overflow past the chat input and beyond the viewport on the main preview page (`/`). The flex layout containers lack `overflow-hidden`, so `flex-1 min-h-0` children expand beyond their parent instead of scrolling internally.
 
-Two improvements to how AI responses display URLs and images:
-
-1. **Auto-link bare URLs** -- If the AI returns a plain URL like `https://example.com/page`, it will become a clickable link instead of plain text.
-2. **Style images properly** -- If the AI returns a markdown image like `![photo](https://...)`, the image will be constrained to fit neatly inside the chat bubble with rounded corners.
-
----
+## Why This Is Safe
+- The scrolling fix (internal `ScrollArea` relative calculations) lives in `ChatMessages.tsx` and is completely untouched
+- `overflow-hidden` works at the outer container level -- it enforces the height constraint that lets the internal `ScrollArea` activate properly
+- The Vindis preview is unaffected because its host div already has a fixed height
 
 ## Changes
 
-### `src/components/chat/MessageBubble.tsx`
-
-**1. Auto-link bare URLs using `react-markdown`'s `remarkGfm` plugin:**
-
-The `remark-gfm` plugin enables GitHub Flavored Markdown, which automatically converts bare URLs into clickable links.
-
-```tsx
-import remarkGfm from "remark-gfm";
-
-<ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+### 1. `src/App.tsx` (line 70)
+Add `overflow-hidden` to the className passed to Index:
+```
+"flex h-screen flex-col bg-background" -> "flex h-screen flex-col bg-background overflow-hidden"
 ```
 
-**2. Custom component overrides for links and images:**
-
-Pass a `components` prop to `ReactMarkdown` to control how `<a>` and `<img>` elements render:
-
-```tsx
-<ReactMarkdown
-  remarkPlugins={[remarkGfm]}
-  components={{
-    a: ({ href, children }) => (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline break-all opacity-90 hover:opacity-100"
-      >
-        {children}
-      </a>
-    ),
-    img: ({ src, alt }) => (
-      <img
-        src={src}
-        alt={alt || ""}
-        className="rounded max-w-full h-auto my-2"
-        loading="lazy"
-      />
-    ),
-  }}
->
-  {content}
-</ReactMarkdown>
+### 2. `src/pages/Index.tsx` (lines 42 and 79)
+Add `overflow-hidden` to both layout wrapper default classNames:
+```
+"flex h-full flex-col bg-background relative" -> "flex h-full flex-col bg-background relative overflow-hidden"
 ```
 
-**3. Add image-related prose styles to the container div:**
-
+### 3. `src/pages/VindisPreview.tsx` (line 125)
+Add `overflow-hidden` to the className passed to Index:
 ```
-prose-img:rounded prose-img:max-w-full prose-img:h-auto prose-img:my-2
+"flex h-full flex-col bg-background" -> "flex h-full flex-col bg-background overflow-hidden"
 ```
-
----
-
-### New Dependency
-
-- **`remark-gfm`** -- Enables auto-linking of bare URLs and other GitHub Flavored Markdown features (tables, strikethrough, etc.)
-
----
 
 ## Result
-
-| Scenario | Before | After |
-|----------|--------|-------|
-| Bare URL `https://example.com/image.png` | Plain text, not clickable | Clickable link |
-| Markdown image `![alt](url)` | Image renders but may overflow | Image constrained, rounded, styled |
-| Markdown link `[text](url)` | Already works | Now opens in new tab safely |
-
+Messages scroll inside the chat container instead of overflowing the viewport. No impact on the internal scrolling behavior.
