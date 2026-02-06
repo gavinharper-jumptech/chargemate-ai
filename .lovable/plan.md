@@ -1,40 +1,46 @@
 
-
-# Fix: Chat Messages Still Overflowing Container
+# Fix: ScrollArea Not Scrollable After Overflow Fix
 
 ## Problem
-The previous fix added `overflow-hidden` to the outermost containers (`App.tsx`, `Index.tsx`, `VindisPreview.tsx`) but missed the intermediate flex container inside `ChatMessages.tsx`. The flex containment chain must have `overflow-hidden` at every level -- if any link in the chain is missing it, children can expand beyond their parent.
+Adding `overflow-hidden` to the outer wrapper (line 130 in ChatMessages.tsx) correctly prevents content from overflowing the viewport, but the messages are now clipped without any ability to scroll. The content is hidden but not scrollable.
 
 ## Root Cause
+The bordered container (line 140-150) sits between the `overflow-hidden` outer wrapper and the `ScrollArea`, but it lacks `overflow-hidden` itself. Without it:
 
-The layout chain is:
+1. The bordered container grows to fit all its content (the full message list)
+2. The outer `overflow-hidden` clips it visually
+3. The ScrollArea never gets a constrained height, so its viewport never activates scrolling
 
-```text
-Index (h-screen flex-col overflow-hidden)          -- OK
-  ChatMessages outer div (flex-1 min-h-0 flex-col)  -- MISSING overflow-hidden
-    bordered container (flex-1 min-h-0 flex-col)     -- OK
-      ScrollArea (flex-1 min-h-0)                    -- OK
-```
-
-Without `overflow-hidden` on the ChatMessages outer div, the browser allows its children (welcome section, quick actions, bordered container) to collectively grow beyond the available space, pushing messages past the input.
+The containment chain is broken at the bordered container level.
 
 ## Fix
 
-### `src/components/chat/ChatMessages.tsx` (line 130)
+### `src/components/chat/ChatMessages.tsx` -- line 142
 
-Add `overflow-hidden` to the outer wrapper div:
+Add `overflow-hidden` to the bordered container div:
 
 ```
-Before: "flex-1 min-h-0 flex flex-col gap-4 p-4"
-After:  "flex-1 min-h-0 flex flex-col gap-4 p-4 overflow-hidden"
+Before: "flex-1 min-h-0 flex flex-col"
+After:  "flex-1 min-h-0 flex flex-col overflow-hidden"
 ```
 
-This is a single class addition on one line. No other files need changes.
+This completes the height constraint chain:
+
+```text
+outer div (overflow-hidden)           -- constrains total height
+  bordered container (overflow-hidden) -- constrains to available space
+    ScrollArea Root (overflow-hidden)  -- Radix default
+      Viewport (overflow: scroll)      -- actually scrolls
+```
+
+### Single-line change
+
+Only the `cn()` call on line 142 needs updating. No other files are affected.
 
 ## Why This Works
-Adding `overflow-hidden` here completes the containment chain. Every flex parent from the root (`h-screen`) down to the `ScrollArea` will now enforce height constraints, ensuring the `ScrollArea` viewport activates its internal scrolling instead of expanding the page.
+Every flex parent in the chain from the root down to the ScrollArea viewport needs to enforce its height constraint. Adding `overflow-hidden` to the bordered container forces it to respect its `flex-1 min-h-0` sizing instead of growing to fit content. The ScrollArea viewport then gets a constrained height and its internal `overflow: scroll` activates.
 
 ## Impact
-- Main preview (`/`): messages will scroll inside the container
-- Vindis preview: no change (already works via fixed host container height)
-- Internal scroll behavior (smooth scroll to new messages): completely unaffected -- that logic reads from the viewport inside `ScrollArea` which remains unchanged
+- Main preview: messages will scroll inside the chat area
+- Vindis preview: no regression (already constrained by host container)
+- Auto-scroll behavior: unaffected (operates on the viewport ref inside ScrollArea)
