@@ -22306,7 +22306,7 @@ const DI = () => {
       "div",
       {
         className: Re(
-          "flex-1 min-h-0 flex flex-col",
+          "flex-1 min-h-0 flex flex-col overflow-hidden",
           u && "mx-auto bg-[hsl(var(--message-container-bg))]"
         ),
         style: u ? {
