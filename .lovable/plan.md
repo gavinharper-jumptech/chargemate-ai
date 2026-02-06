@@ -1,110 +1,67 @@
 
 
-# Fix: Scroll Only Messages Inside the Bordered Container
+# Fix: Chat Bubble Text Alignment
 
 ## Problem
-Currently, the entire bordered message container (with the teal border) scrolls away when you scroll through messages. The scroll should be **contained inside** the bordered box, keeping the border always visible.
+The text inside chat bubbles is being centered instead of left-aligned. This happens because the widget inherits `text-center` from the parent page's container.
 
-**Current structure:**
-```
-<ScrollArea>                              ← Scrolls everything
-  <div className="p-4">
-    <WelcomeMessage />
-    <CategorizedQuickActions />
-    <div style={{ border: 'teal...' }}>   ← Border scrolls away!
-      {messages}
-      {typing indicator}
-      {quick replies}
-    </div>
-  </div>
-</ScrollArea>
-```
-
-**Desired structure:**
-```
-<div className="p-4">
-  <WelcomeMessage />
-  <CategorizedQuickActions />
-  <div style={{ border: 'teal...' }}>     ← Border stays fixed
-    <ScrollArea>                           ← Scroll ONLY the content inside
-      {messages}
-      {typing indicator}
-      {quick replies}
-    </ScrollArea>
-  </div>
+**In `public/test-vindis.html` (line 321):**
+```html
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <!-- ... -->
+    <div id="ev-chat"></div>
 </div>
 ```
+
+The widget doesn't explicitly reset `text-align`, so it inherits `center` from the parent.
 
 ---
 
 ## Solution
-
-Refactor `ChatMessages.tsx` so the ScrollArea is **inside** the bordered container, not wrapping it.
-
-### Key changes to `src/components/chat/ChatMessages.tsx`:
-
-1. **Move the bordered container outside the ScrollArea**
-2. **Wrap only the messages/typing/quick-replies inside ScrollArea**
-3. **Give the bordered container a fixed/flex height** so the ScrollArea inside has room to scroll
-4. **Keep the welcome section and quick actions outside** (they're already static in the `inputPosition: above` layout)
-
-### New structure:
-
-```tsx
-return (
-  <div className="flex-1 min-h-0 flex flex-col gap-4 p-4">
-    {!hideWelcome && <WelcomeMessage />}
-    {!hideWelcome && <CategorizedQuickActions ... />}
-
-    {/* Bordered container - FIXED, border always visible */}
-    <div
-      className={cn(
-        "flex-1 min-h-0 flex flex-col",  // flex-1 to fill remaining space
-        useContainerStyling && "mx-auto bg-[hsl(var(--message-container-bg))]"
-      )}
-      style={useContainerStyling ? {
-        border: 'var(--message-container-border)',
-        maxWidth: 'var(--message-container-max-width)',
-        minHeight: 'var(--message-container-min-height)',
-        width: '100%',
-      } : undefined}
-    >
-      {/* ScrollArea INSIDE the border - only messages scroll */}
-      <ScrollArea className="flex-1 min-h-0" ref={scrollRef}>
-        <div className="flex flex-col gap-4 p-4">
-          {messages.map(...)}
-          {isLoading && <TypingIndicator />}
-          {quickReplySuggestions && <QuickReplies ... />}
-        </div>
-      </ScrollArea>
-    </div>
-  </div>
-);
-```
-
----
-
-## Visual result
-
-| Before | After |
-|--------|-------|
-| Scroll moves the entire bordered box | Border stays fixed, content scrolls inside |
-| Top border disappears when scrolling | Top border always visible |
-| Feels like page/container is moving | Feels like a proper chat window |
+Add `text-align: left` to the widget's root CSS class to prevent inheritance from parent pages.
 
 ---
 
 ## Files to modify
 
-### `src/components/chat/ChatMessages.tsx`
-- Restructure the component so ScrollArea is nested inside the bordered container
-- Ensure the outer container uses `flex-1 min-h-0` to constrain height properly
-- Move padding from the outer ScrollArea wrapper to inside the content
+### 1) `src/index.css`
+Add `text-align: left;` to the `.jt-ev-chat-widget` class:
+
+```css
+.jt-ev-chat-widget {
+  height: 100%;
+  font-family: var(--jt-ev-chat-font-family, inherit);
+  text-align: left;  /* NEW: Prevent text-center inheritance from parent sites */
+  
+  /* ... rest of variables ... */
+}
+```
+
+### 2) `src/components/chat/MessageBubble.tsx` (extra safety)
+Add `text-left` class to the bubble div to ensure it's always left-aligned:
+
+```tsx
+<div
+  className={cn(
+    "max-w-[85%] px-4 py-3 md:max-w-[70%] text-left",  // Add text-left
+    isUser
+      ? "bg-chat-user text-chat-user-foreground"
+      : "bg-chat-assistant text-chat-assistant-foreground"
+  )}
+```
 
 ---
 
-## Build/CDN Note
-After this fix is merged, you'll need to either:
-1. Purge the jsDelivr cache again, OR
-2. Test with the local widget (default in `/test-vindis.html`)
+## Result
+| Before | After |
+|--------|-------|
+| Text centered inside bubbles | Text left-aligned (standard chat style) |
+| Depends on parent page styles | Widget controls its own alignment |
+
+---
+
+## Note
+The welcome title ("ASK VINDIS AI SPECIALIST") will remain centered because `WelcomeSection.tsx` explicitly uses `text-center` on its own container.
+
+After this fix, remember to purge the jsDelivr CDN cache for the changes to appear in the CDN version.
 
