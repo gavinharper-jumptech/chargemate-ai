@@ -22,7 +22,7 @@ export const useN8nChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState(generateSessionId);
-  const { webhookUrl } = useChatConfig();
+  const { webhookUrl, metadata } = useChatConfig();
 
   const sendMessage = useCallback(
     async (content: string) => {
@@ -54,8 +54,10 @@ export const useN8nChat = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            action: "sendMessage",
             message: content.trim(),
             sessionId,
+            ...(metadata && { metadata }),
           }),
         });
 
@@ -124,7 +126,7 @@ export const useN8nChat = () => {
         setIsLoading(false);
       }
     },
-    [sessionId, webhookUrl],
+    [sessionId, webhookUrl, metadata],
   );
 
   const clearMessages = useCallback(() => {
