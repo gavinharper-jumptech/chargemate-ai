@@ -1,36 +1,31 @@
 
 
-# Remove Hardcoded Default Webhook URL
+# Fix: useN8nChat Not Reading webhookUrl From Context
 
 ## Problem
-`src/lib/chat-config.ts` (line 55) defines a hardcoded fallback webhook URL:
+When you call `createChat({ webhookUrl: '...' })`, the webhookUrl is passed into `ChatConfigProvider` (React context). However, `useN8nChat` on line 31 calls `getConfig()` with no arguments, which only reads from `window.EVChatConfig` -- it never checks the React context. So the webhookUrl you passed is ignored.
 
-```
-const DEFAULT_WEBHOOK_URL = "https://jt-eco.app.n8n.cloud/webhook/1cd4ac0b-7a32-4c9f-9307-d0501ff02822";
-```
-
-If a widget user forgets to pass `webhookUrl` in their `createChat()` config, the widget silently falls back to this URL -- sending traffic (and potentially sensitive user messages) to the wrong endpoint, and incurring costs on the default n8n account.
+This worked before only because there was a hardcoded default URL fallback, which we just removed.
 
 ## Fix
 
-### 1. `src/lib/chat-config.ts`
-- Remove the `DEFAULT_WEBHOOK_URL` constant entirely
-- In `getConfig()`, set `webhookUrl` to `mergedOptions.webhookUrl` (no fallback) -- it will be `undefined` if not provided
+### `src/hooks/use-n8n-chat.ts`
 
-### 2. `src/hooks/use-n8n-chat.ts`
-- At the top of `sendMessage`, check if `webhookUrl` is falsy
-- If missing, show a toast error ("No webhook URL configured") and return early without sending
-- This prevents silent failures and gives clear feedback
+1. Import and use `useChatConfig()` from the context instead of calling `getConfig()` directly
+2. Read `webhookUrl` from the context value (which already merges `createChat()` options with window config)
+3. Remove the `getConfig` import since it's no longer needed
 
-### 3. `src/components/chat/WelcomeSection.tsx` (or equivalent)
-- No changes needed -- the error toast is sufficient feedback
+### What changes
 
-## Summary of changes
+- Remove: `import { getConfig } from "@/lib/chat-config"`
+- Add: `import { useChatConfig } from "@/context/ChatConfigContext"`
+- Inside the hook, call `const { webhookUrl } = useChatConfig()` once at the top level
+- Remove the `getConfig()` call from inside `sendMessage`
+- Add `webhookUrl` to the `useCallback` dependency array
 
-| File | Change |
-|------|--------|
-| `src/lib/chat-config.ts` | Remove `DEFAULT_WEBHOOK_URL`, stop falling back to it |
-| `src/hooks/use-n8n-chat.ts` | Guard against missing `webhookUrl`, show error toast |
+### Why this works
 
-Two files, minimal diff. The dev preview will still work -- you just need to pass `webhookUrl` explicitly (via URL param, `EVChatConfig`, or `createChat()` options).
+`ChatConfigProvider` already merges `createChat()` options, `window.EVChatConfig`, and defaults into a single resolved config object. Every other component already reads from this context (`ChatInput`, `ChatMessages`, `WelcomeSection`, etc). `useN8nChat` was the only consumer still bypassing it.
 
+### Single file change
+Only `src/hooks/use-n8n-chat.ts` needs editing. No other files affected.
