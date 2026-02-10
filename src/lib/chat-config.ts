@@ -31,6 +31,9 @@ export interface CreateChatOptions {
   categories?: QuestionCategory[];
   initialMessages?: string[];
 
+  // Webhook payload
+  metadata?: Record<string, unknown>; // Arbitrary metadata included in webhook requests
+
   // Text customization
   i18n?: I18nConfig;
 }
@@ -117,6 +120,9 @@ export function getConfig(options?: CreateChatOptions): EVChatConfig {
         ? mergedOptions.categories
         : DEFAULT_CATEGORIES,
     initialMessages: mergedOptions.initialMessages,
+
+    // Metadata
+    metadata: mergedOptions.metadata,
 
     // i18n - merge with defaults
     i18n: {

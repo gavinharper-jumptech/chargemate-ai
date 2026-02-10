@@ -118,6 +118,7 @@ For backward compatibility, set `window.EVChatConfig` before loading the script:
 | `inputLayout` | `"separate"` \| `"embedded"` | `"separate"` | Input/button layout style (fullscreen only) |
 | `categories` | `QuestionCategory[]` | (see defaults) | Quick question categories |
 | `initialMessages` | `string[]` | - | Pre-populated conversation messages |
+| `metadata` | `Record<string, unknown>` | - | Arbitrary metadata included in every webhook request |
 | `i18n` | `I18nConfig` | (see defaults) | Text customization |
 
 ### Example with All Options
@@ -136,6 +137,25 @@ createChat({
   }
 });
 ```
+
+---
+
+## Webhook Payload
+
+The widget sends a JSON POST to your `webhookUrl` with this shape:
+
+```json
+{
+  "action": "sendMessage",
+  "message": "user's message text",
+  "sessionId": "session-1234567-abcdefg",
+  "metadata": { "userEmail": "user@example.com" }
+}
+```
+
+- `action` is always `"sendMessage"`
+- `metadata` is only included if configured via `createChat({ metadata: {...} })`
+- If `metadata` is omitted from config, the key is excluded from the payload entirely
 
 ---
 
