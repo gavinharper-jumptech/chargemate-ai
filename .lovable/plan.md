@@ -1,64 +1,36 @@
 
-# Add Configurable Link Colors for Chat Bubbles
+
+# Remove Hardcoded Default Webhook URL
 
 ## Problem
-Links in chat bubbles inherit the bubble's text color, making them hard to see (especially white-on-dark assistant bubbles). Hardcoding a fix would break for widget users who set custom bubble backgrounds.
+`src/lib/chat-config.ts` (line 55) defines a hardcoded fallback webhook URL:
 
-## Solution
-Add new CSS variables for assistant and user link colors, following the existing pattern. Widget users can override them; sensible defaults are provided.
-
-## Changes
-
-### 1. `src/index.css` -- add 4 new variables (after line 78)
-
-```css
---chat-assistant-link: var(--jt-ev-chat-assistant-link, 199 89% 70%);
---chat-assistant-link-hover: var(--jt-ev-chat-assistant-link-hover, 199 89% 80%);
---chat-user-link: var(--jt-ev-chat-user-link, var(--chat-user-foreground));
---chat-user-link-hover: var(--jt-ev-chat-user-link-hover, var(--chat-user-foreground));
+```
+const DEFAULT_WEBHOOK_URL = "https://jt-eco.app.n8n.cloud/webhook/1cd4ac0b-7a32-4c9f-9307-d0501ff02822";
 ```
 
-The assistant default (`199 89% 70%`) is a light sky-blue -- visible on dark backgrounds. User links default to the existing user foreground color since user bubbles are typically dark-on-light.
+If a widget user forgets to pass `webhookUrl` in their `createChat()` config, the widget silently falls back to this URL -- sending traffic (and potentially sensitive user messages) to the wrong endpoint, and incurring costs on the default n8n account.
 
-### 2. `tailwind.config.ts` -- register the new colors (inside the `chat` color block)
+## Fix
 
-```ts
-"assistant-link": "hsl(var(--chat-assistant-link))",
-"assistant-link-hover": "hsl(var(--chat-assistant-link-hover))",
-"user-link": "hsl(var(--chat-user-link))",
-"user-link-hover": "hsl(var(--chat-user-link-hover))",
-```
+### 1. `src/lib/chat-config.ts`
+- Remove the `DEFAULT_WEBHOOK_URL` constant entirely
+- In `getConfig()`, set `webhookUrl` to `mergedOptions.webhookUrl` (no fallback) -- it will be `undefined` if not provided
 
-### 3. `src/components/chat/MessageBubble.tsx` -- line 47
+### 2. `src/hooks/use-n8n-chat.ts`
+- At the top of `sendMessage`, check if `webhookUrl` is falsy
+- If missing, show a toast error ("No webhook URL configured") and return early without sending
+- This prevents silent failures and gives clear feedback
 
-Apply the correct link color based on the message role:
+### 3. `src/components/chat/WelcomeSection.tsx` (or equivalent)
+- No changes needed -- the error toast is sufficient feedback
 
-```tsx
-className={cn(
-  "underline break-all font-medium transition-colors",
-  role === "assistant"
-    ? "text-chat-assistant-link hover:text-chat-assistant-link-hover"
-    : "text-chat-user-link hover:text-chat-user-link-hover"
-)}
-```
+## Summary of changes
 
-The `role` prop is already available in the component.
+| File | Change |
+|------|--------|
+| `src/lib/chat-config.ts` | Remove `DEFAULT_WEBHOOK_URL`, stop falling back to it |
+| `src/hooks/use-n8n-chat.ts` | Guard against missing `webhookUrl`, show error toast |
 
-### 4. `docs/WIDGET_GUIDE.md` -- document the new variables
+Two files, minimal diff. The dev preview will still work -- you just need to pass `webhookUrl` explicitly (via URL param, `EVChatConfig`, or `createChat()` options).
 
-Add the 4 new variables to the CSS variable reference table so widget users know they can override them.
-
-## How widget users override
-
-In the Vindis example, they would just add to their `:root` CSS:
-
-```css
---jt-ev-chat-assistant-link: 172 100% 35%;
---jt-ev-chat-assistant-link-hover: 172 100% 45%;
-```
-
-## Impact
-- Default experience: assistant links are now visibly sky-blue instead of invisible white
-- User bubble links: unchanged (inherit foreground by default)
-- Fully customisable via CSS variables, consistent with the existing theming system
-- No breaking changes
