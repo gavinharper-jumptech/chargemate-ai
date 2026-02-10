@@ -131,6 +131,7 @@ createChat({
   inputPosition: 'above',
   inputLayout: 'embedded',
   categories: [...],
+  metadata: { userEmail: 'user@example.com' },
   i18n: {
     title: 'Chat with us!',
     inputPlaceholder: 'Ask a question...'
