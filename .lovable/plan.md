@@ -1,75 +1,56 @@
 
+# Move to Versioned CDN Releases
 
-# Add Configurable Metadata to Webhook Payload
+## Problem
+Currently the docs reference `@main` on jsDelivr, which requires manual cache purging after each build. jsDelivr throttles purge requests, causing stale files to be served.
 
-## What changes
+## Solution
+Use Git tags (e.g. `v1.0.0`) to create versioned releases. jsDelivr caches each version independently, so new versions are immediately available at a new URL -- no purging needed.
 
-The webhook payload currently sends `{ message, sessionId }`. We'll add `action` and an optional `metadata` object, keeping `message` as-is.
+## Changes
 
-## Usage after this change
+### 1. Update GitHub Actions workflow (`.github/workflows/build-widget.yml`)
+- Add a step after the commit/push that creates a Git tag from the version in `package.json` and pushes it
+- This means every successful widget build automatically gets a versioned tag
 
-```js
-// With metadata
-createChat({
-  webhookUrl: 'https://...',
-  metadata: { userEmail: 'preston@yesss.co.uk' },
-});
-
-// Without metadata -- works exactly as before
-createChat({
-  webhookUrl: 'https://...',
-});
+```yaml
+- name: Tag release
+  if: steps.check_changes.outputs.changes == 'true'
+  run: |
+    VERSION=$(node -p "require('./package.json').version")
+    git tag -f "v$VERSION"
+    git push origin "v$VERSION" --force
 ```
 
-Payload with metadata:
-```json
-{
-  "action": "sendMessage",
-  "message": "user's message here",
-  "sessionId": "8f24954a-...",
-  "metadata": { "userEmail": "preston@yesss.co.uk" }
-}
-```
-
-Payload without metadata:
-```json
-{
-  "action": "sendMessage",
-  "message": "user's message here",
-  "sessionId": "8f24954a-..."
-}
-```
-
-When `metadata` is not provided in config, it is simply omitted from the payload -- no empty object, no error. Fully backward-compatible.
-
-## Files to change
-
-### 1. `src/lib/chat-config.ts`
-- Add `metadata?: Record<string, unknown>` to `CreateChatOptions` interface
-- Pass through in `getConfig()`: `metadata: mergedOptions.metadata`  (remains `undefined` if not set)
-
-### 2. `src/hooks/use-n8n-chat.ts`
-- Read `metadata` from `useChatConfig()` alongside `webhookUrl`
-- Update the fetch body to:
-  ```ts
-  body: JSON.stringify({
-    action: "sendMessage",
-    message: content.trim(),
-    sessionId,
-    ...(metadata && { metadata }),
-  })
+### 2. Add a version bump script to `package.json`
+- Add a `release` script so you can bump the version before pushing:
+  ```json
+  "release:patch": "npm version patch --no-git-tag-version",
+  "release:minor": "npm version minor --no-git-tag-version",
+  "release:major": "npm version major --no-git-tag-version"
   ```
-- Add `metadata` to the `useCallback` dependency array
+- Bump `version` from `"0.0.0"` to `"1.0.0"` as the starting point
 
-### 3. `docs/WIDGET_GUIDE.md`
-- Document the new `metadata` option and updated payload format
+### 3. Update `docs/WIDGET_GUIDE.md`
+- Change all CDN URLs from `@main` to `@v1.0.0` (or `@latest` for always-latest)
+- Add a note explaining versioning:
+  - Use `@v1.0.0` for a pinned, stable version (recommended for production)
+  - Use `@main` for bleeding edge (may be cached/stale)
 
-## Optionality guarantee
+### 4. Update `public/test-vindis.html` (if referencing CDN URLs)
+- Update any CDN references to use versioned tags
 
-`metadata` is typed as `Record<string, unknown> | undefined`. When not provided:
-- It stays `undefined` in config
-- The spread `...(metadata && { metadata })` ensures the key is excluded from the JSON payload entirely
-- No runtime errors, no empty objects -- the webhook receives the same shape as before plus the new `action` field
+## Workflow after this change
 
-Three files, minimal diff.
+1. Make code changes and push to `main`
+2. Before pushing (or in a separate commit), bump the version: `bun run release:patch`
+3. GitHub Actions builds the widget, commits built files, and tags the commit as `v1.0.1`
+4. jsDelivr immediately serves the new version at `@v1.0.1` -- no purging needed
+5. Users on `@v1.0.0` stay on the old version until they update their URL
 
+## CDN URL format
+
+```
+https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@v1.0.0/public/widget/ev-chat.js
+https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@v1.0.0/public/widget/style.css
+```
