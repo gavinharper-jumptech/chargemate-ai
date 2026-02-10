@@ -30,6 +30,15 @@ export const useN8nChat = () => {
       // Get webhook URL from config (supports per-embed customization)
       const { webhookUrl } = getConfig();
 
+      if (!webhookUrl) {
+        toast({
+          title: "No webhook URL configured",
+          description: "Please provide a webhookUrl in your createChat() options.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Add user message immediately
       const userMessage: ChatMessage = {
         id: `user-${Date.now()}`,
