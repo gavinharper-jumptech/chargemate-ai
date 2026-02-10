@@ -25,11 +25,11 @@ Add the stylesheet and script to your HTML:
 
 ```html
 <!-- Styles -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@v1.0.0/public/widget/style.css">
 
 <!-- Widget Script -->
 <script type="module">
-  import { createChat } from 'https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/ev-chat.js';
+  import { createChat } from 'https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@v1.0.0/public/widget/ev-chat.js';
   
   createChat({
     webhookUrl: 'https://your-webhook-url.com/chat'
@@ -37,7 +37,7 @@ Add the stylesheet and script to your HTML:
 </script>
 ```
 
-> **Note**: The widget is served via jsDelivr CDN from GitHub, which provides proper CORS headers for cross-origin embedding. The `@main` tag automatically updates when the main branch changes. For production stability, consider using a specific tag (e.g., `@v1.0.0`) or commit hash.
+> **Note**: The widget is served via jsDelivr CDN from GitHub. Use a versioned tag (e.g., `@v1.0.0`) for production stability — each version is cached independently and available immediately. Use `@main` for bleeding-edge development (may serve stale cached files).
 
 ### Minimal Fullscreen Example
 
@@ -83,7 +83,7 @@ createChat({
 
 ```html
 <script type="module">
-  import { createChat } from 'https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/ev-chat.js';
+  import { createChat } from 'https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@v1.0.0/public/widget/ev-chat.js';
   createChat({ webhookUrl: 'https://...' });
 </script>
 ```
@@ -353,13 +353,13 @@ This format allows the widget to apply opacity modifiers when needed.
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@v1.0.0/public/widget/style.css">
 </head>
 <body>
   <div id="ev-chat" style="height: 100vh;"></div>
   
   <script type="module">
-    import { createChat } from 'https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@main/public/widget/ev-chat.js';
+    import { createChat } from 'https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@v1.0.0/public/widget/ev-chat.js';
     
     createChat({
       webhookUrl: 'https://your-api.com/chat'
