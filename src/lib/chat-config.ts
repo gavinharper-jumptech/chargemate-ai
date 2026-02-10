@@ -50,9 +50,6 @@ declare global {
   }
 }
 
-// Default webhook URL
-const DEFAULT_WEBHOOK_URL =
-  "https://jt-eco.app.n8n.cloud/webhook/1cd4ac0b-7a32-4c9f-9307-d0501ff02822";
 
 // Default categories for standalone mode
 export const DEFAULT_CATEGORIES: QuestionCategory[] = [
@@ -112,7 +109,7 @@ export function getConfig(options?: CreateChatOptions): EVChatConfig {
     inputLayout: mergedOptions.inputLayout || "separate",
 
     // Webhook
-    webhookUrl: mergedOptions.webhookUrl || DEFAULT_WEBHOOK_URL,
+    webhookUrl: mergedOptions.webhookUrl,
 
     // Content
     categories:
