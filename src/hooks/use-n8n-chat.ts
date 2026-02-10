@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { toast } from "@/hooks/use-toast";
-import { getConfig } from "@/lib/chat-config";
+import { useChatConfig } from "@/context/ChatConfigContext";
 
 interface ChatMessage {
   id: string;
@@ -22,13 +22,11 @@ export const useN8nChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState(generateSessionId);
+  const { webhookUrl } = useChatConfig();
 
   const sendMessage = useCallback(
     async (content: string) => {
       if (!content.trim()) return;
-
-      // Get webhook URL from config (supports per-embed customization)
-      const { webhookUrl } = getConfig();
 
       if (!webhookUrl) {
         toast({
@@ -126,7 +124,7 @@ export const useN8nChat = () => {
         setIsLoading(false);
       }
     },
-    [sessionId],
+    [sessionId, webhookUrl],
   );
 
   const clearMessages = useCallback(() => {
