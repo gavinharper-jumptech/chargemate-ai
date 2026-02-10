@@ -1,31 +1,75 @@
 
 
-# Fix: useN8nChat Not Reading webhookUrl From Context
+# Add Configurable Metadata to Webhook Payload
 
-## Problem
-When you call `createChat({ webhookUrl: '...' })`, the webhookUrl is passed into `ChatConfigProvider` (React context). However, `useN8nChat` on line 31 calls `getConfig()` with no arguments, which only reads from `window.EVChatConfig` -- it never checks the React context. So the webhookUrl you passed is ignored.
+## What changes
 
-This worked before only because there was a hardcoded default URL fallback, which we just removed.
+The webhook payload currently sends `{ message, sessionId }`. We'll add `action` and an optional `metadata` object, keeping `message` as-is.
 
-## Fix
+## Usage after this change
 
-### `src/hooks/use-n8n-chat.ts`
+```js
+// With metadata
+createChat({
+  webhookUrl: 'https://...',
+  metadata: { userEmail: 'preston@yesss.co.uk' },
+});
 
-1. Import and use `useChatConfig()` from the context instead of calling `getConfig()` directly
-2. Read `webhookUrl` from the context value (which already merges `createChat()` options with window config)
-3. Remove the `getConfig` import since it's no longer needed
+// Without metadata -- works exactly as before
+createChat({
+  webhookUrl: 'https://...',
+});
+```
 
-### What changes
+Payload with metadata:
+```json
+{
+  "action": "sendMessage",
+  "message": "user's message here",
+  "sessionId": "8f24954a-...",
+  "metadata": { "userEmail": "preston@yesss.co.uk" }
+}
+```
 
-- Remove: `import { getConfig } from "@/lib/chat-config"`
-- Add: `import { useChatConfig } from "@/context/ChatConfigContext"`
-- Inside the hook, call `const { webhookUrl } = useChatConfig()` once at the top level
-- Remove the `getConfig()` call from inside `sendMessage`
-- Add `webhookUrl` to the `useCallback` dependency array
+Payload without metadata:
+```json
+{
+  "action": "sendMessage",
+  "message": "user's message here",
+  "sessionId": "8f24954a-..."
+}
+```
 
-### Why this works
+When `metadata` is not provided in config, it is simply omitted from the payload -- no empty object, no error. Fully backward-compatible.
 
-`ChatConfigProvider` already merges `createChat()` options, `window.EVChatConfig`, and defaults into a single resolved config object. Every other component already reads from this context (`ChatInput`, `ChatMessages`, `WelcomeSection`, etc). `useN8nChat` was the only consumer still bypassing it.
+## Files to change
 
-### Single file change
-Only `src/hooks/use-n8n-chat.ts` needs editing. No other files affected.
+### 1. `src/lib/chat-config.ts`
+- Add `metadata?: Record<string, unknown>` to `CreateChatOptions` interface
+- Pass through in `getConfig()`: `metadata: mergedOptions.metadata`  (remains `undefined` if not set)
+
+### 2. `src/hooks/use-n8n-chat.ts`
+- Read `metadata` from `useChatConfig()` alongside `webhookUrl`
+- Update the fetch body to:
+  ```ts
+  body: JSON.stringify({
+    action: "sendMessage",
+    message: content.trim(),
+    sessionId,
+    ...(metadata && { metadata }),
+  })
+  ```
+- Add `metadata` to the `useCallback` dependency array
+
+### 3. `docs/WIDGET_GUIDE.md`
+- Document the new `metadata` option and updated payload format
+
+## Optionality guarantee
+
+`metadata` is typed as `Record<string, unknown> | undefined`. When not provided:
+- It stays `undefined` in config
+- The spread `...(metadata && { metadata })` ensures the key is excluded from the JSON payload entirely
+- No runtime errors, no empty objects -- the webhook receives the same shape as before plus the new `action` field
+
+Three files, minimal diff.
+
