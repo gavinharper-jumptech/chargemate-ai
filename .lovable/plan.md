@@ -1,56 +1,38 @@
 
-# Move to Versioned CDN Releases
+
+# Fix: Versioned Tag Not Being Created
 
 ## Problem
-Currently the docs reference `@main` on jsDelivr, which requires manual cache purging after each build. jsDelivr throttles purge requests, causing stale files to be served.
+The "Tag release" step in the GitHub Actions workflow only runs when `steps.check_changes.outputs.changes == 'true'`. If the built widget files haven't changed (which is likely when only bumping the version), the tag is never created -- so jsDelivr has nothing to serve at `@v1.0.0`.
 
-## Solution
-Use Git tags (e.g. `v1.0.0`) to create versioned releases. jsDelivr caches each version independently, so new versions are immediately available at a new URL -- no purging needed.
+## Fix
 
-## Changes
-
-### 1. Update GitHub Actions workflow (`.github/workflows/build-widget.yml`)
-- Add a step after the commit/push that creates a Git tag from the version in `package.json` and pushes it
-- This means every successful widget build automatically gets a versioned tag
+### `.github/workflows/build-widget.yml`
+- **Always create the tag** after a successful build, regardless of whether the built files changed
+- Move the tag step outside the `changes == 'true'` condition
+- Keep the commit/push step conditional (no point committing identical files)
 
 ```yaml
-- name: Tag release
-  if: steps.check_changes.outputs.changes == 'true'
-  run: |
-    VERSION=$(node -p "require('./package.json').version")
-    git tag -f "v$VERSION"
-    git push origin "v$VERSION" --force
+      - name: Commit and push
+        if: steps.check_changes.outputs.changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m "chore: build widget [skip ci]"
+          git push
+
+      - name: Tag release
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          git tag -f "v$VERSION"
+          git push origin "v$VERSION" --force
 ```
 
-### 2. Add a version bump script to `package.json`
-- Add a `release` script so you can bump the version before pushing:
-  ```json
-  "release:patch": "npm version patch --no-git-tag-version",
-  "release:minor": "npm version minor --no-git-tag-version",
-  "release:major": "npm version major --no-git-tag-version"
-  ```
-- Bump `version` from `"0.0.0"` to `"1.0.0"` as the starting point
+The only change: remove the `if: steps.check_changes.outputs.changes == 'true'` line from the "Tag release" step.
 
-### 3. Update `docs/WIDGET_GUIDE.md`
-- Change all CDN URLs from `@main` to `@v1.0.0` (or `@latest` for always-latest)
-- Add a note explaining versioning:
-  - Use `@v1.0.0` for a pinned, stable version (recommended for production)
-  - Use `@main` for bleeding edge (may be cached/stale)
+## After this change
+1. Push this fix to `main`
+2. The workflow triggers (since `package.json` is in the paths filter), builds, and creates the `v1.0.0` tag
+3. jsDelivr can then serve files at `@v1.0.0`
 
-### 4. Update `public/test-vindis.html` (if referencing CDN URLs)
-- Update any CDN references to use versioned tags
-
-## Workflow after this change
-
-1. Make code changes and push to `main`
-2. Before pushing (or in a separate commit), bump the version: `bun run release:patch`
-3. GitHub Actions builds the widget, commits built files, and tags the commit as `v1.0.1`
-4. jsDelivr immediately serves the new version at `@v1.0.1` -- no purging needed
-5. Users on `@v1.0.0` stay on the old version until they update their URL
-
-## CDN URL format
-
-```
-https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@v1.0.0/public/widget/ev-chat.js
-https://cdn.jsdelivr.net/gh/gavinharper-jumptech/chargemate-ai@v1.0.0/public/widget/style.css
-```
+If the workflow doesn't auto-trigger, use the **Run workflow** button on the Actions tab (the `workflow_dispatch` trigger is already configured).
