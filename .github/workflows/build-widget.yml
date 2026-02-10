@@ -49,7 +49,6 @@ jobs:
           git push
 
       - name: Tag release
-        if: steps.check_changes.outputs.changes == 'true'
         run: |
           VERSION=$(node -p "require('./package.json').version")
           git tag -f "v$VERSION"
