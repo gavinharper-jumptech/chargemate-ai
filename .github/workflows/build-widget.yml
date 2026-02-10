@@ -47,3 +47,10 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git commit -m "chore: build widget [skip ci]"
           git push
+
+      - name: Tag release
+        if: steps.check_changes.outputs.changes == 'true'
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          git tag -f "v$VERSION"
+          git push origin "v$VERSION" --force
