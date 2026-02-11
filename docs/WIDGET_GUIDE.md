@@ -454,7 +454,7 @@ This format allows the widget to apply opacity modifiers when needed.
       ],
       
       i18n: {
-        title: 'ASK VINDIS AI SPECIALIST',
+        title: 'ASK AI SPECIALIST',
         subtitle: 'Explore common questions or ask a bespoke inquiry.',
         inputPlaceholder: 'Type your own question here...',
         sendButtonText: 'ASK AI SPECIALIST'
