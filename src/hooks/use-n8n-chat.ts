@@ -13,9 +13,20 @@ const generateSessionId = (): string => {
   const stored = sessionStorage.getItem("n8n-session-id");
   if (stored) return stored;
 
-  const newId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  const newId = `session-${crypto.randomUUID()}`;
   sessionStorage.setItem("n8n-session-id", newId);
   return newId;
+};
+
+const isValidWebhookUrl = (url: string): boolean => {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:') return false;
+    const hostname = parsed.hostname;
+    if (/^(10|127|172\.(1[6-9]|2[0-9]|3[01])|192\.168)\./.test(hostname)) return false;
+    if (hostname === 'localhost' || hostname === '0.0.0.0') return false;
+    return true;
+  } catch { return false; }
 };
 
 export const useN8nChat = () => {
@@ -32,6 +43,15 @@ export const useN8nChat = () => {
         toast({
           title: "No webhook URL configured",
           description: "Please provide a webhookUrl in your createChat() options.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!isValidWebhookUrl(webhookUrl)) {
+        toast({
+          title: "Invalid webhook URL",
+          description: "The webhook URL must use HTTPS and point to a valid external server.",
           variant: "destructive",
         });
         return;
@@ -106,7 +126,9 @@ export const useN8nChat = () => {
 
         setMessages((prev) => [...prev, assistantMessage]);
       } catch (error) {
-        console.error("n8n webhook error:", error);
+        if (import.meta.env.DEV) {
+          console.error("Webhook error:", error);
+        }
 
         toast({
           title: "Connection failed",
@@ -132,7 +154,7 @@ export const useN8nChat = () => {
   const clearMessages = useCallback(() => {
     setMessages([]);
     // Generate fresh session ID for new conversation
-    const newId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    const newId = `session-${crypto.randomUUID()}`;
     sessionStorage.setItem("n8n-session-id", newId);
     setSessionId(newId);
   }, []);
