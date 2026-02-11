@@ -1,38 +1,61 @@
 
+# Clean Up Repository for Public Visibility
 
-# Fix: Versioned Tag Not Being Created
+## What needs cleaning
 
-## Problem
-The "Tag release" step in the GitHub Actions workflow only runs when `steps.check_changes.outputs.changes == 'true'`. If the built widget files haven't changed (which is likely when only bumping the version), the tag is never created -- so jsDelivr has nothing to serve at `@v1.0.0`.
+After auditing the codebase, here's what was found:
 
-## Fix
+**Vindis-branded test pages (biggest concern):**
+- `public/test-vindis.html` — full Vindis Group branded demo page with their logo URLs, product images, and branding
+- `public/widget/test-vindis.html` — identical copy
 
-### `.github/workflows/build-widget.yml`
-- **Always create the tag** after a successful build, regardless of whether the built files changed
-- Move the tag step outside the `changes == 'true'` condition
-- Keep the commit/push step conditional (no point committing identical files)
+These contain Vindis logos, copyrights, product images, and the text "ASK VINDIS AI SPECIALIST". They should be removed entirely.
 
-```yaml
-      - name: Commit and push
-        if: steps.check_changes.outputs.changes == 'true'
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git commit -m "chore: build widget [skip ci]"
-          git push
+**Vindis reference in documentation:**
+- `docs/WIDGET_GUIDE.md` line 457 uses "ASK VINDIS AI SPECIALIST" in a theming example — should be changed to a generic brand name
 
-      - name: Tag release
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          git tag -f "v$VERSION"
-          git push origin "v$VERSION" --force
+**No actual webhook URLs found** — all webhook references use placeholders like `https://your-api.com/chat` or `https://...`, so that's clean.
+
+## Scrubbing Git history
+
+Simply deleting these files leaves them in the Git history, still viewable on GitHub. To truly remove all traces, you have two options:
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| **Option A: Rewrite history** with `git filter-repo` | Completely removes files from all history | Force-push required; breaks existing clones/forks |
+| **Option B: Delete files + force-push a squashed history** | Clean single-commit history | Loses all commit history |
+
+**Recommended: Option A** — use `git filter-repo` to surgically remove the two test-vindis.html files from all commits. This keeps your commit history intact while erasing the sensitive files.
+
+## Changes in Lovable
+
+1. **Delete** `public/test-vindis.html`
+2. **Delete** `public/widget/test-vindis.html`
+3. **Update** `docs/WIDGET_GUIDE.md` — replace "ASK VINDIS AI SPECIALIST" with a generic example like "ASK AI SPECIALIST"
+
+## Manual step: Scrub Git history
+
+After the Lovable changes are merged, run this locally:
+
+```bash
+# Install git-filter-repo (if not already installed)
+# macOS: brew install git-filter-repo
+# pip: pip install git-filter-repo
+
+# Clone a fresh copy to work on
+git clone https://github.com/gavinharper-jumptech/chargemate-ai.git chargemate-clean
+cd chargemate-clean
+
+# Remove the Vindis test pages from ALL history
+git filter-repo --path public/test-vindis.html --invert-paths
+git filter-repo --path public/widget/test-vindis.html --invert-paths
+
+# Also remove the deleted VindisPreview page from history
+git filter-repo --path src/pages/VindisPreview.tsx --invert-paths
+
+# Force push the cleaned history
+git remote add origin https://github.com/gavinharper-jumptech/chargemate-ai.git
+git push origin main --force
 ```
 
-The only change: remove the `if: steps.check_changes.outputs.changes == 'true'` line from the "Tag release" step.
-
-## After this change
-1. Push this fix to `main`
-2. The workflow triggers (since `package.json` is in the paths filter), builds, and creates the `v1.0.0` tag
-3. jsDelivr can then serve files at `@v1.0.0`
-
-If the workflow doesn't auto-trigger, use the **Run workflow** button on the Actions tab (the `workflow_dispatch` trigger is already configured).
+After force-pushing, GitHub may still cache old data briefly. You can request a garbage collection via GitHub Support if needed, but typically the old blobs become inaccessible within a few hours.
