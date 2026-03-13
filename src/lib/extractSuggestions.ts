@@ -14,10 +14,13 @@ export function extractSuggestions(message: string): string[] {
   // Check for common question patterns that offer choices
   const patterns = [
     /would you like (?:me to |to )?(.+)\?/i,
-    /do you want (?:me to |to )?(?:know |learn |hear )?(about |more about )?(.+)\?/i,
+    /(?:do you )?want (?:me to |to )?(?:know |learn |hear )?(about |more about )?(.+)\?/i,
     /i can (?:explain|help with|provide information about|tell you about) (.+)\?/i,
     /shall i (?:explain|go into|cover) (.+)\?/i,
     /interested in (?:learning about |hearing about )?(.+)\?/i,
+    /should i (?:explain|cover|go over|help with) (.+)\?/i,
+    /(?:any |have )?questions? (?:about|on|regarding) (.+)\?/i,
+    /like (?:me )?to (?:explain|cover|help with|go over) (.+)\?/i,
   ];
 
   let optionsText = "";
