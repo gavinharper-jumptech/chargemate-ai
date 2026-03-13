@@ -25,7 +25,7 @@ const ChatWindow = ({ position = "bottom-right" }: ChatWindowProps) => {
       {/* Chat Panel */}
       <div
         className={cn(
-          "fixed z-50 w-[380px] h-[600px] max-h-[80vh] rounded-2xl shadow-2xl overflow-hidden",
+          "fixed z-50 w-[calc(100vw-2rem)] sm:w-[380px] h-[600px] max-h-[80vh] rounded-2xl shadow-2xl overflow-hidden",
           "bg-background border border-border",
           "transition-all duration-300 ease-out",
           panelPositionClasses[position],
