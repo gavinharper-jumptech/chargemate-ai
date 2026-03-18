@@ -22284,7 +22284,7 @@ const Pw = ({ onSelect: e }) => {
 )) });
 function ZI(e) {
   if (!e) return [];
-  const n = e.split(new RegExp("(?<=[.!?])\\s+")).reverse().find((a) => a.includes("?"));
+  const n = e.split(new RegExp("(?<=[.!?])\\s+")).reverse().find((u) => u.includes("?"));
   if (!n) return [];
   const r = [
     /would you like (?:me to |to )?(.+)\?/i,
@@ -22295,21 +22295,50 @@ function ZI(e) {
     /should i (?:explain|cover|go over|help with) (.+)\?/i,
     /(?:any |have )?questions? (?:about|on|regarding) (.+)\?/i,
     /like (?:me )?to (?:explain|cover|help with|go over) (.+)\?/i
+  ], i = [
+    /(?:^|[.!?]\s+)is (?:it|the|your|their) (.+)\?/i,
+    /(?:^|[.!?]\s+)are (?:you|they|the|your) (.+)\?/i,
+    /(?:^|[.!?]\s+)do you (?:have |see |notice |prefer |want )?(.+)\?/i,
+    /(?:^|[.!?]\s+)does (?:it|the|your) (.+)\?/i,
+    /(?:^|[.!?]\s+)which (.+)\?/i,
+    /(?:^|[.!?]\s+)what (?:type|kind|color|style|size|version) (?:of |is |are |do )?(.+)\?/i,
+    /(?:^|[.!?]\s+)(?:is|are|was|were) (?:there|it) (.+)\?/i
   ];
-  let i = "";
-  for (const a of r) {
-    const u = n.match(a);
-    if (u) {
-      i = u[u.length - 1];
+  let o = "";
+  for (const u of r) {
+    const c = n.match(u);
+    if (c) {
+      o = c[c.length - 1];
       break;
     }
   }
-  if (!i) return [];
-  const l = i.split(/,\s*(?:or|and)?\s*|\s+or\s+|\s+and\s+/).map((a) => a.trim()).filter((a) => a.length > 0 && a.length < 100).map((a) => {
-    let u = a.replace(/^(explain |tell me |learn |hear |know |more )/i, "").replace(/^(about |more about )/i, "").trim();
-    return u = u.charAt(0).toUpperCase() + u.slice(1), u = u.replace(/[?.!]+$/, ""), u;
+  if (!o)
+    for (const u of i) {
+      const c = n.match(u);
+      if (c) {
+        o = c[c.length - 1];
+        break;
+      }
+    }
+  if (!o && (/,\s*.+\bor\b\s+/i.test(n) || /\bor\b/i.test(n))) {
+    const c = n.match(
+      /(?:is|are|do|does|did|can|could|should|would|was|were|has|have|which|what)\b.+?\b(?:is|are|was|were|have|has|see|notice|prefer|experiencing|showing|displaying|doing|getting|using|running|looking|between)?\s+(.+)\?/i
+    );
+    if (c)
+      o = c[1];
+    else {
+      const f = n.match(/([^?]+(?:,\s*(?:or\s+)?[^?,]+)+\s+or\s+[^?]+)\?/i);
+      f && (o = f[1]);
+    }
+  }
+  if (!o) return [];
+  const l = o.split(/,\s*(?:or|and)?\s*|\s+or\s+|\s+and\s+/).map((u) => u.trim()).filter((u) => u.length > 0 && u.length < 100);
+  if (l.length < 2) return [];
+  const s = l.map((u) => {
+    let c = u.replace(/^(explain |tell me |learn |hear |know |more )/i, "").replace(/^(about |more about )/i, "").replace(/\s*\([^)]*\)\s*/g, " ").trim();
+    return c = c.charAt(0).toUpperCase() + c.slice(1), c = c.replace(/[?.!]+$/, ""), c.trim();
   });
-  return [...new Set(l)].filter((a) => a.length >= 3).slice(0, 4);
+  return [...new Set(s)].filter((u) => u.length >= 2).slice(0, 4);
 }
 const JI = () => {
   const { welcomeTitle: e, welcomeMessage: t } = Zr();
