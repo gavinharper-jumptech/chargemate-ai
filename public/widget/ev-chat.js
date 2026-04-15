@@ -22220,7 +22220,7 @@ const Pw = ({ onSelect: e }) => {
     const u = a.target.value;
     u && (e(u), a.target.value = "");
   };
-  return /* @__PURE__ */ T.jsxs("div", { className: "flex flex-col w-full", children: [
+  return /* @__PURE__ */ T.jsxs("div", { className: "flex flex-col w-full overflow-hidden", children: [
     /* @__PURE__ */ T.jsx(
       "div",
       {
@@ -22263,7 +22263,7 @@ const Pw = ({ onSelect: e }) => {
         variant: "outline",
         size: "sm",
         onClick: () => e(a),
-        className: "border-[var(--chip-border)] bg-[hsl(var(--chip-bg))] text-[hsl(var(--chip-text))] transition-colors h-auto py-2 px-3 hover:bg-[hsl(var(--chip-hover-bg))] hover:border-[hsl(var(--chip-hover-border))] hover:text-[hsl(var(--chip-hover-text))]",
+        className: "border-[var(--chip-border)] bg-[hsl(var(--chip-bg))] text-[hsl(var(--chip-text))] transition-colors h-auto py-2 px-3 hover:bg-[hsl(var(--chip-hover-bg))] hover:border-[hsl(var(--chip-hover-border))] hover:text-[hsl(var(--chip-hover-text))] whitespace-normal text-left",
         style: { borderRadius: "var(--chip-radius)" },
         children: a
       },
@@ -22498,7 +22498,7 @@ const dm = ({ onSend: e, isLoading: t }) => {
     "form",
     {
       onSubmit: s,
-      className: "flex items-end gap-2 bg-card p-4",
+      className: "flex flex-col sm:flex-row items-stretch sm:items-end gap-2 bg-card p-4",
       style: { borderTop: "1px solid var(--input-container-border)" },
       children: [
         /* @__PURE__ */ T.jsx(
@@ -22518,7 +22518,7 @@ const dm = ({ onSend: e, isLoading: t }) => {
           {
             type: "submit",
             disabled: !r.trim() || t,
-            className: "h-11 shrink-0 px-4 hover:bg-[hsl(var(--primary-hover))]",
+            className: "h-11 shrink-0 px-4 hover:bg-[hsl(var(--primary-hover))] w-full sm:w-auto text-xs sm:text-sm truncate",
             style: {
               borderRadius: "var(--button-radius)",
               backgroundColor: "hsl(var(--primary))"
@@ -22572,7 +22572,7 @@ const dm = ({ onSend: e, isLoading: t }) => {
     ),
     /* @__PURE__ */ T.jsxs("div", { className: "flex-shrink-0", children: [
       /* @__PURE__ */ T.jsx(e_, {}),
-      /* @__PURE__ */ T.jsx("div", { className: "flex justify-center px-4 pb-4", children: /* @__PURE__ */ T.jsx(Pw, { onSelect: c }) }),
+      /* @__PURE__ */ T.jsx("div", { className: "flex justify-center px-4 pb-4 overflow-hidden", children: /* @__PURE__ */ T.jsx(Pw, { onSelect: c }) }),
       /* @__PURE__ */ T.jsx(dm, { onSend: u, isLoading: i })
     ] }),
     /* @__PURE__ */ T.jsx(
