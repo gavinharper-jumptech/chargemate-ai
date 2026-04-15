@@ -35,7 +35,7 @@ const CategorizedQuickActions = ({ onSelect }: CategorizedQuickActionsProps) => 
    };
  
    return (
-     <div className="flex flex-col w-full">
+     <div className="flex flex-col w-full overflow-hidden">
         {/* Category Tabs */}
           <div 
             className={cn(
