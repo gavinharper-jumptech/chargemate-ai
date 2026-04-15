@@ -35,7 +35,7 @@ const CategorizedQuickActions = ({ onSelect }: CategorizedQuickActionsProps) => 
    };
  
    return (
-     <div className="flex flex-col w-full">
+     <div className="flex flex-col w-full overflow-hidden">
         {/* Category Tabs */}
           <div 
             className={cn(
@@ -88,7 +88,7 @@ const CategorizedQuickActions = ({ onSelect }: CategorizedQuickActionsProps) => 
                   variant="outline"
                   size="sm"
                   onClick={() => onSelect(question)}
-                  className="border-[var(--chip-border)] bg-[hsl(var(--chip-bg))] text-[hsl(var(--chip-text))] transition-colors h-auto py-2 px-3 hover:bg-[hsl(var(--chip-hover-bg))] hover:border-[hsl(var(--chip-hover-border))] hover:text-[hsl(var(--chip-hover-text))]"
+                  className="border-[var(--chip-border)] bg-[hsl(var(--chip-bg))] text-[hsl(var(--chip-text))] transition-colors h-auto py-2 px-3 hover:bg-[hsl(var(--chip-hover-bg))] hover:border-[hsl(var(--chip-hover-border))] hover:text-[hsl(var(--chip-hover-text))] whitespace-normal text-left"
                   style={{ borderRadius: 'var(--chip-radius)' }}
                 >
                   {question}

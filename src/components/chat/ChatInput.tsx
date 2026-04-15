@@ -78,7 +78,7 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-end gap-2 bg-card p-4"
+      className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2 bg-card p-4"
       style={{ borderTop: '1px solid var(--input-container-border)' }}
     >
       <Textarea
@@ -94,7 +94,7 @@ const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
         <Button
           type="submit"
           disabled={!input.trim() || isLoading}
-          className="h-11 shrink-0 px-4 hover:bg-[hsl(var(--primary-hover))]"
+          className="h-11 shrink-0 px-4 hover:bg-[hsl(var(--primary-hover))] w-full sm:w-auto text-xs sm:text-sm truncate"
           style={{ 
             borderRadius: 'var(--button-radius)',
             backgroundColor: 'hsl(var(--primary))',
