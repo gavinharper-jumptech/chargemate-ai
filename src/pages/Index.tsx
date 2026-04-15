@@ -57,7 +57,7 @@ const Index = ({ className, onClearMessagesRef }: IndexProps) => {
         {/* Static top section */}
         <div className="flex-shrink-0">
           <WelcomeSection />
-          <div className="flex justify-center px-4 pb-4">
+          <div className="flex justify-center px-4 pb-4 overflow-hidden">
             <CategorizedQuickActions onSelect={handleQuickAction} />
           </div>
           <ChatInput onSend={handleSend} isLoading={isLoading} />
